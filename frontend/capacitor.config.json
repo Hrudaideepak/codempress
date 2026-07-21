@@ -1,0 +1,19 @@
+{
+  "appId": "app.vercel.codempress",
+  "appName": "CodeEmpress",
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
+    "CapacitorCookies": {
+      "enabled": true
+    },
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "clientId": "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com",
+      "serverClientId": "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
+}

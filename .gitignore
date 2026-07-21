@@ -1,0 +1,46 @@
+# Secrets — never commit
+client_secret_*.json
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# SQLite database (regenerate via content_generator.py)
+database/*.db
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Android / Capacitor build artifacts
+android/
+.capacitor/
+*.keystore
+*.jks
+*.apk
+*.aab
+*.zip
+_signing_keys_DO_NOT_COMMIT/
+signing-key-info.txt
+# Env
+.env
+.env.*
+!.env.example
+
+# OpenCode config (may contain local secrets / API keys)
+.opencode/
+.opencode.jsonc
+opencode.jsonc
+
+# Downloaded installers
+*.exe
+

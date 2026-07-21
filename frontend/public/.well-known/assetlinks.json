@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.codempress",
+      "sha256_cert_fingerprints": [
+        "A9:D6:18:1E:E7:52:74:9E:E1:5A:17:79:B9:AE:5D:F7:28:84:8D:EC:72:64:6D:73:21:53:E7:AB:45:27:62:53",
+        "A5:5D:D1:B2:84:89:A6:0F:EE:56:67:7A:8D:87:99:9D:52:C1:F5:4C:9B:54:5F:E9:17:2C:CB:37:33:5B:0F:65"
+      ]
+    }
+  }
+]

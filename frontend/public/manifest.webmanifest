@@ -1,0 +1,38 @@
+{
+  "id": "/codempress",
+  "name": "Codempress",
+  "short_name": "Codempress",
+  "description": "Gamified coding education — read theory, take quizzes, level up.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#f7f6fb",
+  "theme_color": "#7C3AED",
+  "categories": ["education", "productivity"],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ca-31a8e6d60a39",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "any", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.png", "sizes": "any", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Arcane Library",
+      "short_name": "Library",
+      "description": "Browse all subjects and topics.",
+      "url": "/library"
+    },
+    {
+      "name": "Continue Learning",
+      "short_name": "Continue",
+      "description": "Jump back into your last topic.",
+      "url": "/topic/1"
+    }
+  ]
+}
+
