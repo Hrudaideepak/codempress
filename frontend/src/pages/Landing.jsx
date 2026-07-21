@@ -13,6 +13,9 @@ export default function Landing() {
       <div className="hero landing">
         <HeroScene />
         <div className="hero-content landing-content">
+          <div style={{ textAlign: "center", marginBottom: "15px" }}>
+            <img src="/brand/master_logo.png" alt="CodeEmpress" style={{ maxWidth: "220px", height: "auto" }} />
+          </div>
           <span className="landing-badge">✦ Gamified Coding Education</span>
           <h1>
             Forge your <span>coding mastery</span>

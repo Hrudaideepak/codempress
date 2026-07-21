@@ -95,6 +95,7 @@ export default function Quiz() {
     return (
       <div className="container">
         <div className="state">
+          <img src="/brand/avatar_thinking.png" alt="Thinking" style={{ width: "90px", height: "auto", marginBottom: "15px" }} />
           <h2>Loading challenges…</h2>
         </div>
       </div>
@@ -104,6 +105,7 @@ export default function Quiz() {
     return (
       <div className="container">
         <div className="state">
+          <img src="/brand/empty_state.png" alt="Empty" style={{ width: "100px", height: "auto", marginBottom: "15px" }} />
           <h2>No quiz available</h2>
           <p>This topic has no active questions yet.</p>
           <Link className="back-link" to={`/topic/${id}`}>
@@ -118,6 +120,7 @@ export default function Quiz() {
     return (
       <div className="container">
         <div className="state">
+          <img src="/brand/avatar_focused.png" alt="Read Theory" style={{ width: "90px", height: "auto", marginBottom: "15px" }} />
           <h2>Read the theory first 📖</h2>
           <p>
             You can only take the practice quiz after reading this topic's
@@ -135,6 +138,11 @@ export default function Quiz() {
       <div className="container">
         <RewardBanner reward={reward} onClose={() => setReward(null)} />
         <div className="state">
+          <img
+            src={passed ? "/brand/avatar_celebration.png" : "/brand/avatar_oops.png"}
+            alt={passed ? "Passed" : "Failed"}
+            style={{ width: "100px", height: "auto", marginBottom: "15px" }}
+          />
           <h2>{passed ? "Topic passed! 🎉" : "Not passed yet"}</h2>
           <p>
             You scored <strong>{score}/{questions.length}</strong>. You need at
