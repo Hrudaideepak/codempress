@@ -3,7 +3,11 @@ import sqlite3
 import asyncio
 from pathlib import Path
 from httpx import AsyncClient, ASGITransport
-from playwright.sync_api import Page, expect
+try:
+    from playwright.sync_api import Page, expect
+except ImportError:
+    Page = None
+    expect = None
 
 # Assuming the project structure places backend in the root
 from backend.main import app
