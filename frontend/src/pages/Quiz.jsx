@@ -20,13 +20,25 @@ export default function Quiz() {
   const toast = useToast();
 
   useEffect(() => {
-    api
-      .getTopic(id)
-      .then((topicData) => {
-        setQuestions(topicData.questions || []);
-        setStatus(topicData.questions?.length ? "ready" : "empty");
-      })
-      .catch(() => setStatus("error"));
+    let isMounted = true;
+    const loadQuiz = async () => {
+      try {
+        let topicData = await api.getTopic(id);
+        if (!topicData.questions || topicData.questions.length === 0) {
+          // Trigger on-demand AI generation if questions not yet cached
+          await api.generateTopic(id);
+          topicData = await api.getTopic(id);
+        }
+        if (isMounted) {
+          setQuestions(topicData.questions || []);
+          setStatus(topicData.questions?.length ? "ready" : "empty");
+        }
+      } catch (err) {
+        if (isMounted) setStatus("error");
+      }
+    };
+    loadQuiz();
+    return () => { isMounted = false; };
   }, [id]);
 
   const current = questions[index];

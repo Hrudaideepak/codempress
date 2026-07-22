@@ -116,7 +116,7 @@ export default function TopicReader() {
     );
 
   const parsedTheory = topic.theory_json ? (typeof topic.theory_json === "string" ? JSON.parse(topic.theory_json) : topic.theory_json) : null;
-  const view = content || parsedTheory || topic;
+  const view = (content && content.theory) ? content.theory : (parsedTheory || topic);
 
   return (
     <div className="container">
