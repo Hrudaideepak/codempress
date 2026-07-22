@@ -17,27 +17,51 @@ export default function Quiz() {
   const [finished, setFinished] = useState(false);
   const [passed, setPassed] = useState(false);
   const [masteryResult, setMasteryResult] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
   const toast = useToast();
 
   useEffect(() => {
-    if (!id) return;
     let isMounted = true;
     const loadQuiz = async () => {
+      setStatus("loading");
       try {
-        let topicData = await api.getTopic(id);
-        if (!topicData.questions || topicData.questions.length === 0) {
-          // Trigger on-demand AI generation if questions not yet cached
-          await api.generateTopic(id);
-          topicData = await api.getTopic(id);
+        const topicId = id || (typeof window !== "undefined" ? (window.location.pathname.split("/quiz/")[1] || "").split("/")[0] : "");
+        if (!topicId || topicId === "undefined") return;
+
+        const token = localStorage.getItem("sf_token") || "";
+        let res = await fetch(`/api/topics/${topicId}?_t=${Date.now()}`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": `Bearer ${token}` } : {})
+          }
+        });
+
+        let topicData = await res.json();
+
+        if (!topicData || !topicData.questions || topicData.questions.length === 0) {
+          await api.generateTopic(topicId);
+          res = await fetch(`/api/topics/${topicId}?_t=${Date.now()}`, {
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            }
+          });
+          topicData = await res.json();
         }
+
+        const questionsList = topicData?.questions || [];
+        console.log("[QUIZ DEBUG]", { topicId, questionsCount: questionsList.length, topicData });
         if (isMounted) {
-          setQuestions(topicData.questions || []);
-          setStatus(topicData.questions?.length ? "ready" : "empty");
+          setQuestions(questionsList);
+          setStatus(questionsList.length > 0 ? "ready" : "empty");
         }
       } catch (err) {
-        if (isMounted) setStatus("error");
+        if (isMounted) {
+          setErrorMsg(err.message || "Failed to load quiz questions");
+          setStatus("error");
+        }
       }
     };
     loadQuiz();
@@ -94,8 +118,21 @@ export default function Quiz() {
   if (status === "loading")
     return (
       <div className="container">
-        <div className="state">
-          <h2>Preparing quiz assessment…</h2>
+        <div className="state" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px" }}>
+          <div style={{
+            width: "54px",
+            height: "54px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, #f59e0b 0%, #d97706 100%)",
+            boxShadow: "0 0 24px rgba(245, 158, 11, 0.6), 0 0 48px rgba(245, 158, 11, 0.3)",
+            display: "grid",
+            placeItems: "center",
+            marginBottom: "20px"
+          }}>
+            <HelpCircle size={28} color="#ffffff" />
+          </div>
+          <h2 style={{ color: "#b45309", fontSize: "22px", fontWeight: 700 }}>Preparing Quiz Assessment…</h2>
+          <p style={{ color: "#d97706", fontSize: "14px", marginTop: "6px" }}>Fetching question bank and configuring options</p>
         </div>
       </div>
     );
@@ -104,7 +141,7 @@ export default function Quiz() {
     return (
       <div className="container">
         <div className="state">
-          <h2>No quiz questions found</h2>
+          <h2>{errorMsg || "No quiz questions found"}</h2>
           <p>Generate theory and questions first for this topic.</p>
           <Link className="back-link" to={`/topic/${id}`}>
             ← Back to Topic
@@ -209,30 +246,100 @@ export default function Quiz() {
           )}
 
           {/* Options */}
-          <div className="options">
-            {current.options.map((opt, i) => (
-              <button
-                key={i}
-                className={selected === i ? "option selected" : "option"}
-                disabled={selected !== null}
-                onClick={() => handleSelect(i)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "16px 20px"
-                }}
-              >
-                <span>{opt}</span>
-                {selected === i && (
-                  i === current.correct_answer ? (
-                    <CheckCircle2 size={20} color="#16a34a" />
-                  ) : (
-                    <XCircle size={20} color="#be123c" />
-                  )
-                )}
-              </button>
-            ))}
+          <div className="options" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {current.options.map((opt, i) => {
+              const isSelected = selected === i;
+              const isCorrect = i === current.correct_answer;
+              const hasAnswered = selected !== null;
+
+              let cardBg = "#ffffff";
+              let cardBorder = "1.5px solid #e5e7eb";
+              let cardGlow = "none";
+              let textColor = "#1f2937";
+
+              if (hasAnswered) {
+                if (isCorrect) {
+                  cardBg = "rgba(16, 185, 129, 0.08)";
+                  cardBorder = "2px solid #10b981";
+                  cardGlow = "0 0 20px rgba(16, 185, 129, 0.4)";
+                  textColor = "#065f46";
+                } else if (isSelected) {
+                  cardBg = "rgba(239, 68, 68, 0.08)";
+                  cardBorder = "2px solid #ef4444";
+                  cardGlow = "0 0 20px rgba(239, 68, 68, 0.4)";
+                  textColor = "#991b1b";
+                }
+              }
+
+              return (
+                <button
+                  key={i}
+                  className="option"
+                  disabled={hasAnswered}
+                  onClick={() => handleSelect(i)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "18px 24px",
+                    borderRadius: "16px",
+                    background: cardBg,
+                    border: cardBorder,
+                    boxShadow: cardGlow,
+                    color: textColor,
+                    fontWeight: isSelected || (hasAnswered && isCorrect) ? 700 : 500,
+                    fontSize: "15px",
+                    cursor: hasAnswered ? "default" : "pointer",
+                    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <span style={{
+                      width: "28px",
+                      height: "28px",
+                      borderRadius: "50%",
+                      background: isCorrect && hasAnswered ? "#10b981" : isSelected && !isCorrect ? "#ef4444" : "#f3f4f6",
+                      color: (isCorrect && hasAnswered) || (isSelected && !isCorrect) ? "#ffffff" : "#4b5563",
+                      display: "grid",
+                      placeItems: "center",
+                      fontSize: "13px",
+                      fontWeight: 700
+                    }}>
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    <span>{opt}</span>
+                  </span>
+
+                  {hasAnswered && (
+                    isCorrect ? (
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        color: "#10b981",
+                        fontWeight: 700,
+                        fontSize: "14px"
+                      }}>
+                        <span>Correct</span>
+                        <CheckCircle2 size={22} color="#10b981" />
+                      </div>
+                    ) : isSelected ? (
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        color: "#ef4444",
+                        fontWeight: 700,
+                        fontSize: "14px"
+                      }}>
+                        <span>Wrong</span>
+                        <XCircle size={22} color="#ef4444" />
+                      </div>
+                    ) : null
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Bottom Action Controls */}

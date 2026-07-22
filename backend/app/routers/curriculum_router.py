@@ -84,7 +84,7 @@ async def get_topic_detail(topic_id: int, current_user: dict = Depends(get_curre
         raise HTTPException(status_code=404, detail="Topic not found")
 
     topic = topic_rows[0]
-    questions_rows = await execute_query("SELECT _id, question_text, code_snippet, options_json FROM questions WHERE topic_id = ?", (topic_id,))
+    questions_rows = await execute_query("SELECT _id, question_text, code_snippet, options_json, correct_answer FROM questions WHERE topic_id = ?", (topic_id,))
     
     progress_rows = await execute_query("SELECT * FROM user_progress WHERE user_id = ? AND topic_id = ?", (user_id, topic_id))
     mastery_percent = progress_rows[0]["mastery_percent"] if progress_rows else 0
@@ -111,7 +111,8 @@ async def get_topic_detail(topic_id: int, current_user: dict = Depends(get_curre
                 "_id": q["_id"],
                 "question_text": q["question_text"],
                 "code_snippet": q["code_snippet"],
-                "options": json.loads(q["options_json"])
+                "options": json.loads(q["options_json"]),
+                "correct_answer": q["correct_answer"] if q["correct_answer"] is not None else 0
             }
             for q in questions_rows
         ]
