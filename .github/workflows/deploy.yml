@@ -27,7 +27,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest httpx pytest-asyncio anyio
 
+      - name: Seed Database Skeleton
+        run: python content/seed_topics.py
+
       - name: Run E2E Test Suite
+        env:
+          PYTHONPATH: .
         run: python -m pytest -k "not test_frontend_rendering"
 
   build-containers:
