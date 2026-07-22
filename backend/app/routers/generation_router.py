@@ -13,14 +13,28 @@ You are an expert Computer Science educator writing clear, bite-sized theory for
 Topic Title: "{title}"
 Subject: "{subject}"
 
+CRITICAL RULE FOR CODE SNIPPETS:
+You MUST write the code example strictly in the programming language of the Subject:
+- If Subject is "C Programming": Write standard C code (#include <stdio.h>, int main())
+- If Subject is "C++" or "Object-Oriented Programming": Write C++ code (#include <iostream>, int main())
+- If Subject is "HTML": Write HTML5 markup (<!DOCTYPE html><html>...)
+- If Subject is "CSS": Write CSS style rules (.selector { property: value; })
+- If Subject is "JavaScript" or "Node.js" or "Three.js": Write modern JavaScript / ES6
+- If Subject is "SQL" or "Database Management Systems": Write SQL queries (SELECT ... FROM ...)
+- If Subject is "Python" or "NumPy" or "Pandas" or "Scikit-learn" or "Machine Learning": Write Python 3
+- If Subject is "Flutter": Write Dart / Flutter widget code
+- If Subject is "React" or "React Native": Write React JSX component code
+
+DO NOT output Python code when the subject is C, HTML, CSS, SQL, or JavaScript!
+
 Provide comprehensive theory in JSON format with the following exact keys:
 {
   "markdown": "Markdown text explaining the concept clearly. Use bolding for key terms.",
   "code_example": {
      "title": "Clear Code Example Title",
-     "code": "A code snippet in the appropriate programming language for the subject (e.g. use HTML for Web/HTML, CSS for Styling/CSS, SQL for Database/SQL, JS/TS for JavaScript/TypeScript, C++ for C++ topics). DO NOT use Python for HTML or Web topics!",
+     "code": "Code snippet in the EXACT programming language of the subject",
      "explanation": "Brief explanation of how the code works line by line",
-     "expected_output": "Expected console stdout, browser view, or database query results representation"
+     "expected_output": "Expected console stdout, browser view, or database query results"
   }
 }
 Return ONLY valid JSON.
@@ -72,8 +86,24 @@ def get_fallback_code_example(title: str, subject: str) -> dict:
     sub_lower = subject.lower()
     title_lower = title.lower()
     
-    # 1. HTML / Web Development
-    if "html" in sub_lower or "html" in title_lower or "web" in sub_lower:
+    # 1. C Programming
+    if "c programming" in sub_lower or sub_lower == "c" or "c lang" in sub_lower:
+        return {
+            "title": "C Program for {title}".format(title=title),
+            "code": (
+                "#include <stdio.h>\n\n"
+                "int main() {\n"
+                "    // Demonstrating {title} in C\n"
+                "    printf(\"Executing C concept: {title}\\n\");\n"
+                "    return 0;\n"
+                "}"
+            ).format(title=title),
+            "explanation": "Standard C main entry point including stdio.h and executing printf for output formatting.",
+            "expected_output": "Executing C concept: {title}".format(title=title)
+        }
+        
+    # 2. HTML / Web Development
+    elif "html" in sub_lower or "html" in title_lower or "web" in sub_lower:
         return {
             "title": "Basic HTML Structure for {title}".format(title=title),
             "code": (
@@ -81,87 +111,92 @@ def get_fallback_code_example(title: str, subject: str) -> dict:
                 "<html>\n"
                 "<head>\n"
                 "  <meta charset=\"utf-8\">\n"
-                "  <title>Demystifying {title}</title>\n"
+                "  <title>{title}</title>\n"
                 "</head>\n"
                 "<body>\n"
-                "  <h1>Welcome to {title}</h1>\n"
-                "  <p>Exploring the core concepts of {title} in Web Development.</p>\n"
+                "  <h1>Exploring {title}</h1>\n"
+                "  <p>HTML5 semantic structure for web applications.</p>\n"
                 "</body>\n"
                 "</html>"
             ).format(title=title),
             "explanation": "Standard HTML5 skeletal markup containing header meta, page title, and structured content elements.",
-            "expected_output": "Rendered web page displaying h1 heading: 'Welcome to {title}'".format(title=title)
+            "expected_output": "Rendered web page displaying h1 heading: 'Exploring {title}'".format(title=title)
         }
         
-    # 2. CSS
+    # 3. CSS
     elif "css" in sub_lower or "css" in title_lower or "style" in sub_lower:
         return {
-            "title": "CSS Layout for {title}".format(title=title),
+            "title": "CSS Styling Rule for {title}".format(title=title),
             "code": (
                 "/* CSS layout rule for {title} */\n"
                 ".concept-box {{\n"
                 "  display: flex;\n"
                 "  justify-content: center;\n"
                 "  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);\n"
-                "  border: 2px solid #ffffff;\n"
+                "  color: #ffffff;\n"
                 "  border-radius: 12px;\n"
                 "  padding: 24px;\n"
-                "  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);\n"
                 "}}"
             ).format(title=title),
             "explanation": "CSS class declarations implementing flex layouts, visual gradients, and responsive margins.",
             "expected_output": "Rendered visual grid with a rounded purple-to-violet gradient container card."
         }
         
-    # 3. JavaScript / TypeScript
-    elif "javascript" in sub_lower or "js" in sub_lower or "typescript" in sub_lower or "ts" in sub_lower:
-        func_name = title.replace(' ', '')
+    # 4. JavaScript / TypeScript
+    elif "javascript" in sub_lower or "js" in sub_lower or "typescript" in sub_lower or "node" in sub_lower:
+        func_name = title.replace(' ', '').replace('&', '').replace('-', '')
         return {
             "title": "JavaScript execution of {title}".format(title=title),
             "code": (
                 "// JavaScript function validating {title}\n"
                 "function run{func_name}() {{\n"
                 "  const concept = '{title}';\n"
-                "  console.log(`Successfully running: ${{concept}}`);\n"
+                "  console.log(`Executing JS: ${{concept}}`);\n"
                 "}}\n\n"
                 "run{func_name}();"
             ).format(title=title, func_name=func_name),
             "explanation": "Declares an ES6 function execution logging the current topic status directly to the developer console.",
-            "expected_output": "Successfully running: {title}".format(title=title)
+            "expected_output": "Executing JS: {title}".format(title=title)
         }
         
-    # 4. SQL / Database
-    elif "sql" in sub_lower or "database" in sub_lower or "query" in title_lower or "table" in title_lower:
+    # 5. SQL / Database
+    elif "sql" in sub_lower or "database" in sub_lower or "query" in title_lower:
         return {
-            "title": "SQL SELECT Statement for {title}".format(title=title),
+            "title": "SQL Query for {title}".format(title=title),
             "code": (
-                "-- Querying records for {title}\n"
-                "SELECT _id, title, level_name FROM curriculum_topics\n"
-                "WHERE subject_name = '{subject}' AND title = '{title}'\n"
-                "LIMIT 1;"
+                "-- SQL query execution for {title}\n"
+                "SELECT _id, title, level FROM topics\n"
+                "WHERE subject_name = '{subject}'\n"
+                "LIMIT 5;"
             ).format(title=title, subject=subject),
             "explanation": "Standard ANSI-SQL relational query filtering columns based on the subject and topic filters.",
-            "expected_output": "Table row matching topic: '{title}'".format(title=title)
+            "expected_output": "5 database rows returned from topics table."
         }
         
-    # 5. C++ / C
-    elif "c++" in sub_lower or "cpp" in sub_lower or "c#" in sub_lower:
+    # 6. C++ / Object-Oriented Programming
+    elif "c++" in sub_lower or "cpp" in sub_lower or "object-oriented" in sub_lower:
         return {
-            "title": "C++ Console Execution for {title}".format(title=title),
+            "title": "C++ OOP Execution for {title}".format(title=title),
             "code": (
                 "#include <iostream>\n"
                 "#include <string>\n\n"
-                "int main() {{\n"
-                "    std::string topic = \"{title}\";\n"
-                "    std::cout << \"Learning topic: \" << topic << std::endl;\n"
+                "class ConceptDemo {\n"
+                "public:\n"
+                "    void display() {\n"
+                "        std::cout << \"C++ OOP Concept: {title}\" << std::endl;\n"
+                "    }\n"
+                "};\n\n"
+                "int main() {\n"
+                "    ConceptDemo demo;\n"
+                "    demo.display();\n"
                 "    return 0;\n"
-                "}}"
+                "}"
             ).format(title=title),
-            "explanation": "Includes standard iostream libraries and executes standard namespace console prints.",
-            "expected_output": "Learning topic: {title}".format(title=title)
+            "explanation": "C++ class definition instantiation executing member methods.",
+            "expected_output": "C++ OOP Concept: {title}".format(title=title)
         }
         
-    # 6. Default Fallback (Python)
+    # 7. Default Fallback (Python)
     else:
         return {
             "title": "Python implementation of {title}".format(title=title),
