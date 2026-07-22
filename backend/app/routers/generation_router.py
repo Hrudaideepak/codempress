@@ -43,13 +43,29 @@ Return ONLY valid JSON.
 """
 
 def parse_ai_json(raw_content: str) -> str:
-    """Cleans and extracts JSON raw payload from Markdown block syntax wrappers."""
+    """Cleans and extracts JSON raw payload from Markdown block syntax wrappers or conversational text."""
     cleaned = raw_content.strip()
-    if cleaned.startswith("```json"):
-        cleaned = cleaned.replace("```json", "", 1)
-    if cleaned.endswith("```"):
-        cleaned = cleaned.rsplit("```", 1)[0]
-    return cleaned.strip()
+    if "```json" in cleaned:
+        cleaned = cleaned.split("```json", 1)[1].split("```", 1)[0]
+    elif "```" in cleaned:
+        cleaned = cleaned.split("```", 1)[1].split("```", 1)[0]
+    
+    cleaned = cleaned.strip()
+    
+    # Extract JSON object {...} or array [...] boundaries if extra text exists
+    first_obj = cleaned.find("{")
+    first_arr = cleaned.find("[")
+    
+    if first_obj != -1 and (first_arr == -1 or first_obj < first_arr):
+        last_obj = cleaned.rfind("}")
+        if last_obj != -1:
+            return cleaned[first_obj:last_obj + 1]
+    elif first_arr != -1:
+        last_arr = cleaned.rfind("]")
+        if last_arr != -1:
+            return cleaned[first_arr:last_arr + 1]
+            
+    return cleaned
 
 def get_fallback_code_example(title: str, subject: str) -> dict:
     """Returns a highly specific fallback code example in the correct language for the topic/subject."""
