@@ -163,7 +163,7 @@ async def get_library(current_user: dict = Depends(get_current_user)):
             topics_list.append({
                 "id": t_id,
                 "title": t["title"],
-                "description": t["description"],
+                "description": t.get("description", ""),
                 "level_name": level,
                 "locked": locked,
                 "cleared": cleared,
