@@ -17,7 +17,9 @@ function renderBody(text) {
 }
 
 export default function TopicReader() {
-  const { id } = useParams();
+  const params = useParams();
+  const rawId = params.id || (typeof window !== "undefined" ? (window.location.pathname.split("/topic/")[1] || "").split("/")[0] : "");
+  const id = rawId && rawId !== "undefined" ? rawId : "";
   const [topic, setTopic] = useState(null);
   const [content, setContent] = useState(null);
   const [status, setStatus] = useState("loading");

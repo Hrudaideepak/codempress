@@ -6,7 +6,9 @@ import RewardBanner from "../RewardBanner";
 import { CheckCircle2, XCircle, Award, ArrowLeft, ArrowRight, HelpCircle, Sparkles } from "lucide-react";
 
 export default function Quiz() {
-  const { id } = useParams();
+  const params = useParams();
+  const rawId = params.id || (typeof window !== "undefined" ? (window.location.pathname.split("/quiz/")[1] || "").split("/")[0] : "");
+  const id = rawId && rawId !== "undefined" ? rawId : "";
   const [questions, setQuestions] = useState([]);
   const [status, setStatus] = useState("loading");
   const [index, setIndex] = useState(0);
