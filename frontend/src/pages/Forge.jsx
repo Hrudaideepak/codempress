@@ -114,22 +114,62 @@ export default function Forge() {
   const runCode = async () => {
     setOutput("Executing script...");
     if (lang === "javascript") {
-      const logs = [];
-      const oldLog = console.log;
-      console.log = (...args) => {
-        logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-      };
-
       try {
-        const result = new Function(code)();
-        if (result !== undefined) {
-          logs.push(`→ Return: ${typeof result === 'object' ? JSON.stringify(result) : String(result)}`);
-        }
-        setOutput(logs.join("\n") || "Script ran successfully with no log outputs.");
+        const workerCode = `
+          self.onmessage = function(e) {
+            const logs = [];
+            const customConsole = {
+              log: function(...args) {
+                logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+              }
+            };
+            try {
+              const fn = new Function('console', e.data);
+              const result = fn(customConsole);
+              if (result !== undefined) {
+                logs.push('→ Return: ' + (typeof result === 'object' ? JSON.stringify(result) : String(result)));
+              }
+              self.postMessage({ status: 'success', output: logs.join('\\n') || 'Script ran successfully with no log outputs.' });
+            } catch(err) {
+              self.postMessage({ status: 'error', error: err.message });
+            }
+          };
+        `;
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const worker = new Worker(URL.createObjectURL(blob));
+
+        worker.onmessage = (e) => {
+          if (e.data.status === 'success') {
+            setOutput(e.data.output);
+          } else {
+            setOutput(`⚠️ JS Evaluation Error: ${e.data.error}`);
+          }
+          worker.terminate();
+        };
+
+        worker.onerror = (err) => {
+          setOutput(`⚠️ JS Execution Error: ${err.message}`);
+          worker.terminate();
+        };
+
+        worker.postMessage(code);
       } catch (err) {
-        setOutput(`⚠️ JS Evaluation Error: ${err.message}`);
-      } finally {
-        console.log = oldLog;
+        const logs = [];
+        const oldLog = console.log;
+        console.log = (...args) => {
+          logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+        };
+        try {
+          const result = new Function(code)();
+          if (result !== undefined) {
+            logs.push(`→ Return: ${typeof result === 'object' ? JSON.stringify(result) : String(result)}`);
+          }
+          setOutput(logs.join("\n") || "Script ran successfully with no log outputs.");
+        } catch (e) {
+          setOutput(`⚠️ JS Evaluation Error: ${e.message}`);
+        } finally {
+          console.log = oldLog;
+        }
       }
     } else {
       // Python (Pyodide WebAssembly)
