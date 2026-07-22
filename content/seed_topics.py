@@ -20,6 +20,7 @@ def init_and_seed_db():
     
     conn = sqlite3.connect(str(DB_PATH))
     cursor = conn.cursor()
+    cursor.execute("PRAGMA journal_mode = WAL;")
 
     # Execute schema DDL
     print(f"Reading schema DDL from {SCHEMA_PATH}...")
