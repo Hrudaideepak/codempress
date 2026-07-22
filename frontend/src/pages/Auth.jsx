@@ -233,9 +233,11 @@ export default function Auth() {
 
         <form className="auth-form" onSubmit={submit}>
           {isSignup && (
-            <label className="auth-field">
+            <label className="auth-field" htmlFor="signup-name">
               <span>Name</span>
               <input
+                id="signup-name"
+                name="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -245,9 +247,11 @@ export default function Auth() {
             </label>
           )}
 
-          <label className="auth-field">
+          <label className="auth-field" htmlFor="auth-email">
             <span>Email</span>
             <input
+              id="auth-email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -259,10 +263,12 @@ export default function Auth() {
             )}
           </label>
 
-          <label className="auth-field">
+          <label className="auth-field" htmlFor="auth-password">
             <span>Password</span>
             <div className="pwd-wrap">
               <input
+                id="auth-password"
+                name="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

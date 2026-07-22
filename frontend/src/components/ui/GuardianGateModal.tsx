@@ -428,6 +428,8 @@ function TerminalView({ remote }: { remote?: {
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <span style={{ color: "#45A29E" }}>$</span>
             <input
+              id="guardian-gate-input"
+              name="commandInput"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}

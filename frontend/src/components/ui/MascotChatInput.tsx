@@ -80,6 +80,8 @@ export default function MascotChatInput({ inline = false }: Props) {
       {/* Text input */}
       <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <input
+          id="mascot-chat-input"
+          name="mascotMessage"
           ref={inputRef}
           type="text"
           value={input}

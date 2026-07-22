@@ -258,6 +258,8 @@ export default function TopicReader() {
           {/* Query Input */}
           <div style={{ display: "flex", gap: "8px" }}>
             <input
+              id="ai-query-input"
+              name="aiQuery"
               type="text"
               placeholder="Ask a doubt..."
               value={aiQuery}

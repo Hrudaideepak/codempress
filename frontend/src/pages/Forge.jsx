@@ -206,6 +206,8 @@ export default function Forge() {
           </div>
 
           <textarea
+            id="code-editor-textarea"
+            name="code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
