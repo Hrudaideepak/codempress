@@ -10,10 +10,13 @@ function stars(n) {
 }
 
 export default function Subject() {
-  const { category } = useParams();
-  const decoded = decodeURIComponent(category || "");
+  const params = useParams();
+  const rawCat = params.category || (typeof window !== "undefined" ? (window.location.pathname.split("/subject/")[1] || "").split("/")[0] : "");
+  const decoded = decodeURIComponent(rawCat || "").trim();
   const navigate = useNavigate();
   const toast = useToast();
+
+  console.log("SUBJECT RENDER:", { params, rawCat, decoded });
 
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState("loading");
@@ -22,16 +25,21 @@ export default function Subject() {
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 640 : false);
 
   useEffect(() => {
+    if (!decoded) {
+      navigate("/library", { replace: true });
+      return;
+    }
     const handleResize = () => setIsMobile(window.innerWidth < 640);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [decoded, navigate]);
 
   useEffect(() => {
     api
       .getLibrary()
       .then((data) => {
-        setCategories(data.categories);
+        const cats = data?.categories || [];
+        setCategories(cats);
         setStatus("ready");
       })
       .catch((e) => {
@@ -40,13 +48,11 @@ export default function Subject() {
       });
   }, []);
 
-  const cat = useMemo(
-    () =>
-      categories.find(
-        (c) => c.name.trim().toLowerCase() === decoded.trim().toLowerCase()
-      ),
-    [categories, decoded]
-  );
+  const cat = useMemo(() => {
+    if (!categories.length || !decoded) return null;
+    const target = decoded.toLowerCase();
+    return categories.find((c) => c && c.name && c.name.trim().toLowerCase() === target) || null;
+  }, [categories, decoded]);
 
   const openTopic = (topic) => {
     if (topic.locked) {
