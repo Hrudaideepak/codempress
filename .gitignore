@@ -14,8 +14,10 @@ venv/
 node_modules/
 dist/
 
-# SQLite database (regenerate via content_generator.py)
+# SQLite database
 database/*.db
+database/*.db-shm
+database/*.db-wal
 
 # OS
 Thumbs.db

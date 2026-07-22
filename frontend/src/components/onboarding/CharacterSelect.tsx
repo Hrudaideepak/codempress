@@ -27,7 +27,7 @@ export default function CharacterSelect() {
     setMascotStore(id);
 
     // Persist to Supabase
-    if (user?.id) {
+    if (user?.id && supabase) {
       try {
         await supabase
           .from("profiles")

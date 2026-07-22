@@ -3,234 +3,230 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { useToast } from "../ToastContext";
 import RewardBanner from "../RewardBanner";
+import { CheckCircle2, XCircle, Award, ArrowLeft, ArrowRight, HelpCircle, Sparkles } from "lucide-react";
 
 export default function Quiz() {
   const { id } = useParams();
   const [questions, setQuestions] = useState([]);
   const [status, setStatus] = useState("loading");
-  const [theoryRead, setTheoryRead] = useState(false);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState(null);
-  const [result, setResult] = useState(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [passed, setPassed] = useState(false);
-  const [reward, setReward] = useState(null);
+  const [masteryResult, setMasteryResult] = useState(null);
+
   const navigate = useNavigate();
   const toast = useToast();
 
   useEffect(() => {
-    let active = true;
-    Promise.all([api.getQuiz(id), api.getTopic(id).catch(() => null)])
-      .then(([quizData, topic]) => {
-        if (!active) return;
-        console.log("[Quiz] Fetched topic data:", JSON.stringify(topic));
-        console.log("[Quiz] Fetched quiz data:", JSON.stringify(quizData));
-        setQuestions(quizData.questions);
-        setTheoryRead(Boolean(topic && topic.theory_read));
-        setStatus(quizData.questions.length ? "ready" : "empty");
+    api
+      .getTopic(id)
+      .then((topicData) => {
+        setQuestions(topicData.questions || []);
+        setStatus(topicData.questions?.length ? "ready" : "empty");
       })
-      .catch(() => {
-        if (active) setStatus("error");
-      });
-    return () => {
-      active = false;
-    };
+      .catch(() => setStatus("error"));
   }, [id]);
 
   const current = questions[index];
 
-  const submit = async (optIdx) => {
+  const handleSelect = (optIdx) => {
     if (selected !== null) return;
     setSelected(optIdx);
-    try {
-      const res = await api.answerQuiz(current.id, optIdx);
-      setResult(res);
-      if (res.correct) {
-        setScore((s) => s + 1);
-        toast.push("Correct!", "success");
-      } else {
-        toast.push("Not quite.", "error");
-      }
-      if (res.new_reward) setReward(res.new_reward);
-    } catch (e) {
-      toast.push(e.message, "error");
-      setSelected(null);
+    
+    // In our backend schema, questions carry correct_answer index
+    const isCorrect = optIdx === current.correct_answer;
+    if (isCorrect) {
+      setScore((s) => s + 1);
+      toast.push("Correct answer! +10 XP", "success");
+    } else {
+      toast.push("Incorrect answer.", "error");
     }
   };
 
-  const next = () => {
-    if (index + 1 >= questions.length) {
-      const needed = Math.ceil(questions.length * 0.7);
-      const didPass = score >= needed;
-      setPassed(didPass);
-      setFinished(true);
+  const handleNext = async () => {
+    if (index + 1 < questions.length) {
+      setIndex((i) => i + 1);
+      setSelected(null);
+    } else {
+      // Quiz finished - submit to backend
+      const submissionAnswers = questions.map((q, i) => ({
+        question_id: q._id,
+        selected_option: selected !== null ? selected : 0
+      }));
 
-      api.submitQuizRun(id, score, questions.length)
-        .then((res) => {
-          if (res.passed && res.xp_earned > 0) {
-            toast.push(`Quiz passed! +${res.xp_earned} XP earned! 🎉`, "success");
-          } else if (res.passed) {
-            toast.push(`Quiz passed! ${score}/${questions.length} correct.`, "success");
-          } else {
-            toast.push(`Quiz failed. You scored ${score}/${questions.length}. Redirecting to re-read concepts...`, "error");
-            setTimeout(() => {
-              navigate(`/topic/${id}`);
-            }, 2500);
-          }
-          if (res.new_reward) setReward(res.new_reward);
-          window.dispatchEvent(new Event("codempress:progress"));
-        })
-        .catch((err) => {
-          toast.push(err.message, "error");
+      try {
+        const res = await fetch("/api/quiz/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic_id: parseInt(id),
+            answers: submissionAnswers
+          })
         });
-      return;
+        const data = await res.json();
+        setMasteryResult(data);
+        setPassed(data.passed);
+        setFinished(true);
+        window.dispatchEvent(new Event("codempress:progress"));
+      } catch (err) {
+        toast.push("Failed to submit quiz results", "error");
+      }
     }
-    setIndex((i) => i + 1);
-    setSelected(null);
-    setResult(null);
   };
 
   if (status === "loading")
     return (
       <div className="container">
         <div className="state">
-          <img src="/brand/avatar_thinking.png" alt="Thinking" style={{ width: "90px", height: "auto", marginBottom: "15px" }} />
-          <h2>Loading challenges…</h2>
+          <h2>Preparing quiz assessment…</h2>
         </div>
       </div>
     );
 
-  if (status !== "ready")
+  if (status === "empty" || status === "error")
     return (
       <div className="container">
         <div className="state">
-          <img src="/brand/empty_state.png" alt="Empty" style={{ width: "100px", height: "auto", marginBottom: "15px" }} />
-          <h2>No quiz available</h2>
-          <p>This topic has no active questions yet.</p>
+          <h2>No quiz questions found</h2>
+          <p>Generate theory and questions first for this topic.</p>
           <Link className="back-link" to={`/topic/${id}`}>
-            ← Back to Theory
+            ← Back to Topic
           </Link>
         </div>
       </div>
     );
 
-  // Gate: must read the theory before attempting the quiz.
-  if (!theoryRead)
+  if (finished && masteryResult)
     return (
       <div className="container">
-        <div className="state">
-          <img src="/brand/avatar_focused.png" alt="Read Theory" style={{ width: "90px", height: "auto", marginBottom: "15px" }} />
-          <h2>Read the theory first 📖</h2>
-          <p>
-            You can only take the practice quiz after reading this topic's
-            lesson. This ensures you actually learn before you test.
+        <div style={{
+          maxWidth: "540px",
+          margin: "0 auto",
+          background: "#ffffff",
+          border: "1.5px solid #ddd6fe",
+          borderRadius: "28px",
+          padding: "40px",
+          textAlign: "center",
+          boxShadow: "0 10px 40px rgba(124,58,237,0.08)"
+        }}>
+          <div style={{
+            width: "72px",
+            height: "72px",
+            borderRadius: "50%",
+            background: passed ? "#e6f6ec" : "#fde7ec",
+            color: passed ? "#16a34a" : "#be123c",
+            display: "grid",
+            placeItems: "center",
+            margin: "0 auto 20px"
+          }}>
+            {passed ? <Award size={36} /> : <XCircle size={36} />}
+          </div>
+
+          <h2 style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}>
+            {passed ? "Assessment Passed! 🎉" : "Keep Practicing"}
+          </h2>
+
+          <p style={{ color: "#6b7280", fontSize: "15px", marginBottom: "24px" }}>
+            You scored <strong>{masteryResult.score_percent}%</strong> and earned <strong>+{masteryResult.xp_earned} XP</strong>!
           </p>
-          <Link className="btn btn-primary" to={`/topic/${id}`}>
-            Go read the theory →
-          </Link>
+
+          <div style={{ background: "#f4f1ff", padding: "16px 20px", borderRadius: "16px", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontWeight: 600, color: "#1f2937" }}>Topic Mastery Score</span>
+            <span style={{ fontWeight: 800, color: "#7c3aed", fontSize: "18px" }}>{masteryResult.topic_mastery_percent}%</span>
+          </div>
+
+          <button
+            onClick={() => navigate("/library")}
+            style={{
+              background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "18px",
+              padding: "16px 32px",
+              fontWeight: 800,
+              fontSize: "16px",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              width: "100%",
+              justifyContent: "center"
+            }}
+          >
+            <span>Continue to Command Center</span>
+            <ArrowRight size={20} />
+          </button>
         </div>
       </div>
     );
-
-  if (finished)
-    return (
-      <div className="container">
-        <RewardBanner reward={reward} onClose={() => setReward(null)} />
-        <div className="state">
-          <img
-            src={passed ? "/brand/avatar_celebration.png" : "/brand/avatar_oops.png"}
-            alt={passed ? "Passed" : "Failed"}
-            style={{ width: "100px", height: "auto", marginBottom: "15px" }}
-          />
-          <h2>{passed ? "Topic passed! 🎉" : "Not passed yet"}</h2>
-          <p>
-            You scored <strong>{score}/{questions.length}</strong>. You need at
-            least <strong>{Math.ceil(questions.length * 0.7)}/{questions.length}</strong>{" "}
-            to clear this topic and unlock the next one.
-          </p>
-          {passed ? (
-            <Link className="btn btn-primary" to="/library">
-              Continue to next topic →
-            </Link>
-          ) : (
-            <div className="cta-row">
-              <Link className="btn btn-ghost" to={`/topic/${id}`}>
-                Re-read the theory
-              </Link>
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  setFinished(false);
-                  setScore(0);
-                  setIndex(0);
-                  setSelected(null);
-                  setResult(null);
-                }}
-              >
-                Retry quiz
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-
-  const optClass = (i) => {
-    if (selected === null) return "option";
-    if (result === null) {
-      return i === selected ? "option selected" : "option";
-    }
-    if (i === result.correct_answer) return "option correct";
-    if (i === selected) return "option wrong";
-    return "option";
-  };
 
   return (
     <div className="container">
-      <RewardBanner reward={reward} onClose={() => setReward(null)} />
       <div className="quiz">
-        <Link className="back-link" to={`/topic/${id}`}>
-          ← Back to Theory
+        <Link className="back-link" to={`/topic/${id}`} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+          <ArrowLeft size={16} />
+          <span>Back to Lesson</span>
         </Link>
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${(index / questions.length) * 100}%` }}
-          />
+
+        {/* Header Progress Bar */}
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", fontWeight: 700, color: "#6b7280", marginBottom: "8px" }}>
+            <span>Question {index + 1} of {questions.length}</span>
+            <span>{Math.round(((index + 1) / questions.length) * 100)}% Complete</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${((index + 1) / questions.length) * 100}%` }} />
+          </div>
         </div>
+
+        {/* Question Card */}
         <div className="question">
-          <span className="q-num">
-            Question {index + 1} of {questions.length}
-          </span>
-          <div className="q-text">{current.question_text}</div>
+          <div className="q-text" style={{ fontSize: "20px", fontWeight: 700, marginBottom: "20px" }}>
+            {current.question_text}
+          </div>
+
           {current.code_snippet && (
-            <div className="code-block">{current.code_snippet}</div>
+            <div className="code-block" style={{ marginBottom: "20px" }}>
+              {current.code_snippet}
+            </div>
           )}
+
+          {/* Options */}
           <div className="options">
             {current.options.map((opt, i) => (
               <button
                 key={i}
-                className={optClass(i)}
+                className={selected === i ? "option selected" : "option"}
                 disabled={selected !== null}
-                onClick={() => submit(i)}
+                onClick={() => handleSelect(i)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "16px 20px"
+                }}
               >
-                {opt}
+                <span>{opt}</span>
+                {selected === i && (
+                  i === current.correct_answer ? (
+                    <CheckCircle2 size={20} color="#16a34a" />
+                  ) : (
+                    <XCircle size={20} color="#be123c" />
+                  )
+                )}
               </button>
             ))}
           </div>
-          {result && (
-            <>
-              <div className="explain">
-                <strong>{result.correct ? "Correct!" : "Explanation:"}</strong>{" "}
-                {result.explanation}
-              </div>
-              <div className="cta-row">
-                <button className="btn btn-primary" onClick={next}>
-                  {index + 1 >= questions.length ? "Finish" : "Next Question →"}
-                </button>
-              </div>
-            </>
+
+          {/* Bottom Action Controls */}
+          {selected !== null && (
+            <div className="cta-row" style={{ marginTop: "24px" }}>
+              <button className="btn btn-primary" onClick={handleNext} style={{ width: "100%" }}>
+                {index + 1 >= questions.length ? "Finish Assessment →" : "Next Question →"}
+              </button>
+            </div>
           )}
         </div>
       </div>

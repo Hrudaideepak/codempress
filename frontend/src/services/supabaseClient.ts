@@ -26,12 +26,12 @@ let _client: SupabaseClient | null = null;
  *   import { supabase } from "./services/supabaseClient";
  *   const { data } = await supabase.from("profiles").select("*");
  */
-export function getSupabase(): SupabaseClient {
+export function getSupabase(): SupabaseClient | null {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return null;
+  }
   if (!_client) {
-    _client = createClient(
-      SUPABASE_URL ?? "",
-      SUPABASE_ANON_KEY ?? ""
-    );
+    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
   return _client;
 }

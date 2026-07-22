@@ -2,22 +2,16 @@
  * Codempress Arcane Library — Main App Layout
  *
  * RPG Cyberpunk-themed SPA with:
- *   - HUD top bar (XP bar, level, mascot avatar, user avatar)
- *   - CharacterSelect onboarding modal
- *   - Floating MascotDisplay
+ *   - HUD top bar (XP bar, level, user avatar)
  *   - Route-based page rendering
  */
 
 import { useEffect } from "react";
 import { Route, Routes, Link } from "react-router-dom";
 import { useAppStore } from "./store/appStore";
-import { MASCOTS } from "./config/mascots";
-import { MASCOT_FOLDER } from "./config/mascotConfig";
-import MascotDisplay from "./components/ui/MascotDisplay";
-import CharacterSelect from "./components/onboarding/CharacterSelect";
 import { AuthProvider } from "./AuthContext";
 import { ToastProvider } from "./ToastContext";
-import "./styles/globals.css";
+import "./styles.css";
 
 // Existing JSX pages — Vite handles mixed imports
 import Landing from "./pages/Landing";
@@ -37,10 +31,6 @@ function HUD() {
   const user = useAppStore((s) => s.user);
   const xp = useAppStore((s) => s.xp);
   const level = useAppStore((s) => s.level);
-  const mascotId = useAppStore((s) => s.mascotId);
-  const setMascotModalOpen = useAppStore((s) => s.setMascotModalOpen);
-
-  const mascot = MASCOTS.find((m) => m.id === mascotId);
 
   // XP bar: percentage toward next level
   const xpForCurrent = level > 1 ? 100 * (level - 1) ** 2 : 0;
@@ -50,29 +40,13 @@ function HUD() {
     : 0;
 
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        background: "rgba(11, 12, 16, 0.92)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid #2a2740",
-        padding: "8px 24px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: 56,
-      }}
-    >
+    <header className="topbar">
       {/* Left */}
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         <Link
           to="/library"
           style={{
-            color: "#A78BFA",
+            color: "#7C3AED",
             fontWeight: 800,
             fontSize: 16,
             letterSpacing: "0.5px",
@@ -87,32 +61,7 @@ function HUD() {
 
       {/* Right */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <button
-          onClick={() => setMascotModalOpen(true)}
-          title={mascot ? `${mascot.name} — change` : "Choose mascot"}
-          style={{
-            background: "transparent",
-            border: "1px solid #333",
-            borderRadius: "50%",
-            width: 32,
-            height: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            overflow: "hidden",
-          }}
-        >
-          {mascot ? (
-            <img
-              src={`/mascots/${MASCOT_FOLDER[mascot.id] ?? "raccoon"}/1_idle.png`}
-              alt={mascot.name}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            />
-          ) : "❓"}
-        </button>
-
-        <span style={{ color: "#A78BFA", fontWeight: 700, fontSize: 13 }}>
+        <span style={{ color: "#7C3AED", fontWeight: 700, fontSize: 13 }}>
           Lv. {level}
         </span>
 
@@ -120,7 +69,7 @@ function HUD() {
           style={{
             width: 120,
             height: 8,
-            background: "#2a2740",
+            background: "#ede7fb",
             borderRadius: 4,
             overflow: "hidden",
           }}
@@ -171,7 +120,6 @@ function HUD() {
 
 export default function App() {
   const setUser = useAppStore((s) => s.setUser);
-  const setMascotModalOpen = useAppStore((s) => s.setMascotModalOpen);
 
   useEffect(() => {
     try {
@@ -180,20 +128,13 @@ export default function App() {
     } catch {
       // ignore
     }
-
-    const hasChosenMascot = localStorage.getItem("hasCompletedTour");
-    if (!hasChosenMascot) {
-      setMascotModalOpen(true);
-    }
   }, []);
 
   return (
     <AuthProvider>
       <ToastProvider>
-        <div style={{ minHeight: "100vh", background: "#0B0C10", color: "#C5C6C7", paddingTop: 56 }}>
+        <div className="app-shell" style={{ minHeight: "100vh" }}>
           <HUD />
-          <CharacterSelect />
-          <MascotDisplay />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />

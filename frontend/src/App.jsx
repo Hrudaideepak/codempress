@@ -1,18 +1,21 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { api } from "./api";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ToastProvider, useToast } from "./ToastContext";
 import ErrorBoundary from "./ErrorBoundary";
-import Landing from "./pages/Landing";
-import Auth from "./pages/Auth";
-import Library from "./pages/Library";
-import Subject from "./pages/Subject";
-import TopicReader from "./pages/TopicReader";
-import Quiz from "./pages/Quiz";
-import Profile from "./pages/Profile";
-import Forge from "./pages/Forge";
+import Spinner from "./components/ui/Spinner";
+
+// Route-based code-splitting via dynamic imports
+const Landing = lazy(() => import("./pages/Landing"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Library = lazy(() => import("./pages/Library"));
+const Subject = lazy(() => import("./pages/Subject"));
+const TopicReader = lazy(() => import("./pages/TopicReader"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Forge = lazy(() => import("./pages/Forge"));
 
 function TopBar() {
   const { user, logout } = useAuth();
@@ -208,36 +211,41 @@ function AppShell() {
         </div>
       )}
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/auth" element={user ? <Navigate to="/library" replace /> : <Auth />} />
-          <Route
-            path="/library"
-            element={
-              <RequireAuth>
-                <TopBar />
-                <Library />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/subject/:category"
-            element={
-              <RequireAuth>
-                <TopBar />
-                <Subject />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/topic/:id"
-            element={
-              <RequireAuth>
-                <TopBar />
-                <TopicReader />
-              </RequireAuth>
-            }
-          />
+        <Suspense fallback={
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+            <Spinner size="lg" color="var(--primary)" />
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={user ? <Navigate to="/library" replace /> : <Auth />} />
+            <Route
+              path="/library"
+              element={
+                <RequireAuth>
+                  <TopBar />
+                  <Library />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/subject/:category"
+              element={
+                <RequireAuth>
+                  <TopBar />
+                  <Subject />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/topic/:id"
+              element={
+                <RequireAuth>
+                  <TopBar />
+                  <TopicReader />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/quiz/:id"
               element={
@@ -265,7 +273,8 @@ function AppShell() {
                 </RequireAuth>
               }
             />
-        </Routes>
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );

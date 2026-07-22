@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import HeroScene from "../HeroScene";
 import { useToast } from "../ToastContext";
+import { Card, Button } from "../components/ui";
 
 function stars(n) {
   return "★".repeat(n) + "☆".repeat(Math.max(0, 5 - n));
@@ -17,6 +18,14 @@ export default function Subject() {
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState("map");
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 640 : false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     api
@@ -32,7 +41,10 @@ export default function Subject() {
   }, []);
 
   const cat = useMemo(
-    () => categories.find((c) => c.name === decoded),
+    () =>
+      categories.find(
+        (c) => c.name.trim().toLowerCase() === decoded.trim().toLowerCase()
+      ),
     [categories, decoded]
   );
 
@@ -89,6 +101,25 @@ export default function Subject() {
       )}
 
       {status === "ready" && cat && (
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px", gap: "10px" }}>
+          <Button
+            variant={viewMode === "map" ? "primary" : "secondary"}
+            size="sm"
+            onClick={() => setViewMode("map")}
+          >
+            🗺️ Visual Path
+          </Button>
+          <Button
+            variant={viewMode === "grid" ? "primary" : "secondary"}
+            size="sm"
+            onClick={() => setViewMode("grid")}
+          >
+            ☰ Grid List
+          </Button>
+        </div>
+      )}
+
+      {status === "ready" && cat && viewMode === "grid" && (
         <div className="grid">
           {topics.map((topic) => (
             <div
@@ -139,6 +170,157 @@ export default function Subject() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {status === "ready" && cat && viewMode === "map" && (
+        <div className="skill-tree" style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "40px",
+          padding: isMobile ? "20px 10px 20px 30px" : "40px 10px",
+          margin: "0 auto",
+          maxWidth: "800px"
+        }}>
+          {/* Central Connecting Road */}
+          <div style={{
+            position: "absolute",
+            top: "40px",
+            bottom: "40px",
+            left: isMobile ? "20px" : "50%",
+            transform: "translateX(-50%)",
+            width: "6px",
+            background: "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
+            opacity: 0.2,
+            zIndex: 0,
+            borderRadius: "3px"
+          }} />
+
+          {topics.map((topic, idx) => {
+            const isLeft = isMobile ? false : idx % 2 === 0;
+            const isLocked = topic.locked;
+            const isCleared = topic.cleared;
+
+            // Border color configuration
+            const borderColor = isLocked
+              ? "var(--border)"
+              : isCleared
+                ? "var(--success)"
+                : "var(--primary)";
+
+            const glowColor = isLocked
+              ? "none"
+              : isCleared
+                ? "rgba(22, 163, 74, 0.15)"
+                : "rgba(124, 58, 237, 0.15)";
+
+            return (
+              <div
+                key={topic.id}
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: isLeft ? "flex-start" : "flex-end",
+                  position: "relative",
+                  zIndex: 1
+                }}
+              >
+                {/* Node Center Milestone Circle */}
+                <div style={{
+                  position: "absolute",
+                  left: isMobile ? "20px" : "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "50%",
+                  background: isLocked ? "var(--bg-subtle)" : isCleared ? "var(--success)" : "var(--primary)",
+                  border: `4px solid var(--bg-panel)`,
+                  boxShadow: isLocked ? "none" : `0 0 12px ${isCleared ? "var(--success)" : "var(--primary)"}`,
+                  zIndex: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "10px",
+                  fontWeight: "bold"
+                }}>
+                  {isCleared ? "✓" : idx + 1}
+                </div>
+
+                {/* Snake Path Card element */}
+                <Card
+                  clickable
+                  hoverLift={!isLocked}
+                  onClick={() => openTopic(topic)}
+                  style={{
+                    width: isMobile ? "calc(100% - 40px)" : "42%",
+                    padding: "24px",
+                    borderRadius: "20px",
+                    background: "var(--bg-panel)",
+                    border: `1.5px solid ${borderColor}`,
+                    boxShadow: glowColor,
+                    opacity: isLocked ? 0.6 : 1,
+                    textAlign: "left"
+                  }}
+                >
+                  <div className="card-top" style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", alignItems: "center" }}>
+                    <span className="level-tag" style={{
+                      fontSize: "11px",
+                      padding: "4px 8px",
+                      borderRadius: "6px",
+                      background: "var(--bg-subtle)",
+                      color: "var(--ink-soft)"
+                    }}>{topic.level_name}</span>
+
+                    {isLocked ? (
+                      <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>🔒 Locked</span>
+                    ) : isCleared ? (
+                      <span style={{ fontSize: "12px", color: "var(--success)", fontWeight: 700 }}>✓ Mastered</span>
+                    ) : (
+                      <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: 700 }}>● Active</span>
+                    )}
+                  </div>
+
+                  <h3 style={{ fontSize: "17px", fontWeight: 700, color: "var(--ink)", marginBottom: "8px" }}>
+                    {topic.title}
+                  </h3>
+                  
+                  <p style={{ fontSize: "13px", color: "var(--ink-soft)", lineHeight: 1.5, marginBottom: "16px" }}>
+                    {topic.description}
+                  </p>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--accent)" }}>+{topic.xp} XP</span>
+                    {!isLocked && typeof topic.mastery === "number" && (
+                      <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 500 }}>
+                        Mastery: {topic.mastery}%
+                      </span>
+                    )}
+                  </div>
+
+                  {!isLocked && typeof topic.mastery === "number" && (
+                    <div style={{
+                      height: "6px",
+                      background: "var(--bg-subtle)",
+                      borderRadius: "3px",
+                      overflow: "hidden",
+                      marginTop: "12px"
+                    }}>
+                      <div style={{
+                        height: "100%",
+                        width: `${topic.mastery}%`,
+                        background: isCleared ? "var(--success)" : "var(--primary)",
+                        transition: "width 0.3s ease"
+                      }} />
+                    </div>
+                  )}
+                </Card>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

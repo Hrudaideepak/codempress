@@ -32,7 +32,7 @@ function PasswordChecklist({ password }) {
 }
 
 export default function Auth() {
-  const { loginWithGoogle, signup, login } = useAuth();
+  const { loginWithGoogle, loginDevBypass, signup, login } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -57,6 +57,19 @@ export default function Auth() {
     /[^A-Za-z0-9]/.test(password);
   const nameValid = !isSignup || name.trim().length > 0;
   const formValid = emailValid && passwordValid && nameValid && !submitting;
+
+  const handleDevBypass = async () => {
+    setSubmitting(true);
+    try {
+      await loginDevBypass();
+      toast.push("Successfully logged in using Dev Bypass!", "success");
+      navigate("/library");
+    } catch (err) {
+      toast.push(err.message || "Dev Bypass failed", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     // Skip loading the web script on native Capacitor builds to prevent network errors.
@@ -101,7 +114,7 @@ export default function Auth() {
     return () => {
       cancelled = true;
     };
-  }, [loginWithGoogle, navigate, toast]);
+  }, []); // run once on mount — loginWithGoogle/navigate/toast refs are stable
 
   const submit = async (e) => {
     e.preventDefault();
@@ -155,6 +168,45 @@ export default function Auth() {
         ← Back
       </button>
       <div className="auth-card">
+
+        {/* ── DEV BYPASS BANNER (always visible at top) ── */}
+        <div
+          onClick={handleDevBypass}
+          style={{
+            background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)",
+            border: "1.5px dashed #818cf8",
+            borderRadius: "14px",
+            padding: "14px 18px",
+            marginBottom: "24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            cursor: submitting ? "wait" : "pointer",
+            opacity: submitting ? 0.7 : 1,
+            transition: "transform 0.15s ease",
+          }}
+          onMouseOver={e => e.currentTarget.style.transform = "translateY(-1px)"}
+          onMouseOut={e => e.currentTarget.style.transform = "none"}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "22px" }}>🛠️</span>
+            <div>
+              <div style={{ color: "#c7d2fe", fontWeight: 800, fontSize: "13px" }}>Dev Login Bypass</div>
+              <div style={{ color: "#818cf8", fontSize: "11px", marginTop: "2px" }}>Skip auth — log in instantly for local dev</div>
+            </div>
+          </div>
+          <span style={{
+            background: "#4f46e5",
+            color: "#e0e7ff",
+            padding: "5px 12px",
+            borderRadius: "8px",
+            fontSize: "12px",
+            fontWeight: 700,
+          }}>
+            {submitting ? "..." : "Enter →"}
+          </span>
+        </div>
+
         <div className="auth-head" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <img
             src="/full_logo.png"
@@ -243,7 +295,7 @@ export default function Auth() {
           <span>or</span>
         </div>
 
-        <div className="auth-google">
+        <div className="auth-google" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
           {window.Capacitor ? (
             <button
               type="button"
@@ -284,7 +336,7 @@ export default function Auth() {
               {!GOOGLE_CLIENT_ID && (
                 <span className="gbtn-fallback">Google not configured</span>
               )}
-              <div ref={gbtnRef} className="gbtn" aria-label="Sign in with Google" />
+              <div ref={gbtnRef} className="gbtn" aria-label="Sign in with Google" style={{ margin: "0 auto" }} />
             </>
           )}
         </div>

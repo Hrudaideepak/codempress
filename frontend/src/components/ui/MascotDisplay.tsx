@@ -101,7 +101,7 @@ export default function MascotDisplay() {
   }, [roamEnabled, chatOpen, defaultX, defaultY]);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !supabase) return;
     const channel = supabase
       .channel("mascot-events")
       .on("postgres_changes",

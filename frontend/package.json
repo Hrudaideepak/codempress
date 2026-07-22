@@ -18,11 +18,19 @@
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
     "@react-three/drei": "^9.114.0",
     "@react-three/fiber": "^8.17.10",
+    "@supabase/supabase-js": "^2.110.8",
     "@vercel/analytics": "^2.0.1",
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.42.2",
+    "immer": "^11.1.15",
+    "lucide-react": "^1.25.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
-    "three": "^0.169.0"
+    "tailwind-merge": "^3.6.0",
+    "three": "^0.169.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

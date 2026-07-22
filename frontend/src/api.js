@@ -79,6 +79,13 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  // ... existing methods
+  logout: () => {
+    // Clear local storage and optionally redirect
+    clearSession();
+    // Note: navigation is handled by caller
+    return Promise.resolve();
+  },
   signup: (email, password, name) =>
     request("/auth/signup", {
       method: "POST",
@@ -94,7 +101,9 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ id_token: idToken }),
     }),
+  devLogin: () => request("/auth/dev-login", { method: "POST" }),
   getMe: () => request("/auth/me"),
+  getSubjects: () => request("/subjects"),
   getLibrary: () => getLibraryCached(),
   getTopic: async (id) => {
     const cacheKey = `topic_${id}`;
