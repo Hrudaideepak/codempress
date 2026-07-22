@@ -191,7 +191,7 @@ export default function TopicReader() {
                 <button className="btn btn-ghost" onClick={finishTheory} disabled={marked}>
                   {marked ? "✓ Theory Read" : "Mark Theory Complete"}
                 </button>
-                <button className="btn btn-primary" onClick={() => navigate(`/quiz/${id}`)}>
+                <button className="btn btn-primary" onClick={() => navigate(`/quiz/${topic?._id || topic?.id || id}`)}>
                   Start Practice Quiz →
                 </button>
               </div>
