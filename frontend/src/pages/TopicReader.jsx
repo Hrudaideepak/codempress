@@ -36,9 +36,15 @@ export default function TopicReader() {
   const toast = useToast();
 
   useEffect(() => {
+    if (!id) return;
+    setStatus("loading");
     api
       .getTopic(id)
       .then((t) => {
+        if (!t) {
+          setStatus("error");
+          return;
+        }
         setTopic(t);
         setMarked(!!t.theory_read);
         setStatus("ready");

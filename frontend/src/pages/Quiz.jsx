@@ -22,6 +22,7 @@ export default function Quiz() {
   const toast = useToast();
 
   useEffect(() => {
+    if (!id) return;
     let isMounted = true;
     const loadQuiz = async () => {
       try {
