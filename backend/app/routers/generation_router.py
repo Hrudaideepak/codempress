@@ -84,91 +84,91 @@ def parse_ai_json(raw_content: str) -> str:
 def get_fallback_code_example(title: str, subject: str) -> dict:
     """Returns a highly specific fallback code example in the correct language for the topic/subject."""
     sub_lower = subject.lower()
-    title_lower = title.lower()
-    
+    title_clean = title.replace('"', '\\"')
+
     # 1. C Programming
     if "c programming" in sub_lower or sub_lower == "c" or "c lang" in sub_lower:
         return {
-            "title": "C Program for {title}".format(title=title),
+            "title": f"C Program for {title}",
             "code": (
                 "#include <stdio.h>\n\n"
                 "int main() {\n"
-                "    // Demonstrating {title} in C\n"
-                "    printf(\"Executing C concept: {title}\\n\");\n"
+                f"    // Demonstrating {title} in C\n"
+                f'    printf("Executing C concept: {title_clean}\\n");\n'
                 "    return 0;\n"
                 "}"
-            ).format(title=title),
+            ),
             "explanation": "Standard C main entry point including stdio.h and executing printf for output formatting.",
-            "expected_output": "Executing C concept: {title}".format(title=title)
+            "expected_output": f"Executing C concept: {title}"
         }
         
     # 2. HTML / Web Development
-    elif "html" in sub_lower or "html" in title_lower or "web" in sub_lower:
+    elif "html" in sub_lower or "web" in sub_lower:
         return {
-            "title": "Basic HTML Structure for {title}".format(title=title),
+            "title": f"Basic HTML Structure for {title}",
             "code": (
                 "<!DOCTYPE html>\n"
                 "<html>\n"
                 "<head>\n"
                 "  <meta charset=\"utf-8\">\n"
-                "  <title>{title}</title>\n"
+                f"  <title>{title}</title>\n"
                 "</head>\n"
                 "<body>\n"
-                "  <h1>Exploring {title}</h1>\n"
+                f"  <h1>Exploring {title}</h1>\n"
                 "  <p>HTML5 semantic structure for web applications.</p>\n"
                 "</body>\n"
                 "</html>"
-            ).format(title=title),
+            ),
             "explanation": "Standard HTML5 skeletal markup containing header meta, page title, and structured content elements.",
-            "expected_output": "Rendered web page displaying h1 heading: 'Exploring {title}'".format(title=title)
+            "expected_output": f"Rendered web page displaying h1 heading: 'Exploring {title}'"
         }
         
     # 3. CSS
-    elif "css" in sub_lower or "css" in title_lower or "style" in sub_lower:
+    elif "css" in sub_lower or "style" in sub_lower:
         return {
-            "title": "CSS Styling Rule for {title}".format(title=title),
+            "title": f"CSS Styling Rule for {title}",
             "code": (
-                "/* CSS layout rule for {title} */\n"
-                ".concept-box {{\n"
+                f"/* CSS layout rule for {title} */\n"
+                ".concept-box {\n"
                 "  display: flex;\n"
                 "  justify-content: center;\n"
                 "  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);\n"
                 "  color: #ffffff;\n"
                 "  border-radius: 12px;\n"
                 "  padding: 24px;\n"
-                "}}"
-            ).format(title=title),
+                "}"
+            ),
             "explanation": "CSS class declarations implementing flex layouts, visual gradients, and responsive margins.",
             "expected_output": "Rendered visual grid with a rounded purple-to-violet gradient container card."
         }
         
     # 4. JavaScript / TypeScript
     elif "javascript" in sub_lower or "js" in sub_lower or "typescript" in sub_lower or "node" in sub_lower:
-        func_name = title.replace(' ', '').replace('&', '').replace('-', '')
+        func_name = "".join(c for c in title if c.isalnum())
         return {
-            "title": "JavaScript execution of {title}".format(title=title),
+            "title": f"JavaScript execution of {title}",
             "code": (
-                "// JavaScript function validating {title}\n"
-                "function run{func_name}() {{\n"
-                "  const concept = '{title}';\n"
-                "  console.log(`Executing JS: ${{concept}}`);\n"
-                "}}\n\n"
-                "run{func_name}();"
-            ).format(title=title, func_name=func_name),
+                f"// JavaScript function validating {title}\n"
+                f"function run{func_name}() {{\n"
+                f"  const concept = '{title}';\n"
+                "  console.log(`Executing JS: ${concept}`);\n"
+                "}\n\n"
+                f"run{func_name}();"
+            ),
             "explanation": "Declares an ES6 function execution logging the current topic status directly to the developer console.",
-            "expected_output": "Executing JS: {title}".format(title=title)
+            "expected_output": f"Executing JS: {title}"
         }
         
     # 5. SQL / Database
-    elif "sql" in sub_lower or "database" in sub_lower or "query" in title_lower:
+    elif "sql" in sub_lower or "database" in sub_lower:
         return {
-            "title": "SQL Query for {title}".format(title=title),
+            "title": f"SQL Query for {title}",
             "code": (
-                "-- SQL query execution for {title}\n"
+                f"-- SQL query execution for {title}\n"
                 "SELECT _id, title, level FROM topics\n"
-                "WHERE subject_name = '{subject}'\n"
+                f"WHERE subject_name = '{subject}'\n"
                 "LIMIT 5;"
-            ).format(title=title, subject=subject),
+            ),
             "explanation": "Standard ANSI-SQL relational query filtering columns based on the subject and topic filters.",
             "expected_output": "5 database rows returned from topics table."
         }
@@ -176,14 +176,14 @@ def get_fallback_code_example(title: str, subject: str) -> dict:
     # 6. C++ / Object-Oriented Programming
     elif "c++" in sub_lower or "cpp" in sub_lower or "object-oriented" in sub_lower:
         return {
-            "title": "C++ OOP Execution for {title}".format(title=title),
+            "title": f"C++ OOP Execution for {title}",
             "code": (
                 "#include <iostream>\n"
                 "#include <string>\n\n"
                 "class ConceptDemo {\n"
                 "public:\n"
                 "    void display() {\n"
-                "        std::cout << \"C++ OOP Concept: {title}\" << std::endl;\n"
+                f'        std::cout << "C++ OOP Concept: {title_clean}" << std::endl;\n'
                 "    }\n"
                 "};\n\n"
                 "int main() {\n"
@@ -191,13 +191,25 @@ def get_fallback_code_example(title: str, subject: str) -> dict:
                 "    demo.display();\n"
                 "    return 0;\n"
                 "}"
-            ).format(title=title),
+            ),
             "explanation": "C++ class definition instantiation executing member methods.",
-            "expected_output": "C++ OOP Concept: {title}".format(title=title)
+            "expected_output": f"C++ OOP Concept: {title}"
         }
         
     # 7. Default Fallback (Python)
     else:
+        return {
+            "title": f"Python implementation of {title}",
+            "code": (
+                f"# Python script for {title}\n"
+                "def show_concept():\n"
+                f"    concept = '{title}'\n"
+                "    print(f'Mastering concept: {{concept}}')\n\n"
+                "show_concept()"
+            ),
+            "explanation": "Declares a standard Python block printing the formatted subject concept string output.",
+            "expected_output": f"Mastering concept: {title}"
+        }
         return {
             "title": "Python implementation of {title}".format(title=title),
             "code": (
@@ -210,6 +222,49 @@ def get_fallback_code_example(title: str, subject: str) -> dict:
             "explanation": "Declares a standard Python block printing the formatted subject concept string output.",
             "expected_output": "Mastering concept: {title}".format(title=title)
         }
+
+def ensure_correct_language_code_example(code_example: dict, title: str, subject_name: str) -> dict:
+    """Validates that code_example matches the target subject's programming language.
+    If it is missing or written in the wrong language (e.g., Python code for C or HTML),
+    returns a pristine language-matched code example.
+    """
+    if not code_example or not isinstance(code_example, dict) or not code_example.get("code"):
+        return get_fallback_code_example(title, subject_name)
+
+    sub_lower = subject_name.lower()
+    code = str(code_example.get("code", ""))
+
+    # 1. C Programming: Must have C syntax (#include, printf, or int main)
+    if "c programming" in sub_lower or sub_lower == "c" or "c lang" in sub_lower:
+        if "#include" not in code and "printf" not in code and "int main" not in code:
+            return get_fallback_code_example(title, subject_name)
+
+    # 2. HTML: Must have HTML tags (< ... >)
+    elif "html" in sub_lower or "web" in sub_lower:
+        if "<" not in code or ">" not in code:
+            return get_fallback_code_example(title, subject_name)
+
+    # 3. CSS: Must have CSS syntax
+    elif "css" in sub_lower or "style" in sub_lower:
+        if "def " in code or "print(" in code or "#include" in code or ("{" not in code and ":" not in code):
+            return get_fallback_code_example(title, subject_name)
+
+    # 4. SQL: Must have SQL keywords
+    elif "sql" in sub_lower or "database" in sub_lower:
+        if not any(k in code.upper() for k in ["SELECT", "CREATE", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE"]):
+            return get_fallback_code_example(title, subject_name)
+
+    # 5. JavaScript / Node.js / Three.js: Must have JS syntax
+    elif "javascript" in sub_lower or "js" in sub_lower or "node" in sub_lower or "three.js" in sub_lower:
+        if "def " in code or "#include" in code or ("console.log" not in code and "const" not in code and "function" not in code and "let" not in code):
+            return get_fallback_code_example(title, subject_name)
+
+    # 6. C++ / OOP: Must have C++ syntax
+    elif "c++" in sub_lower or "cpp" in sub_lower or "object-oriented" in sub_lower:
+        if "#include" not in code and "cout" not in code and "class" not in code:
+            return get_fallback_code_example(title, subject_name)
+
+    return code_example
 
 @router.post("/{topic_id}/generate")
 async def generate_topic_content(topic_id: int, current_user: dict = Depends(get_current_user)):

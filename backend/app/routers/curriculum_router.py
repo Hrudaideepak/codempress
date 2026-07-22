@@ -5,6 +5,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from backend.database import execute_query, execute_write
 from backend.auth import get_current_user
 
+from backend.app.routers.generation_router import ensure_correct_language_code_example
+
 logger = logging.getLogger("codempress.curriculum_router")
 router = APIRouter(prefix="/api", tags=["Curriculum"])
 
@@ -23,30 +25,27 @@ async def get_static_subjects():
     return _static_subjects
 
 async def get_static_curriculum():
-    """Returns static curriculum categories and topics skeleton, preloaded once from DB."""
+    """Returns full static curriculum skeleton (topics grouped by subject), preloaded once from DB."""
     global _static_curriculum
     if _static_curriculum is None:
-        # Fetch all topics ordered by subject and ID
-        topics_rows = await execute_query(
-            "SELECT _id, subject_name, title, level, description FROM topics ORDER BY subject_name, _id"
+        all_topics = await execute_query(
+            "SELECT _id, subject_name, title, level FROM topics ORDER BY subject_name, _id"
         )
-        # Group topics by subject name
-        subjects_map = {}
-        for t in topics_rows:
-            sub_name = t["subject_name"]
-            if sub_name not in subjects_map:
-                subjects_map[sub_name] = []
-            subjects_map[sub_name].append({
+        curriculum = {}
+        for t in all_topics:
+            sub = t["subject_name"]
+            if sub not in curriculum:
+                curriculum[sub] = []
+            curriculum[sub].append({
                 "id": t["_id"],
                 "title": t["title"],
-                "description": t["description"] or "",
                 "level_name": t["level"]
             })
-        _static_curriculum = subjects_map
+        _static_curriculum = curriculum
     return _static_curriculum
 
 @router.get("/subjects")
-async def get_all_subjects(current_user: dict = Depends(get_current_user)):
+async def get_subjects(current_user: dict = Depends(get_current_user)):
     """Returns list of subjects with total topics & user progress metrics (read from memory cache)."""
     user_id = int(current_user["sub"])
     subjects_rows = await get_static_subjects()
@@ -90,12 +89,22 @@ async def get_topic_detail(topic_id: int, current_user: dict = Depends(get_curre
     progress_rows = await execute_query("SELECT * FROM user_progress WHERE user_id = ? AND topic_id = ?", (user_id, topic_id))
     mastery_percent = progress_rows[0]["mastery_percent"] if progress_rows else 0
 
+    theory_json_str = topic["theory_json"]
+    if theory_json_str:
+        try:
+            parsed = json.loads(theory_json_str) if isinstance(theory_json_str, str) else theory_json_str
+            if isinstance(parsed, dict) and "code_example" in parsed:
+                parsed["code_example"] = ensure_correct_language_code_example(parsed["code_example"], topic["title"], topic["subject_name"])
+                theory_json_str = json.dumps(parsed)
+        except Exception as e:
+            logger.warning(f"Error validating code example language for topic {topic_id}: {e}")
+
     return {
         "_id": topic["_id"],
         "subject_name": topic["subject_name"],
         "title": topic["title"],
         "level": topic["level"],
-        "theory_json": topic["theory_json"],
+        "theory_json": theory_json_str,
         "mastery_percent": mastery_percent,
         "questions": [
             {
