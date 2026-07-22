@@ -106,7 +106,7 @@ export const api = {
   getSubjects: () => request("/subjects"),
   getLibrary: () => getLibraryCached(),
   getTopic: async (id) => {
-    checkValidId(id);
+    if (!id || id === "undefined" || id === "null") return null;
     const cacheKey = `topic_${id}`;
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       const cached = localStorage.getItem(cacheKey);

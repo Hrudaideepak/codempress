@@ -36,10 +36,12 @@ export default function TopicReader() {
   const toast = useToast();
 
   useEffect(() => {
-    if (!id) return;
+    const topicId = id || (typeof window !== "undefined" ? (window.location.pathname.split("/topic/")[1] || "").split("/")[0] : "");
+    if (!topicId || topicId === "undefined") return;
+
     setStatus("loading");
     api
-      .getTopic(id)
+      .getTopic(topicId)
       .then((t) => {
         if (!t) {
           setStatus("error");
@@ -50,7 +52,7 @@ export default function TopicReader() {
         setStatus("ready");
         const hasTheory = !!(t.theory_body || t.theory_intro || t.theory_json);
         if (!hasTheory) {
-          runGeneration();
+          runGeneration(topicId);
         }
       })
       .catch(() => setStatus("error"));
