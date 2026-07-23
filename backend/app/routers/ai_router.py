@@ -1,6 +1,7 @@
 import json
 import time
 import logging
+from typing import Optional
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Depends
 from backend.database import execute_query
