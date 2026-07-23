@@ -1,12 +1,16 @@
 import os
 import sys
+import time
+import uuid
 import logging
+import traceback
 from pathlib import Path
+from typing import Dict, Any
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import traceback
-from contextlib import asynccontextmanager
 
 # Add project root to path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -19,8 +23,18 @@ from backend.app.routers.generation_router import router as generation_router
 from backend.app.routers.quiz_router import router as quiz_router
 from backend.app.routers.ai_router import router as ai_router
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s")
 logger = logging.getLogger("codempress.app")
+
+# Telemetry metrics accumulator
+_telemetry_metrics: Dict[str, Any] = {
+    "start_time": time.time(),
+    "total_requests": 0,
+    "success_2xx": 0,
+    "error_4xx": 0,
+    "error_5xx": 0,
+    "total_latency_ms": 0.0,
+}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -76,25 +90,55 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Cross-Origin Opener Policy middleware for Google OAuth popup postMessage support
+# Observability Middleware: Request Correlation ID + Structured Telemetry Logging + Performance Metrics
 @app.middleware("http")
-async def add_coop_header_middleware(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
-    return response
-
-# Global crash protection middleware
-@app.middleware("http")
-async def global_crash_protection_middleware(request: Request, call_next):
-    """Catches all unhandled runtime exceptions at the HTTP boundary to prevent server crashes."""
+async def observability_telemetry_middleware(request: Request, call_next):
+    req_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+    start_time = time.perf_counter()
+    
+    _telemetry_metrics["total_requests"] += 1
+    
     try:
-        return await call_next(request)
-    except Exception as exc:
-        logger.error(f"Unhandled server exception on {request.method} {request.url.path}: {exc}\n{traceback.format_exc()}")
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "An internal server error occurred. The system has automatically recovered."}
+        response = await call_next(request)
+        duration_ms = (time.perf_counter() - start_time) * 1000.0
+        
+        status = response.status_code
+        if 200 <= status < 300:
+            _telemetry_metrics["success_2xx"] += 1
+        elif 400 <= status < 500:
+            _telemetry_metrics["error_4xx"] += 1
+        elif status >= 500:
+            _telemetry_metrics["error_5xx"] += 1
+            
+        _telemetry_metrics["total_latency_ms"] += duration_ms
+        
+        response.headers["X-Request-ID"] = req_id
+        response.headers["X-Response-Time-Ms"] = f"{duration_ms:.2f}"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+        
+        # Structured log entry for request observability
+        logger.info(
+            f"req_id={req_id} method={request.method} path={request.url.path} status={status} duration_ms={duration_ms:.2f}"
         )
+        return response
+    except Exception as exc:
+        duration_ms = (time.perf_counter() - start_time) * 1000.0
+        _telemetry_metrics["error_5xx"] += 1
+        _telemetry_metrics["total_latency_ms"] += duration_ms
+        
+        logger.error(
+            f"req_id={req_id} UNHANDLED EXCEPTION method={request.method} path={request.url.path} duration_ms={duration_ms:.2f} error={exc}\n{traceback.format_exc()}"
+        )
+        res = JSONResponse(
+            status_code=500,
+            content={
+                "detail": "An internal server error occurred. The system has automatically recovered.",
+                "request_id": req_id
+            }
+        )
+        res.headers["X-Request-ID"] = req_id
+        res.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+        return res
 
 # Mount Router Modules
 app.include_router(auth_router)
@@ -106,3 +150,32 @@ app.include_router(ai_router)
 @app.get("/health")
 def health_check():
     return {"status": "ok", "app": "Codempress API", "version": "1.0.0"}
+
+@app.get("/api/telemetry")
+async def get_telemetry():
+    """Observability endpoint exposing real-time API latency, request counters, database status, and uptime."""
+    uptime_seconds = int(time.time() - _telemetry_metrics["start_time"])
+    total_reqs = _telemetry_metrics["total_requests"]
+    avg_latency = (_telemetry_metrics["total_latency_ms"] / total_reqs) if total_reqs > 0 else 0.0
+    
+    db_status = "connected"
+    try:
+        from backend.database import execute_query
+        res = await execute_query("SELECT 1")
+        if not res:
+            db_status = "degraded"
+    except Exception as e:
+        db_status = f"disconnected: {e}"
+
+    return {
+        "status": "healthy",
+        "uptime_seconds": uptime_seconds,
+        "database_status": db_status,
+        "metrics": {
+            "total_requests": total_reqs,
+            "success_2xx": _telemetry_metrics["success_2xx"],
+            "error_4xx": _telemetry_metrics["error_4xx"],
+            "error_5xx": _telemetry_metrics["error_5xx"],
+            "avg_latency_ms": round(avg_latency, 2)
+        }
+    }
