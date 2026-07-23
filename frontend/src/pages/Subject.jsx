@@ -16,8 +16,6 @@ export default function Subject() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  console.log("SUBJECT RENDER:", { params, rawCat, decoded });
-
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
