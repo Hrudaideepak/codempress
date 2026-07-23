@@ -1,28 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
-  /* Light theme tokens */
-  --bg: #f7f6fb;
-  --bg-panel: #ffffff;
-  --bg-subtle: #f0eef7;
-  --ink: #1a1626;
-  --ink-soft: #5b5570;
-  --ink-faint: #9c96af;
-  --primary: #7c3aed;
-  --primary-soft: #ede7fb;
-  --accent: #f43f5e;
-  --accent-soft: #fde7ec;
-  --success: #16a34a;
-  --success-soft: #e6f6ec;
-  --border: #e6e2f0;
-  --shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
-  --shadow-lg: 0 12px 40px rgba(124, 58, 237, 0.14);
-  --radius: 24px;
+  /* ===================================================================
+     Engineering Atelier Design Tokens (Linear + Hyperstudio + Apple)
+     =================================================================== */
+  --bg: #FAFBFC;
+  --bg-panel: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --bg-blueprint: #F8FAFC;
+  --ink: #0F172A;
+  --ink-soft: #475569;
+  --ink-faint: #94A3B8;
+  --primary: #7C3AED;
+  --primary-soft: #F5F3FF;
+  --primary-border: #DDD6FE;
+  --accent: #3B82F6;
+  --accent-soft: #EFF6FF;
+  --success: #10B981;
+  --success-soft: #ECFDF5;
+  --border: #E5E7EB;
+  --border-strong: #CBD5E1;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --radius: 14px;
+  --radius-sm: 8px;
   --font-heading: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-subheading: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-content: "Inter", system-ui, sans-serif;
   --font: "Inter", system-ui, sans-serif;
-  --mono: "Space Mono", monospace;
+  --mono: "JetBrains Mono", monospace;
 }
 
 * {
@@ -126,33 +132,40 @@ a {
   padding: 40px 32px 80px;
 }
 
-/* Hero */
+/* Engineering Atelier Hero & Blueprint styling */
 .hero {
   position: relative;
-  border-radius: 24px;
+  border-radius: var(--radius);
   overflow: hidden;
-  margin-bottom: 40px;
-  background: linear-gradient(135deg, #f3ecff 0%, #fdeef2 100%);
-  border: 1px solid var(--border);
+  margin-bottom: 36px;
+  background: var(--bg-blueprint);
+  background-image: 
+    linear-gradient(to right, rgba(203, 213, 225, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(203, 213, 225, 0.45) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
 }
 
 .hero-3d {
   position: absolute;
   inset: 0;
+  opacity: 0.6;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
-  padding: 56px 48px;
-  max-width: 620px;
+  padding: 48px 40px;
+  max-width: 640px;
 }
 
 .hero h1 {
-  font-size: 44px;
-  line-height: 1.05;
+  font-size: 38px;
+  line-height: 1.1;
   letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  color: var(--ink);
 }
 
 .hero h1 span {
@@ -163,44 +176,46 @@ a {
 }
 
 .hero p {
-  font-size: 17px;
+  font-size: 16px;
   color: var(--ink-soft);
   line-height: 1.6;
 }
 
-/* Sections */
+/* Engineering Sections */
 .section-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 40px 0 20px;
+  margin: 36px 0 16px;
 }
 
 .section-head h2 {
-  font-size: 24px;
+  font-size: 22px;
   letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .section-head .count {
-  color: var(--ink-soft); /* Darker soft ink for >=4.5:1 contrast */
+  color: var(--ink-soft);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
+  font-family: var(--mono);
 }
 
-/* Grid */
+/* Linear-style Precision Card Grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 .card {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: 20px;
   box-shadow: var(--shadow);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -208,8 +223,9 @@ a {
 }
 
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
 }
 
 .card.locked {
@@ -323,22 +339,26 @@ a {
 }
 
 .block-title {
-  font-size: 20px;
-  margin: 36px 0 14px;
+  font-size: 19px;
+  margin: 32px 0 12px;
   letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
 .code-block {
-  background: #1a1626;
-  color: #e8e4f4;
-  border-radius: 12px;
-  padding: 18px 20px;
+  background: #0F172A;
+  color: #F8FAFC;
+  border-radius: var(--radius-sm);
+  border: 1px solid #1E293B;
+  padding: 16px 20px;
   font-family: var(--mono);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13.5px;
+  line-height: 1.65;
   overflow-x: auto;
-  margin: 12px 0;
+  margin: 14px 0;
   white-space: pre;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  position: relative;
 }
 
 .example {
@@ -347,10 +367,12 @@ a {
   padding: 18px 20px;
   margin-bottom: 16px;
   background: var(--bg-panel);
+  box-shadow: var(--shadow);
 }
 .example h4 {
   font-size: 15px;
   margin-bottom: 10px;
+  color: var(--ink);
 }
 .example .exp {
   color: var(--ink-soft);
@@ -360,8 +382,13 @@ a {
 .example .out {
   font-family: var(--mono);
   font-size: 13px;
-  color: var(--success);
+  color: #10B981;
+  background: #064E3B;
+  padding: 8px 12px;
+  border-radius: 6px;
   margin-top: 8px;
+  display: inline-block;
+}
 }
 
 .list-card {
