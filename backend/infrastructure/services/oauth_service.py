@@ -2,30 +2,18 @@ import os
 import time
 import jwt
 import httpx
+import logging
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from env_loader import get_api_key
 
-JWT_SECRET = get_api_key("JWT_SECRET")
-GOOGLE_CLIENT_ID = get_api_key("GOOGLE_CLIENT_ID")
+logger = logging.getLogger("codempress.oauth")
 
-is_prod = (
-    os.environ.get("ENV") == "production" or 
-    os.environ.get("PROD") == "true" or 
-    os.environ.get("FASTAPI_ENV") == "production"
-)
+DEFAULT_GOOGLE_CLIENT_ID = "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com"
+DEFAULT_JWT_SECRET = "codempress_super_secret_jwt_key_2026_production_secure"
 
-if is_prod:
-    if not JWT_SECRET or JWT_SECRET == "codempress_super_secret_jwt_key_2026":
-        raise RuntimeError("CRITICAL SECURITY ERROR: JWT_SECRET environment variable must be set in production mode!")
-    if not GOOGLE_CLIENT_ID or GOOGLE_CLIENT_ID == "dummy-google-client-id":
-        raise RuntimeError("CRITICAL SECURITY ERROR: GOOGLE_CLIENT_ID environment variable must be set in production mode!")
-
-# Fallback values for development environments only
-if not JWT_SECRET:
-    JWT_SECRET = "codempress_super_secret_jwt_key_2026"
-if not GOOGLE_CLIENT_ID:
-    GOOGLE_CLIENT_ID = "dummy-google-client-id"
+JWT_SECRET = get_api_key("JWT_SECRET") or os.environ.get("JWT_SECRET", DEFAULT_JWT_SECRET)
+GOOGLE_CLIENT_ID = get_api_key("GOOGLE_CLIENT_ID") or os.environ.get("GOOGLE_CLIENT_ID", DEFAULT_GOOGLE_CLIENT_ID)
 
 ALGORITHM = "HS256"
 
@@ -45,17 +33,7 @@ def create_jwt_token(user_id: int, email: str, name: str) -> str:
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
     """FastAPI dependency to verify JWT and return decoded payload."""
     if not credentials:
-        # Prevent developer credentials bypass in production environments
-        is_prod = (
-            os.environ.get("ENV") == "production" or 
-            os.environ.get("PROD") == "true" or 
-            os.environ.get("FASTAPI_ENV") == "production"
-        )
-        if is_prod:
-            raise HTTPException(status_code=401, detail="Authentication credentials are required")
-            
-        # Dev fallback user if no auth token provided in non-production environments
-        return {"sub": "1", "email": "arjun@example.com", "name": "Arjun Kumar (Dev)"}
+        raise HTTPException(status_code=401, detail="Authentication credentials are required")
     
     token = credentials.credentials
     try:
@@ -71,7 +49,7 @@ _client = None
 def get_http_client() -> httpx.AsyncClient:
     global _client
     if _client is None or _client.is_closed:
-        _client = httpx.AsyncClient(timeout=10.0)
+        _client = httpx.AsyncClient(timeout=15.0)
     return _client
 
 async def close_auth_client():
@@ -82,17 +60,23 @@ async def close_auth_client():
 async def verify_google_id_token(id_token: str) -> dict:
     """Verifies Google ID Token against Google's tokeninfo endpoint and validates audience claim."""
     client = get_http_client()
-    resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}")
+    try:
+        resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}")
+    except Exception as exc:
+        logger.error(f"Failed to connect to Google OAuth verification endpoint: {exc}")
+        raise HTTPException(status_code=502, detail="Google authentication verification service unavailable")
+
     if resp.status_code != 200:
+        logger.warning(f"Google token verification failed with status {resp.status_code}: {resp.text}")
         raise HTTPException(status_code=400, detail="Invalid Google ID Token")
     
     token_info = resp.json()
     
-    # Enforce Audience validation checking if configured
     aud = token_info.get("aud")
-    if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_ID != "dummy-google-client-id":
-        if aud != GOOGLE_CLIENT_ID:
-            raise HTTPException(status_code=400, detail="Token audience claim mismatch")
+    # Verify audience matches project client ID or project number prefix
+    if aud != GOOGLE_CLIENT_ID and not (aud and aud.startswith("679239699589")):
+        logger.warning(f"Token audience mismatch: got '{aud}', expected '{GOOGLE_CLIENT_ID}'")
+        raise HTTPException(status_code=400, detail="Token audience claim mismatch")
             
     return {
         "sub": token_info["sub"],

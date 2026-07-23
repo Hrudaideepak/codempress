@@ -4,4 +4,5 @@
     <string name="title_activity_main">CodeEmpress</string>
     <string name="package_name">app.vercel.codempress</string>
     <string name="custom_url_scheme">app.vercel.codempress</string>
+    <string name="server_client_id">679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com</string>
 </resources>
