@@ -23,49 +23,26 @@ export default function Quiz() {
   const toast = useToast();
 
   useEffect(() => {
-    let isMounted = true;
-    const loadQuiz = async () => {
-      setStatus("loading");
-      try {
-        const topicId = id || (typeof window !== "undefined" ? (window.location.pathname.split("/quiz/")[1] || "").split("/")[0] : "");
-        if (!topicId || topicId === "undefined") return;
+    const currentId = id || (typeof window !== "undefined" ? (window.location.pathname.split("/quiz/")[1] || "").split("/")[0] : "");
+    if (!currentId || currentId === "undefined") return;
 
-        const token = localStorage.getItem("sf_token") || "";
-        let res = await fetch(`/api/topics/${topicId}?_t=${Date.now()}`, {
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "Authorization": `Bearer ${token}` } : {})
-          }
-        });
-
-        let topicData = await res.json();
-
-        if (!topicData || !topicData.questions || topicData.questions.length === 0) {
-          await api.generateTopic(topicId);
-          res = await fetch(`/api/topics/${topicId}?_t=${Date.now()}`, {
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { "Authorization": `Bearer ${token}` } : {})
-            }
-          });
-          topicData = await res.json();
+    setStatus("loading");
+    api.getTopic(currentId)
+      .then(async (topicData) => {
+        let qList = topicData?.questions || [];
+        if (!qList || qList.length === 0) {
+          await api.generateTopic(currentId);
+          localStorage.removeItem(`topic_${currentId}`);
+          topicData = await api.getTopic(currentId);
+          qList = topicData?.questions || [];
         }
-
-        const questionsList = topicData?.questions || [];
-        console.log("[QUIZ DEBUG]", { topicId, questionsCount: questionsList.length, topicData });
-        if (isMounted) {
-          setQuestions(questionsList);
-          setStatus(questionsList.length > 0 ? "ready" : "empty");
-        }
-      } catch (err) {
-        if (isMounted) {
-          setErrorMsg(err.message || "Failed to load quiz questions");
-          setStatus("error");
-        }
-      }
-    };
-    loadQuiz();
-    return () => { isMounted = false; };
+        setQuestions(qList);
+        setStatus(qList.length > 0 ? "ready" : "empty");
+      })
+      .catch((err) => {
+        setErrorMsg(err.message || "Failed to load quiz questions");
+        setStatus("error");
+      });
   }, [id]);
 
   const current = questions[index];

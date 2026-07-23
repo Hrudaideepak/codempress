@@ -125,7 +125,10 @@ export const api = {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         try {
-          return JSON.parse(cached);
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.questions && parsed.questions.length > 0) {
+            return parsed;
+          }
         } catch {}
       }
       throw err;
