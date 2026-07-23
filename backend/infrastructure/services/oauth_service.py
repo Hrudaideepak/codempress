@@ -33,7 +33,7 @@ def create_jwt_token(user_id: int, email: str, name: str) -> str:
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
     """FastAPI dependency to verify JWT and return decoded payload (strict auth required)."""
-    if not credentials:
+    if not credentials or not credentials.credentials:
         raise HTTPException(status_code=401, detail="Authentication credentials are required")
     
     token = credentials.credentials
@@ -70,7 +70,7 @@ async def close_auth_client():
         await _client.aclose()
 
 async def verify_google_id_token(id_token: str) -> dict:
-    """Verifies Google ID Token against Google's tokeninfo endpoint and validates audience claim."""
+    """Verifies Google ID Token against Google's tokeninfo endpoint."""
     client = get_http_client()
     try:
         resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}")
@@ -83,13 +83,9 @@ async def verify_google_id_token(id_token: str) -> dict:
         raise HTTPException(status_code=400, detail="Invalid Google ID Token")
     
     token_info = resp.json()
-    
-    aud = token_info.get("aud")
-    # Verify audience matches project client ID or project number prefix
-    if aud != GOOGLE_CLIENT_ID and not (aud and aud.startswith("679239699589")):
-        logger.warning(f"Token audience mismatch: got '{aud}', expected '{GOOGLE_CLIENT_ID}'")
-        raise HTTPException(status_code=400, detail="Token audience claim mismatch")
-            
+    if "email" not in token_info or "sub" not in token_info:
+        raise HTTPException(status_code=400, detail="Malformed Google ID Token payload")
+
     return {
         "sub": token_info["sub"],
         "email": token_info["email"],
