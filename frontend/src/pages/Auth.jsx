@@ -142,19 +142,21 @@ export default function Auth() {
       const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
       await GoogleAuth.initialize({
         clientId: "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com",
+        serverClientId: "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com",
+        grantOfflineAccess: true,
         scopes: ["profile", "email"],
       });
       const googleUser = await GoogleAuth.signIn();
-      const idToken = googleUser.authentication.idToken;
+      const idToken = googleUser.authentication?.idToken || googleUser.idToken;
       if (!idToken) {
         throw new Error("Google Sign-In did not return an ID token.");
       }
       await loginWithGoogle(idToken);
-      toast.push("Welcome to CodeEmpress!", "success");
+      toast.push("Welcome to Codempress!", "success");
       navigate("/library");
     } catch (e) {
       console.error("Native Google sign-in failed:", e);
-      if (e.message && !e.message.includes("cancel")) {
+      if (e.message && !e.message.includes("cancel") && !e.message.includes("12501")) {
         toast.push(e.message || "Native Google sign-in failed", "error");
       }
     } finally {

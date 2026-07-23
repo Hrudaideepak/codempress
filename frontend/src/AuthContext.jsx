@@ -7,15 +7,24 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
   const [loading, setLoading] = useState(false);
 
-  // Validate a stored token on first load
+  // Validate stored token on first load without destroying offline session on network glitch
   useEffect(() => {
     const token = localStorage.getItem("sf_token");
-    if (token && user) {
+    if (token) {
       api
         .getMe()
-        .catch(() => {
-          clearSession();
-          setUser(null);
+        .then((freshUser) => {
+          if (freshUser) {
+            setUser(freshUser);
+            localStorage.setItem("sf_user", JSON.stringify(freshUser));
+          }
+        })
+        .catch((err) => {
+          // Only clear session if token is explicitly rejected (401 Unauthorized)
+          if (err && (err.status === 401 || (err.message && err.message.includes("401")))) {
+            clearSession();
+            setUser(null);
+          }
         });
     }
   }, []);
@@ -97,4 +106,10 @@ export function AuthProvider({ children }) {
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
