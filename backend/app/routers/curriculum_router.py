@@ -1,9 +1,10 @@
 import time
 import json
 import logging
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
 from backend.database import execute_query, execute_write
-from backend.auth import get_current_user
+from backend.auth import get_current_user, get_current_user_optional
 
 from backend.app.routers.generation_router import ensure_correct_language_code_example
 
@@ -45,18 +46,19 @@ async def get_static_curriculum():
     return _static_curriculum
 
 @router.get("/subjects")
-async def get_subjects(current_user: dict = Depends(get_current_user)):
+async def get_subjects(current_user: Optional[dict] = Depends(get_current_user_optional)):
     """Returns list of subjects with total topics & user progress metrics (read from memory cache)."""
-    user_id = int(current_user["sub"])
+    user_id = int(current_user["sub"]) if current_user and "sub" in current_user else None
     subjects_rows = await get_static_subjects()
     
-    user_progress_rows = await execute_query(
-        "SELECT t.subject_name, COUNT(p._id) as mastered_count FROM user_progress p "
-        "JOIN topics t ON p.topic_id = t._id WHERE p.user_id = ? AND p.mastery_percent >= 60 GROUP BY t.subject_name",
-        (user_id,)
-    )
-    
-    progress_map = {r["subject_name"]: r["mastered_count"] for r in user_progress_rows}
+    progress_map = {}
+    if user_id:
+        user_progress_rows = await execute_query(
+            "SELECT t.subject_name, COUNT(p._id) as mastered_count FROM user_progress p "
+            "JOIN topics t ON p.topic_id = t._id WHERE p.user_id = ? AND p.mastery_percent >= 60 GROUP BY t.subject_name",
+            (user_id,)
+        )
+        progress_map = {r["subject_name"]: r["mastered_count"] for r in user_progress_rows}
 
     results = []
     for s in subjects_rows:
@@ -75,9 +77,9 @@ async def get_subjects(current_user: dict = Depends(get_current_user)):
     return {"subjects": results}
 
 @router.get("/topics/{topic_id}")
-async def get_topic_detail(topic_id: int, current_user: dict = Depends(get_current_user)):
+async def get_topic_detail(topic_id: int, current_user: Optional[dict] = Depends(get_current_user_optional)):
     """Returns topic details, cached theory, questions, and user mastery status."""
-    user_id = int(current_user["sub"])
+    user_id = int(current_user["sub"]) if current_user and "sub" in current_user else None
     
     topic_rows = await execute_query("SELECT * FROM topics WHERE _id = ?", (topic_id,))
     if not topic_rows:
@@ -86,8 +88,10 @@ async def get_topic_detail(topic_id: int, current_user: dict = Depends(get_curre
     topic = topic_rows[0]
     questions_rows = await execute_query("SELECT _id, question_text, code_snippet, options_json, correct_answer FROM questions WHERE topic_id = ?", (topic_id,))
     
-    progress_rows = await execute_query("SELECT * FROM user_progress WHERE user_id = ? AND topic_id = ?", (user_id, topic_id))
-    mastery_percent = progress_rows[0]["mastery_percent"] if progress_rows else 0
+    mastery_percent = 0
+    if user_id:
+        progress_rows = await execute_query("SELECT * FROM user_progress WHERE user_id = ? AND topic_id = ?", (user_id, topic_id))
+        mastery_percent = progress_rows[0]["mastery_percent"] if progress_rows else 0
 
     theory_json_str = topic["theory_json"]
     if theory_json_str:
@@ -119,21 +123,21 @@ async def get_topic_detail(topic_id: int, current_user: dict = Depends(get_curre
     }
 
 @router.get("/library")
-async def get_library(current_user: dict = Depends(get_current_user)):
+async def get_library(current_user: Optional[dict] = Depends(get_current_user_optional)):
     """Returns all subjects and their topics with progress metrics, optimized using memory skeletons."""
-    user_id = int(current_user["sub"])
+    user_id = int(current_user["sub"]) if current_user and "sub" in current_user else None
     
     # 1. Fetch static skeleton from cache
     subjects_map = await get_static_curriculum()
     
-    # 2. Fetch only the user's progress records (O(K) rows, where K is user's studied topics)
-    progress_rows = await execute_query(
-        "SELECT topic_id, mastery_percent FROM user_progress WHERE user_id = ?",
-        (user_id,)
-    )
-    
-    # Map progress details for quick O(1) in-memory lookups
-    progress_map = {p["topic_id"]: p["mastery_percent"] for p in progress_rows}
+    # 2. Fetch only the user's progress records (if logged in)
+    progress_map = {}
+    if user_id:
+        progress_rows = await execute_query(
+            "SELECT topic_id, mastery_percent FROM user_progress WHERE user_id = ?",
+            (user_id,)
+        )
+        progress_map = {p["topic_id"]: p["mastery_percent"] for p in progress_rows}
     
     # 3. Assemble dynamic progress state with static memory caching
     categories = []

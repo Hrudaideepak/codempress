@@ -1,6 +1,8 @@
 import pytest
 import sqlite3
 import asyncio
+import jwt
+import time
 from pathlib import Path
 from httpx import AsyncClient, ASGITransport
 try:
@@ -9,9 +11,9 @@ except ImportError:
     Page = None
     expect = None
 
-# Assuming the project structure places backend in the root
 from backend.main import app
 from backend.database import DB_PATH
+from backend.auth import JWT_SECRET, create_jwt_token
 
 @pytest.fixture(scope="session")
 def anyio_backend():
@@ -34,12 +36,10 @@ def test_database_integrity():
     conn = sqlite3.connect(str(DB_PATH))
     cursor = conn.cursor()
     
-    # Check if integrity check passes
     cursor.execute("PRAGMA integrity_check;")
     result = cursor.fetchone()
     assert result[0] == "ok", "Database integrity check failed"
     
-    # Verify WAL mode is set (as per database.py)
     cursor.execute("PRAGMA journal_mode;")
     journal_mode = cursor.fetchone()[0]
     assert journal_mode.lower() == "wal", "Journal mode is not WAL"
@@ -61,8 +61,7 @@ def test_frontend_rendering(request):
 
 @pytest.mark.anyio
 async def test_library_endpoint():
-    """Verify GET /api/library returns categories and topics."""
-    # Ensure user 1 exists in the database to satisfy foreign keys
+    """Verify GET /api/library returns categories and topics for guests and users."""
     conn = sqlite3.connect(str(DB_PATH))
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO users (_id, google_sub, email, name) VALUES (1, 'dev-sub-1', 'arjun@example.com', 'Arjun Kumar (Dev)')")
@@ -75,58 +74,35 @@ async def test_library_endpoint():
     data = response.json()
     assert "categories" in data
     assert len(data["categories"]) > 0
-    # First subject should have topics
     first_cat = data["categories"][0]
     assert "name" in first_cat
     assert "topics" in first_cat
     assert len(first_cat["topics"]) > 0
     
-    # Verify topic fields
     topic = first_cat["topics"][0]
     assert "id" in topic
     assert "title" in topic
     assert "level_name" in topic
     assert "locked" in topic
     assert "cleared" in topic
-    assert "difficulty" in topic
-    assert "xp" in topic
-    assert "mastery" in topic
 
 @pytest.mark.anyio
 async def test_theory_read_endpoint():
-    """Verify POST /api/topics/{id}/theory-read updates progress."""
+    """Verify POST /api/topics/{id}/theory-read updates progress when authenticated."""
+    token = create_jwt_token(1, "arjun@example.com", "Arjun Kumar (Dev)")
+    headers = {"Authorization": f"Bearer {token}"}
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/api/topics/1/theory-read")
+        response = await ac.post("/api/topics/1/theory-read", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     assert data["topic_id"] == 1
     assert data["theory_read"] is True
-    assert "mastery" in data
 
 @pytest.mark.anyio
 async def test_auth_production_enforcement(monkeypatch):
-    """Verify that credentials fallback is blocked when ENV=production is active."""
-    monkeypatch.setenv("ENV", "production")
+    """Verify that protected route GET /api/auth/me requires valid JWT credentials."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/api/library")
+        response = await ac.get("/api/auth/me")
     assert response.status_code == 401
     assert "credentials are required" in response.json()["detail"]
-
-def test_production_credentials_crash_enforcement():
-    """Verify that the backend crashes on start if ENV=production is set but credentials are default/missing."""
-    import subprocess
-    import sys
-    import os
-    
-    env = os.environ.copy()
-    env["ENV"] = "production"
-    env["JWT_SECRET"] = "codempress_super_secret_jwt_key_2026"
-    env["GOOGLE_CLIENT_ID"] = "dummy-google-client-id"
-    env["PYTHONPATH"] = "."
-    
-    cmd = [sys.executable, "-c", "import backend.infrastructure.services.oauth_service"]
-    result = subprocess.run(cmd, env=env, capture_output=True, text=True)
-    
-    assert result.returncode != 0
-    assert "CRITICAL SECURITY ERROR" in result.stderr

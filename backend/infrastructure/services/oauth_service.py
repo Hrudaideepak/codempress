@@ -3,6 +3,7 @@ import time
 import jwt
 import httpx
 import logging
+from typing import Optional
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from env_loader import get_api_key
@@ -31,7 +32,7 @@ def create_jwt_token(user_id: int, email: str, name: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
-    """FastAPI dependency to verify JWT and return decoded payload."""
+    """FastAPI dependency to verify JWT and return decoded payload (strict auth required)."""
     if not credentials:
         raise HTTPException(status_code=401, detail="Authentication credentials are required")
     
@@ -43,6 +44,17 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+def get_current_user_optional(credentials: HTTPAuthorizationCredentials = Security(security)) -> Optional[dict]:
+    """FastAPI dependency that returns decoded user payload if valid JWT provided, else None."""
+    if not credentials or not credentials.credentials:
+        return None
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+        return payload
+    except Exception:
+        return None
 
 _client = None
 
