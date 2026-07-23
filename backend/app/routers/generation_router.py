@@ -1,5 +1,6 @@
 import json
 import logging
+import asyncio
 from fastapi import APIRouter, HTTPException, Depends
 from backend.database import execute_query, execute_write
 from backend.auth import get_current_user
@@ -7,6 +8,7 @@ from backend.ai_engine import ai_engine
 
 logger = logging.getLogger("codempress.generation_router")
 router = APIRouter(prefix="/api/topics", tags=["Generation"])
+_generation_lock = asyncio.Lock()
 
 THEORY_PROMPT_TEMPLATE = """
 You are an expert Computer Science educator writing clear, bite-sized theory for university students.
@@ -269,23 +271,24 @@ def ensure_correct_language_code_example(code_example: dict, title: str, subject
 @router.post("/{topic_id}/generate")
 async def generate_topic_content(topic_id: int, current_user: dict = Depends(get_current_user)):
     """Generates theory & MCQs on-demand if not already cached in SQLite."""
-    # 1. Fetch topic
-    rows = await execute_query("SELECT * FROM topics WHERE _id = ?", (topic_id,))
-    if not rows:
-        raise HTTPException(status_code=404, detail="Topic not found")
-    
-    topic = rows[0]
-    
-    # 2. Return cached content if already generated
-    existing_questions = await execute_query("SELECT * FROM questions WHERE topic_id = ?", (topic_id,))
-    if topic.get("theory_json") and len(existing_questions) > 0:
-        return {
-            "status": "cached",
-            "topic_id": topic_id,
-            "title": topic["title"],
-            "theory": json.loads(topic["theory_json"]),
-            "questions_count": len(existing_questions)
-        }
+    async with _generation_lock:
+        # 1. Fetch topic
+        rows = await execute_query("SELECT * FROM topics WHERE _id = ?", (topic_id,))
+        if not rows:
+            raise HTTPException(status_code=404, detail="Topic not found")
+        
+        topic = rows[0]
+        
+        # 2. Return cached content if already generated
+        existing_questions = await execute_query("SELECT * FROM questions WHERE topic_id = ?", (topic_id,))
+        if topic.get("theory_json") and len(existing_questions) > 0:
+            return {
+                "status": "cached",
+                "topic_id": topic_id,
+                "title": topic["title"],
+                "theory": json.loads(topic["theory_json"]),
+                "questions_count": len(existing_questions)
+            }
 
     # 3. Generate Theory via AI Engine
     title = topic["title"]

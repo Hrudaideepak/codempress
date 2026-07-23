@@ -19,9 +19,8 @@ def get_db_connection() -> sqlite3.Connection:
         raise RuntimeError(f"Database file not found at {DB_PATH}.")
     
     if not hasattr(_local, "conn") or _local.conn is None:
-        conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=15.0)
+        conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=20.0)
         conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA synchronous=NORMAL;")
         conn.execute("PRAGMA cache_size=-64000;")
         conn.execute("PRAGMA temp_store=MEMORY;")
@@ -32,20 +31,30 @@ def get_db_connection() -> sqlite3.Connection:
 
 def _sync_execute_query(query: str, params: tuple = ()):
     conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
-        return [dict(row) for row in rows]
-    except Exception as e:
-        logger.error(f"Database query failed: {query} with params {params}. Error: {e}")
-        raise e
-    finally:
-        cursor.close()
+    retries = 3
+    delay = 0.1
+    for attempt in range(retries):
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower() and attempt < retries - 1:
+                time.sleep(delay)
+                delay *= 2
+                continue
+            logger.error(f"Database query failed: {query} with params {params}. Error: {e}")
+            raise e
+        except Exception as e:
+            logger.error(f"Database query failed: {query} with params {params}. Error: {e}")
+            raise e
+        finally:
+            cursor.close()
 
 def _sync_execute_write(query: str, params: tuple = ()) -> int:
     conn = get_db_connection()
-    retries = 3
+    retries = 5
     delay = 0.1
     for attempt in range(retries):
         cursor = conn.cursor()
@@ -71,7 +80,7 @@ def _sync_execute_write(query: str, params: tuple = ()) -> int:
 def _sync_execute_batch_write(queries_and_params: list) -> list:
     """Executes multiple write queries within a single transaction, rolling back all on failure."""
     conn = get_db_connection()
-    retries = 3
+    retries = 5
     delay = 0.1
     for attempt in range(retries):
         cursor = conn.cursor()
