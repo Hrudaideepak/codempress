@@ -79,6 +79,23 @@ app.include_router(generation_router)
 app.include_router(quiz_router)
 app.include_router(ai_router)
 
+# Global crash protection middleware
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import traceback
+
+@app.middleware("http")
+async def global_crash_protection_middleware(request: Request, call_next):
+    """Catches all unhandled runtime exceptions at the HTTP boundary to prevent server crashes."""
+    try:
+        return await call_next(request)
+    except Exception as exc:
+        logger.error(f"Unhandled server exception on {request.method} {request.url.path}: {exc}\n{traceback.format_exc()}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "An internal server error occurred. The system has automatically recovered."}
+        )
+
 @app.get("/health")
 def health_check():
     return {"status": "ok", "app": "Codempress API", "version": "1.0.0"}
