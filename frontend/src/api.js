@@ -101,7 +101,6 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ id_token: idToken }),
     }),
-  devLogin: () => request("/auth/dev-login", { method: "POST" }),
   getMe: () => request("/auth/me"),
   getSubjects: () => request("/subjects"),
   getLibrary: () => getLibraryCached(),
