@@ -59,3 +59,45 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: false
+
+  build-android-apk:
+    name: Build Android APK Package
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies & Build Web Bundle
+        run: |
+          cd frontend
+          npm install --legacy-peer-deps
+          npm run build
+
+      - name: Sync Capacitor Android Project
+        run: |
+          cd frontend
+          npx cap sync android
+
+      - name: Build Android APK with Gradle
+        run: |
+          cd frontend/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codempress-android-app
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
