@@ -2,8 +2,10 @@ import os
 import sys
 import logging
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import traceback
 from contextlib import asynccontextmanager
 
 # Add project root to path
@@ -48,42 +50,38 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-is_prod = (
-    os.environ.get("ENV") == "production" or 
-    os.environ.get("PROD") == "true" or 
-    os.environ.get("FASTAPI_ENV") == "production"
-)
-
-# CORS Setup - Enforce strict origin boundaries
-allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
-if is_prod:
-    origins_env = os.environ.get("ALLOWED_ORIGINS")
-    if origins_env:
-        allowed_origins = [o.strip() for o in origins_env.split(",") if o.strip()]
-    else:
-        logger.warning("CORS: ALLOWED_ORIGINS is not set in production. Defaulting to empty list (CORS blocked) for security.")
-        allowed_origins = []
+# CORS Setup - Explicitly allow Vercel production frontend & local dev environments
+allowed_origins = [
+    "https://codempress.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+origins_env = os.environ.get("ALLOWED_ORIGINS")
+if origins_env:
+    for o in origins_env.split(","):
+        stripped = o.strip()
+        if stripped and stripped not in allowed_origins:
+            allowed_origins.append(stripped)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Mount Router Modules
-app.include_router(auth_router)
-app.include_router(curriculum_router)
-app.include_router(generation_router)
-app.include_router(quiz_router)
-app.include_router(ai_router)
+# Cross-Origin Opener Policy middleware for Google OAuth popup postMessage support
+@app.middleware("http")
+async def add_coop_header_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+    return response
 
 # Global crash protection middleware
-from fastapi import Request
-from fastapi.responses import JSONResponse
-import traceback
-
 @app.middleware("http")
 async def global_crash_protection_middleware(request: Request, call_next):
     """Catches all unhandled runtime exceptions at the HTTP boundary to prevent server crashes."""
@@ -95,6 +93,13 @@ async def global_crash_protection_middleware(request: Request, call_next):
             status_code=500,
             content={"detail": "An internal server error occurred. The system has automatically recovered."}
         )
+
+# Mount Router Modules
+app.include_router(auth_router)
+app.include_router(curriculum_router)
+app.include_router(generation_router)
+app.include_router(quiz_router)
+app.include_router(ai_router)
 
 @app.get("/health")
 def health_check():
