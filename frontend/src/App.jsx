@@ -94,8 +94,9 @@ function TopBar() {
                 </span>
               )}
             </Link>
-            <button className="logout-btn" onClick={logout} title="Sign out">
-              Sign out
+            <button className="logout-btn" onClick={logout} title="Sign out of your Codempress account">
+              <span className="logout-text">Sign out</span>
+              <span className="logout-icon">🚪</span>
             </button>
           </div>
         )}

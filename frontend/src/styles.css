@@ -1106,20 +1106,31 @@ a {
   border: none;
 }
 .logout-btn {
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   background: var(--bg-panel);
   color: var(--ink-soft);
   font-family: var(--font);
   font-weight: 700;
   font-size: 13px;
   padding: 8px 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .logout-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+}
+.logout-btn:active {
+  transform: translateY(0);
 }
 
 

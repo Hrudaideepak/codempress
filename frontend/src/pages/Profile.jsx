@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../AuthContext";
 import { Card } from "../components/ui";
-import { Flame, Award, BookOpen, CheckCircle2, Trophy, Star, ArrowLeft } from "lucide-react";
+import { Flame, Award, BookOpen, CheckCircle2, Trophy, Star, ArrowLeft, LogOut } from "lucide-react";
 
 const LEVEL_NAMES = ["Explorer", "Apprentice", "Journeyman", "Master", "Architect", "Legend"];
 
@@ -31,7 +31,7 @@ function Stat({ label, value, icon: Icon, color }) {
 }
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [profileUser, setProfileUser] = useState(user);
   const [subjects, setSubjects] = useState([]);
   const [status, setStatus] = useState("loading");
@@ -211,6 +211,30 @@ export default function Profile() {
               background: "var(--primary)",
               transition: "width 0.3s ease"
             }} />
+          </div>
+          <div style={{ marginTop: "14px" }}>
+            <button
+              onClick={logout}
+              className="logout-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 16px",
+                borderRadius: "12px",
+                background: "rgba(239, 68, 68, 0.08)",
+                border: "1.5px solid rgba(239, 68, 68, 0.3)",
+                color: "#ef4444",
+                fontWeight: 700,
+                fontSize: "13px",
+                cursor: "pointer",
+                transition: "all 0.15s ease"
+              }}
+              title="Sign out of your Codempress account"
+            >
+              <LogOut size={14} />
+              <span>Sign Out</span>
+            </button>
           </div>
         </div>
       </div>
