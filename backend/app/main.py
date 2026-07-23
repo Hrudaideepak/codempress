@@ -67,36 +67,23 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Setup - Explicitly allow Vercel production frontend & local dev environments
-allowed_origins = [
-    "https://codempress.vercel.app",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-origins_env = os.environ.get("ALLOWED_ORIGINS")
-if origins_env:
-    for o in origins_env.split(","):
-        stripped = o.strip()
-        if stripped and stripped not in allowed_origins:
-            allowed_origins.append(stripped)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Observability Middleware: Request Correlation ID + Structured Telemetry Logging + Performance Metrics
+# Universal Bulletproof CORS & Observability Middleware
 @app.middleware("http")
-async def observability_telemetry_middleware(request: Request, call_next):
+async def observability_and_cors_middleware(request: Request, call_next):
     req_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     start_time = time.perf_counter()
+    origin = request.headers.get("origin", "*")
     
+    # Preflight OPTIONS request handler - guarantee instant 200 OK with full CORS headers
+    if request.method == "OPTIONS":
+        res = JSONResponse(status_code=200, content={"status": "ok"})
+        res.headers["Access-Control-Allow-Origin"] = origin if origin != "*" else "*"
+        res.headers["Access-Control-Allow-Credentials"] = "true"
+        res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        res.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, X-Request-ID, Accept, Origin, User-Agent"
+        res.headers["Access-Control-Max-Age"] = "86400"
+        return res
+
     _telemetry_metrics["total_requests"] += 1
     
     try:
@@ -113,11 +100,15 @@ async def observability_telemetry_middleware(request: Request, call_next):
             
         _telemetry_metrics["total_latency_ms"] += duration_ms
         
+        # Inject CORS & Telemetry headers into all normal responses
+        response.headers["Access-Control-Allow-Origin"] = origin if origin != "*" else "*"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, X-Request-ID, Accept, Origin, User-Agent"
         response.headers["X-Request-ID"] = req_id
         response.headers["X-Response-Time-Ms"] = f"{duration_ms:.2f}"
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
         
-        # Structured log entry for request observability
         logger.info(
             f"req_id={req_id} method={request.method} path={request.url.path} status={status} duration_ms={duration_ms:.2f}"
         )
@@ -137,6 +128,10 @@ async def observability_telemetry_middleware(request: Request, call_next):
                 "request_id": req_id
             }
         )
+        res.headers["Access-Control-Allow-Origin"] = origin if origin != "*" else "*"
+        res.headers["Access-Control-Allow-Credentials"] = "true"
+        res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        res.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, X-Request-ID, Accept, Origin, User-Agent"
         res.headers["X-Request-ID"] = req_id
         res.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
         return res
