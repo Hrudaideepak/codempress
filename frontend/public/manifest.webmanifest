@@ -15,10 +15,10 @@
   "categories": ["education", "productivity"],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ca-31a8e6d60a39",
   "icons": [
-    { "src": "/favicon.png", "sizes": "any", "type": "image/png", "purpose": "any" },
-    { "src": "/favicon.png", "sizes": "any", "type": "image/png", "purpose": "maskable" },
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "/brand/favicons/favicon-48.png", "sizes": "48x48", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/android_adaptive_icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/android_adaptive_icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/brand/ios_app_icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
   ],
   "shortcuts": [
     {

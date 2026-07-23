@@ -1,6 +1,6 @@
 // Minimal service worker for offline shell + PWA installability.
-const CACHE = "codempress-v1";
-const SHELL = ["/", "/index.html", "/favicon.png", "/icon-192.png", "/icon-512.png", "/horizontal_logo.png", "/full_logo.png", "/manifest.webmanifest"];
+const CACHE = "codempress-v2";
+const SHELL = ["/", "/index.html", "/brand/favicons/favicon-48.png", "/brand/android_adaptive_icon.png", "/brand/ios_app_icon.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -17,8 +17,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-  // Network-first for API; cache-first for static shell.
-  if (req.url.includes("/api/")) {
+  // Network-first for API and JS bundles; cache-first for static shell.
+  if (req.url.includes("/api/") || req.url.includes("/assets/")) {
     event.respondWith(fetch(req).catch(() => caches.match(req)));
     return;
   }
