@@ -26,9 +26,10 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing Codempress API Engine services...")
     try:
         from backend.database import execute_write
-        logger.info("Ensuring database performance indexes exist...")
         await execute_write("CREATE INDEX IF NOT EXISTS idx_questions_topic_id ON questions(topic_id);")
         await execute_write("CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_topic ON quiz_attempts(user_id, topic_id);")
+        await execute_write("CREATE INDEX IF NOT EXISTS idx_user_progress_user_topic ON user_progress(user_id, topic_id);")
+        await execute_write("CREATE INDEX IF NOT EXISTS idx_topics_subject_id ON topics(subject_name, _id);")
         logger.info("Database performance indexing verified.")
     except Exception as e:
         logger.warning(f"Failed to create performance indexes: {e}")
