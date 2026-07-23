@@ -24,7 +24,10 @@ Thumbs.db
 .DS_Store
 
 # Android / Capacitor build artifacts
-android/
+.gradle/
+build/
+**/build/
+**/local.properties
 .capacitor/
 *.keystore
 *.jks
@@ -33,16 +36,11 @@ android/
 *.zip
 _signing_keys_DO_NOT_COMMIT/
 signing-key-info.txt
-# Env
-.env
-.env.*
-!.env.example
 
-# OpenCode config (may contain local secrets / API keys)
+# OpenCode config
 .opencode/
 .opencode.jsonc
 opencode.jsonc
 
 # Downloaded installers
 *.exe
-
