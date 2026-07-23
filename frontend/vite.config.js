@@ -19,22 +19,6 @@ export default defineConfig({
     },
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (
-              id.includes("three") || 
-              id.includes("@react-three") || 
-              id.includes("fiber") || 
-              id.includes("drei")
-            ) {
-              return "vendor-three";
-            }
-            return "vendor-core";
-          }
-        },
-      },
-    },
+    chunkSizeWarningLimit: 1500,
   },
 });
