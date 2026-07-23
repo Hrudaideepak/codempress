@@ -2,21 +2,47 @@ import sqlite3
 import threading
 import logging
 import time
+import sys
 from pathlib import Path
 from starlette.concurrency import run_in_threadpool
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-DB_PATH = BASE_DIR / "database" / "skillforge.db"
+DB_DIR = BASE_DIR / "database"
+DB_PATH = DB_DIR / "skillforge.db"
+
+# Ensure BASE_DIR and content are in sys.path
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+content_dir = BASE_DIR / "content"
+if str(content_dir) not in sys.path:
+    sys.path.insert(0, str(content_dir))
 
 logger = logging.getLogger("codempress.database")
 
 # Thread-local storage for database connections
 _local = threading.local()
 
+def ensure_database_seeded():
+    """Ensure database directory, tables, and curriculum topics exist automatically."""
+    if not DB_PATH.exists() or DB_PATH.stat().st_size == 0:
+        logger.info(f"Database missing at {DB_PATH}. Initializing schema and curriculum topics...")
+        DB_DIR.mkdir(parents=True, exist_ok=True)
+        try:
+            from content.seed_topics import init_and_seed_db
+            init_and_seed_db()
+            logger.info("Database successfully seeded.")
+        except Exception as e:
+            logger.error(f"Failed to run init_and_seed_db: {e}. Falling back to schema DDL execution.")
+            conn = sqlite3.connect(str(DB_PATH))
+            schema_path = DB_DIR / "schema.sql"
+            if schema_path.exists():
+                conn.executescript(schema_path.read_text(encoding="utf-8"))
+            conn.commit()
+            conn.close()
+
 def get_db_connection() -> sqlite3.Connection:
-    """Returns a thread-local SQLite connection, creating it if needed."""
-    if not DB_PATH.exists():
-        raise RuntimeError(f"Database file not found at {DB_PATH}.")
+    """Returns a thread-local SQLite connection, creating and seeding it if needed."""
+    ensure_database_seeded()
     
     if not hasattr(_local, "conn") or _local.conn is None:
         conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=20.0)

@@ -27,6 +27,8 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Initializing Codempress API Engine services...")
     try:
+        from backend.infrastructure.database.db_connection import ensure_database_seeded
+        ensure_database_seeded()
         from backend.database import execute_write
         await execute_write("CREATE INDEX IF NOT EXISTS idx_questions_topic_id ON questions(topic_id);")
         await execute_write("CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_topic ON quiz_attempts(user_id, topic_id);")
