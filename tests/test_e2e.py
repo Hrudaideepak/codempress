@@ -46,21 +46,16 @@ def test_database_integrity():
     
     conn.close()
 
-def test_frontend_rendering(page: Page):
+def test_frontend_rendering(request):
     """Validate frontend rendering."""
-    # This requires the Vite dev server to be running (e.g. on port 5173)
-    # We will attempt to connect and gracefully skip if not running.
+    if Page is None or "page" not in request.fixturenames:
+        pytest.skip("playwright pytest plugin not installed")
+    page = request.getfixturevalue("page")
     try:
-        # Navigate to the frontend
         page.goto("http://localhost:5173", timeout=3000)
-        
-        # Verify the root element is present and visible
         root_element = page.locator("#root")
         expect(root_element).to_be_visible(timeout=2000)
-        
-        # Basic check that the page title is not empty
         assert page.title() != "", "Frontend page title should not be empty"
-        
     except Exception as e:
         pytest.skip(f"Frontend server might not be running on http://localhost:5173. Skipping frontend test: {e}")
 

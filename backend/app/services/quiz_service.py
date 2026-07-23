@@ -66,4 +66,31 @@ class QuizService:
             passed=score_percent >= 60
         )
 
+    async def recalculate_topic_mastery(self, user_id: int, topic_id: int) -> int:
+        """Calculates mastery: 30% for reading theory + up to 70% based on quiz accuracy."""
+        prog = await self.repo.get_user_topic_progress(user_id, topic_id)
+        has_progress = bool(prog)
+        theory_score = 30 if (has_progress and prog.get("theory_read")) else 0
+
+        attempts = await self.repo.get_questions_by_ids([]) # reuse query
+        from backend.database import execute_query, execute_write
+        attempts_rows = await execute_query(
+            "SELECT score_percent FROM quiz_attempts WHERE user_id = ? AND topic_id = ? ORDER BY _id DESC LIMIT 1",
+            (user_id, topic_id)
+        )
+        quiz_score = int((attempts_rows[0]["score_percent"] / 100.0) * 70) if attempts_rows else 0
+        total_mastery = min(100, theory_score + quiz_score)
+
+        if has_progress:
+            await execute_write(
+                "UPDATE user_progress SET mastery_percent = ?, last_studied = CURRENT_TIMESTAMP WHERE user_id = ? AND topic_id = ?",
+                (total_mastery, user_id, topic_id)
+            )
+        else:
+            await execute_write(
+                "INSERT INTO user_progress (user_id, topic_id, mastery_percent) VALUES (?, ?, ?)",
+                (user_id, topic_id, total_mastery)
+            )
+        return total_mastery
+
 quiz_service = QuizService()
