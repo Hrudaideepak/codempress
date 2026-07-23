@@ -23,4 +23,4 @@ EXPOSE 8008
 RUN useradd -u 8888 appuser && chown -R appuser:appuser /app
 USER appuser
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8008"]
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8008}"]
