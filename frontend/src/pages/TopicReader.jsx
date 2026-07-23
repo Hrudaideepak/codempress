@@ -89,12 +89,7 @@ export default function TopicReader() {
     setAiLoading(true);
     setAiResponse("");
     try {
-      const res = await fetch("/api/ai/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic_id: parseInt(id), message: msg })
-      });
-      const data = await res.json();
+      const data = await api.askAIChat(parseInt(id), msg);
       setAiResponse(data.reply || "No response generated.");
     } catch (err) {
       setAiResponse("Unable to connect to AI Mentor. Try again shortly.");

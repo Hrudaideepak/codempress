@@ -4,7 +4,7 @@ import logging
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Depends
 from backend.database import execute_query
-from backend.auth import get_current_user
+from backend.auth import get_current_user, get_current_user_optional
 from backend.ai_engine import ai_engine
 
 logger = logging.getLogger("codempress.ai_router")
@@ -22,7 +22,7 @@ You are the Codempress Socratic AI Mentor. Your goal is to guide Computer Scienc
 """
 
 @router.post("/chat")
-async def socratic_mentor_chat(request: ChatRequest, current_user: dict = Depends(get_current_user)):
+async def socratic_mentor_chat(request: ChatRequest, current_user: Optional[dict] = Depends(get_current_user_optional)):
     topic_rows = await execute_query("SELECT title, subject_name FROM topics WHERE _id = ?", (request.topic_id,))
     topic_context = f"Topic: {topic_rows[0]['title']} ({topic_rows[0]['subject_name']})" if topic_rows else "General CS Topic"
     

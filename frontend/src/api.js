@@ -211,6 +211,16 @@ export const api = {
     request(`/topics/${topicId}/generate`, { method: "POST", body: JSON.stringify({}) }),
   getRewards: () => request(`/rewards/me?_t=${Date.now()}`),
   getAppStatus: () => request("/app-status"),
+  submitQuizSubmission: (topicId, answers) =>
+    request("/quiz/submit", {
+      method: "POST",
+      body: JSON.stringify({ topic_id: topicId, answers }),
+    }),
+  askAIChat: (topicId, message) =>
+    request("/ai/chat", {
+      method: "POST",
+      body: JSON.stringify({ topic_id: topicId, message }),
+    }),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

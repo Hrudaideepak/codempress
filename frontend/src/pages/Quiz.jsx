@@ -73,15 +73,7 @@ export default function Quiz() {
       }));
 
       try {
-        const res = await fetch("/api/quiz/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            topic_id: parseInt(id),
-            answers: submissionAnswers
-          })
-        });
-        const data = await res.json();
+        const data = await api.submitQuizSubmission(parseInt(id), submissionAnswers);
         setMasteryResult(data);
         setPassed(data.passed);
         setFinished(true);

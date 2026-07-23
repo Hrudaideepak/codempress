@@ -74,25 +74,29 @@ export default function Auth() {
     let cancelled = false;
     loadGoogleScript()
       .then((google) => {
-        if (cancelled) return;
-        google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: async (resp) => {
-            try {
-              await loginWithGoogle(resp.credential);
-              toast.push("Welcome to Codempress!", "success");
-              navigate("/library");
-            } catch (e) {
-              toast.push(e.message || "Sign-in failed", "error");
-            }
-          },
-        });
-        google.accounts.id.renderButton(gbtnRef.current, {
-          theme: "outline",
-          size: "large",
-          width: 280,
-          text: "continue_with",
-        });
+        if (!window.__gsiInitialized) {
+          google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: async (resp) => {
+              try {
+                await loginWithGoogle(resp.credential);
+                toast.push("Welcome to Codempress!", "success");
+                navigate("/library");
+              } catch (e) {
+                toast.push(e.message || "Sign-in failed", "error");
+              }
+            },
+          });
+          window.__gsiInitialized = true;
+        }
+        if (gbtnRef.current) {
+          google.accounts.id.renderButton(gbtnRef.current, {
+            theme: "outline",
+            size: "large",
+            width: 280,
+            text: "continue_with",
+          });
+        }
         setGoogleReady(true);
       })
       .catch((e) => {
