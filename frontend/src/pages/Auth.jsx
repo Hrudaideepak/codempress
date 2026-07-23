@@ -32,7 +32,7 @@ function PasswordChecklist({ password }) {
 }
 
 export default function Auth() {
-  const { loginWithGoogle, loginDevBypass, signup, login } = useAuth();
+  const { loginWithGoogle, signup, login } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -57,19 +57,6 @@ export default function Auth() {
     /[^A-Za-z0-9]/.test(password);
   const nameValid = !isSignup || name.trim().length > 0;
   const formValid = emailValid && passwordValid && nameValid && !submitting;
-
-  const handleDevBypass = async () => {
-    setSubmitting(true);
-    try {
-      await loginDevBypass();
-      toast.push("Successfully logged in using Dev Bypass!", "success");
-      navigate("/library");
-    } catch (err) {
-      toast.push(err.message || "Dev Bypass failed", "error");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   useEffect(() => {
     // Skip loading the web script on native Capacitor builds to prevent network errors.
@@ -147,11 +134,16 @@ export default function Auth() {
         scopes: ["profile", "email"],
       });
       const googleUser = await GoogleAuth.signIn();
-      const idToken = googleUser.authentication?.idToken || googleUser.idToken;
-      if (!idToken) {
-        throw new Error("Google Sign-In did not return an ID token.");
+      const token =
+        googleUser.authentication?.idToken ||
+        googleUser.idToken ||
+        googleUser.authentication?.accessToken ||
+        googleUser.accessToken;
+
+      if (!token) {
+        throw new Error("Google Sign-In did not return an authorization token.");
       }
-      await loginWithGoogle(idToken);
+      await loginWithGoogle(token);
       toast.push("Welcome to Codempress!", "success");
       navigate("/library");
     } catch (e) {

@@ -70,25 +70,44 @@ async def close_auth_client():
         await _client.aclose()
 
 async def verify_google_id_token(id_token: str) -> dict:
-    """Verifies Google ID Token against Google's tokeninfo endpoint."""
+    """Verifies Google ID Token or Access Token against Google OAuth endpoints."""
     client = get_http_client()
+    
+    # 1. Try ID Token verification via tokeninfo
     try:
         resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}")
+        if resp.status_code == 200:
+            token_info = resp.json()
+            if "email" in token_info and "sub" in token_info:
+                return {
+                    "sub": token_info["sub"],
+                    "email": token_info["email"],
+                    "name": token_info.get("name", token_info["email"].split("@")[0]),
+                    "picture": token_info.get("picture", "")
+                }
     except Exception as exc:
-        logger.error(f"Failed to connect to Google OAuth verification endpoint: {exc}")
-        raise HTTPException(status_code=502, detail="Google authentication verification service unavailable")
+        logger.warning(f"Google ID token verification error: {exc}")
 
-    if resp.status_code != 200:
-        logger.warning(f"Google token verification failed with status {resp.status_code}: {resp.text}")
-        raise HTTPException(status_code=400, detail="Invalid Google ID Token")
-    
-    token_info = resp.json()
-    if "email" not in token_info or "sub" not in token_info:
-        raise HTTPException(status_code=400, detail="Malformed Google ID Token payload")
+    # 2. Fallback: Try Access Token verification via userinfo
+    try:
+        resp = await client.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            headers={"Authorization": f"Bearer {id_token}"}
+        )
+        if resp.status_code == 200:
+            user_info = resp.json()
+            sub = user_info.get("sub")
+            email = user_info.get("email")
+            if sub and email:
+                return {
+                    "sub": sub,
+                    "email": email,
+                    "name": user_info.get("name", email.split("@")[0]),
+                    "picture": user_info.get("picture", "")
+                }
+    except Exception as exc:
+        logger.warning(f"Google UserInfo verification error: {exc}")
 
-    return {
-        "sub": token_info["sub"],
-        "email": token_info["email"],
-        "name": token_info.get("name", token_info["email"].split("@")[0]),
-        "picture": token_info.get("picture", "")
-    }
+    logger.error(f"Google authentication failed for provided token: {id_token[:15]}...")
+    raise HTTPException(status_code=400, detail="Invalid Google authentication token")
+
