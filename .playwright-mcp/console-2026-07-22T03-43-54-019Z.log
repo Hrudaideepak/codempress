@@ -1,0 +1,10 @@
+[     182ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-342R7NCG.js?v=6f463b1c:21550
+[   59415ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-342R7NCG.js?v=6f463b1c:21550
+[  125562ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: CSS, decoded: CSS} @ http://localhost:5173/src/pages/Subject.jsx?t=1784691959487:33
+[  125563ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: CSS, decoded: CSS} @ http://localhost:5173/src/pages/Subject.jsx?t=1784691959487:33
+[  125690ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: CSS, decoded: CSS} @ http://localhost:5173/src/pages/Subject.jsx?t=1784691959487:33
+[  125694ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: CSS, decoded: CSS} @ http://localhost:5173/src/pages/Subject.jsx?t=1784691959487:33
+[  125805ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: CSS, decoded: CSS} @ http://localhost:5173/src/pages/Subject.jsx?t=1784691959487:33
+[  125807ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: CSS, decoded: CSS} @ http://localhost:5173/src/pages/Subject.jsx?t=1784691959487:33
+[  126073ms] [LOG] THREE.WebGLRenderer: Context Lost. @ http://localhost:5173/node_modules/.vite/deps/chunk-GPWO6QDY.js?v=6f463b1c:33268
+[  132548ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559

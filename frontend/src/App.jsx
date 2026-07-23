@@ -68,9 +68,9 @@ function TopBar() {
     <header className="topbar">
       <Link to="/library" className="brand">
         <img
-          src="/horizontal_logo.png"
+          src="/brand/android_adaptive_icon.png"
           alt="Codempress"
-          style={{ height: "36px", display: "block" }}
+          style={{ height: "36px", width: "36px", borderRadius: "8px", display: "block" }}
         />
       </Link>
       <div className="topbar-right">

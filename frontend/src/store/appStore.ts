@@ -1,7 +1,7 @@
 /**
  * Codempress global application store.
  *
- * Manages user identity, selected mascot, XP/level, and topic progress.
+ * Manages user identity, XP/level, and topic progress.
  * Uses Zustand with immer middleware for immutable updates.
  */
 
@@ -29,19 +29,13 @@ export interface TopicProgress {
 export interface AppState {
   // ── Data ──────────────────────────────────────────────────────────
   user: User | null;
-  mascotId: number | null;       // 1-8, null = not yet chosen
   xp: number;
   level: number;
   topicProgress: Record<number, TopicProgress>; // keyed by topicId
   currentTopicId: number | null;
 
-  // ── UI flags ───────────────────────────────────────────────────────
-  isMascotModalOpen: boolean;
-
   // ── Actions ────────────────────────────────────────────────────────
   setUser: (user: User | null) => void;
-  setMascot: (id: number) => void;
-  setMascotModalOpen: (open: boolean) => void;
   addXP: (amount: number) => void;
   setLevel: (level: number) => void;
   setProgress: (data: TopicProgress) => void;
@@ -56,20 +50,16 @@ export interface AppState {
 const initialState: Pick<
   AppState,
   | "user"
-  | "mascotId"
   | "xp"
   | "level"
   | "topicProgress"
   | "currentTopicId"
-  | "isMascotModalOpen"
 > = {
   user: null,
-  mascotId: null,
   xp: 0,
   level: 1,
   topicProgress: {},
   currentTopicId: null,
-  isMascotModalOpen: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -83,19 +73,6 @@ export const useAppStore = create<AppState>()(
     setUser: (user) =>
       set((state) => {
         state.user = user;
-      }),
-
-    setMascot: (id) =>
-      set((state) => {
-        if (id >= 1 && id <= 8) {
-          state.mascotId = id;
-          state.isMascotModalOpen = false;
-        }
-      }),
-
-    setMascotModalOpen: (open) =>
-      set((state) => {
-        state.isMascotModalOpen = open;
       }),
 
     addXP: (amount) =>
@@ -121,12 +98,10 @@ export const useAppStore = create<AppState>()(
     reset: () =>
       set((state) => {
         state.user = null;
-        state.mascotId = null;
         state.xp = 0;
         state.level = 1;
         state.topicProgress = {};
         state.currentTopicId = null;
-        state.isMascotModalOpen = false;
       }),
   }))
 );

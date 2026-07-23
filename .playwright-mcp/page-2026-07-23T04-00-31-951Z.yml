@@ -1,0 +1,29 @@
+- generic [ref=f29e3]:
+  - banner [ref=f29e4]:
+    - generic [ref=f29e5]:
+      - link "⬡ Codempress" [ref=f29e6] [cursor=pointer]:
+        - /url: /library
+      - link "Library" [ref=f29e7] [cursor=pointer]:
+        - /url: /library
+    - generic [ref=f29e8]:
+      - generic [ref=f29e9]: Lv. 1
+      - link "U" [ref=f29e11] [cursor=pointer]:
+        - /url: /profile
+  - generic [ref=f29e12]:
+    - generic [ref=f29e14]:
+      - generic [ref=f29e15]: AI-Powered CS Learning Operating System
+      - heading "Know exactly what to learn. Every day. Until you're hired." [level=1] [ref=f29e20]
+      - paragraph [ref=f29e21]: Codempress is your daily command center for Computer Science. We organize learning, practice, and skill mastery into one continuous daily plan.
+      - generic [ref=f29e22]:
+        - button "Enter Command Center" [ref=f29e23] [cursor=pointer]
+        - generic [ref=f29e27]: Free for CS students · 3,405 Topics · 34 Subjects
+    - generic [ref=f29e28]:
+      - generic [ref=f29e29]:
+        - heading "Zero-Decision Daily Plan" [level=3] [ref=f29e33]
+        - paragraph [ref=f29e34]: No decision fatigue. Wake up, open Codempress, and complete your 3 daily micro-tasks.
+      - generic [ref=f29e35]:
+        - heading "Bite-Sized Theory & MCQs" [level=3] [ref=f29e39]
+        - paragraph [ref=f29e40]: Concise theory paired with instant 8-question quizzes and runnable code snippets.
+      - generic [ref=f29e41]:
+        - heading "Multi-Model AI Failover" [level=3] [ref=f29e46]
+        - paragraph [ref=f29e47]: Server-side Socratic AI mentor powered by 12 free-tier providers with zero downtime.

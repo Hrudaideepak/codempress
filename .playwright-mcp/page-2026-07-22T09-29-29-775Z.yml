@@ -1,0 +1,49 @@
+- generic [ref=f30e3]:
+  - banner [ref=f30e4]:
+    - generic [ref=f30e5]:
+      - link "⬡ Codempress" [ref=f30e6] [cursor=pointer]:
+        - /url: /library
+      - link "Library" [ref=f30e7] [cursor=pointer]:
+        - /url: /library
+    - generic [ref=f30e8]:
+      - generic [ref=f30e9]: Lv. 1
+      - link "U" [ref=f30e11] [cursor=pointer]:
+        - /url: /profile
+  - generic [ref=f30e12]:
+    - link "Back to Command Center" [ref=f30e13] [cursor=pointer]:
+      - /url: /library
+    - generic [ref=f30e17]:
+      - generic [ref=f30e18]:
+        - heading "What is C, history, compilation process" [level=1] [ref=f30e19]
+        - generic [ref=f30e20]:
+          - paragraph [ref=f30e21]: "### What is C, history, compilation process"
+          - paragraph [ref=f30e22]:
+            - text: Comprehensive conceptual overview of
+            - strong [ref=f30e23]: What is C, history, compilation process
+            - text: in
+            - strong [ref=f30e24]: C Programming
+            - text: .
+        - generic [ref=f30e25]:
+          - heading "Interactive Code Snippet" [level=3] [ref=f30e26]
+          - generic [ref=f30e30]: "#include <stdio.h> int main() { // Demonstrating What is C, history, compilation process in C printf(\"Executing C concept: What is C, history, compilation process\\n\"); return 0; }"
+          - generic [ref=f30e31]:
+            - strong [ref=f30e32]: "Explanation:"
+            - text: Standard C main entry point including stdio.h and executing printf for output formatting.
+          - generic [ref=f30e33]:
+            - strong [ref=f30e34]: "Output:"
+            - text: "Executing C concept: What is C, history, compilation process"
+        - generic [ref=f30e35]:
+          - button "Mark Theory Complete" [ref=f30e36] [cursor=pointer]
+          - button "Start Practice Quiz →" [ref=f30e37] [cursor=pointer]
+      - generic [ref=f30e38]:
+        - generic [ref=f30e39]: AI Socratic Mentor
+        - paragraph [ref=f30e44]:
+          - text: Have a doubt about
+          - strong [ref=f30e45]: What is C, history, compilation process
+          - text: "? Ask our AI mentor for a guided explanation."
+        - generic [ref=f30e46]:
+          - button "💡 \"Explain using a real-world analogy\"" [ref=f30e47] [cursor=pointer]
+          - button "⚠️ \"What are common edge cases?\"" [ref=f30e48] [cursor=pointer]
+        - generic [ref=f30e49]:
+          - textbox "Ask a doubt..." [ref=f30e50]
+          - button [ref=f30e51] [cursor=pointer]

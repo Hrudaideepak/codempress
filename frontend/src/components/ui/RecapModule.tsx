@@ -2,15 +2,12 @@
  * RecapModule — "Parchment of Recall"
  *
  * Slideshow that shows the user's last 3 completed nodes for a topic.
- * The mascot narrates the recap intro before the slides appear.
  * Uses Framer Motion for slide transitions.
  */
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiClient } from "../../services/apiClient";
-import { useAppStore } from "../../store/appStore";
-import { MASCOTS } from "../../config/mascots";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -42,8 +39,6 @@ export default function RecapModule({ topicId, open, onClose }: RecapModuleProps
   const [data, setData] = useState<RecapData | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
   const [loading, setLoading] = useState(false);
-  const mascotId = useAppStore((s) => s.mascotId);
-  const mascot = MASCOTS.find((m) => m.id === mascotId);
 
   // Fetch recap data when opened
   useEffect(() => {
@@ -132,7 +127,7 @@ export default function RecapModule({ topicId, open, onClose }: RecapModuleProps
         {!loading && nodes.length === 0 && (
           <div style={{ textAlign: "center", padding: 30 }}>
             <p style={{ color: "#45A29E", fontSize: 14 }}>
-              {mascot?.getDialogue("idle") ?? "No completed nodes yet."}
+              No completed nodes yet.
             </p>
             <p style={{ color: "#888", fontSize: 13, marginTop: 8 }}>
               Complete some nodes first, and your journey will be remembered here.
@@ -155,7 +150,7 @@ export default function RecapModule({ topicId, open, onClose }: RecapModuleProps
                 borderRadius: 8,
               }}
             >
-              🗣️ {mascot?.getDialogue("tour") ?? "Here's what you learned:"}
+              🗣️ Here's what you learned:
             </p>
 
             {/* Slide */}

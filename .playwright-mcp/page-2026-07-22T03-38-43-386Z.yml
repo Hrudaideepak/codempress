@@ -1,0 +1,375 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "⬡ Codempress" [ref=e6] [cursor=pointer]:
+          - /url: /library
+        - link "Library" [ref=e7] [cursor=pointer]:
+          - /url: /library
+      - generic [ref=e8]: Lv. 1
+    - generic [ref=e92]:
+      - generic [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]: TODAY'S MISSION
+            - heading "Your Daily Action Plan" [level=1] [ref=e102]
+          - generic [ref=e103]: 5 Day Streak
+        - paragraph [ref=e107]: "Zero decisions required. Complete these 3 micro-tasks today to advance your software engineering readiness:"
+        - generic [ref=e108]:
+          - generic [ref=e113] [cursor=pointer]:
+            - text: 1. Learn (15m)
+            - generic [ref=e114]: Arrays & Prefix Sums
+          - generic [ref=e125] [cursor=pointer]:
+            - text: 2. Practice Quiz
+            - generic [ref=e126]: 8 MCQ Assessment
+          - generic [ref=e131] [cursor=pointer]:
+            - text: 3. Spaced Review
+            - generic [ref=e132]: Recursion Base Cases
+        - button "Start Today's Plan" [ref=e133] [cursor=pointer]
+      - generic [ref=e137]:
+        - heading "Curriculum & Learning Paths" [level=2] [ref=e138]
+        - generic [ref=e139]: 34 Subjects Available
+      - generic [ref=e140]:
+        - generic [ref=e141] [cursor=pointer]:
+          - generic [ref=e142]:
+            - generic [ref=e143]: Agentic AI
+            - generic [ref=e144]: 105 Topics
+          - heading "Agentic AI" [level=3] [ref=e145]
+          - paragraph [ref=e146]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e148]:
+            - generic [ref=e149]: Progress
+            - generic [ref=e150]: 0%
+          - generic [ref=e152]: Explore Path →
+        - generic [ref=e154] [cursor=pointer]:
+          - generic [ref=e155]:
+            - generic [ref=e156]: C Programming
+            - generic [ref=e157]: 59 Topics
+          - heading "C Programming" [level=3] [ref=e158]
+          - paragraph [ref=e159]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e161]:
+            - generic [ref=e162]: Progress
+            - generic [ref=e163]: 0%
+          - generic [ref=e165]: Explore Path →
+        - generic [ref=e167] [cursor=pointer]:
+          - generic [ref=e168]:
+            - generic [ref=e169]: CSS
+            - generic [ref=e170]: 110 Topics
+          - heading "CSS" [level=3] [ref=e171]
+          - paragraph [ref=e172]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e174]:
+            - generic [ref=e175]: Progress
+            - generic [ref=e176]: 0%
+          - generic [ref=e178]: Explore Path →
+        - generic [ref=e180] [cursor=pointer]:
+          - generic [ref=e181]:
+            - generic [ref=e182]: Computer Networks
+            - generic [ref=e183]: 68 Topics
+          - heading "Computer Networks" [level=3] [ref=e184]
+          - paragraph [ref=e185]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e187]:
+            - generic [ref=e188]: Progress
+            - generic [ref=e189]: 0%
+          - generic [ref=e191]: Explore Path →
+        - generic [ref=e193] [cursor=pointer]:
+          - generic [ref=e194]:
+            - generic [ref=e195]: Data Structures & Algorithms
+            - generic [ref=e196]: 112 Topics
+          - heading "Data Structures & Algorithms" [level=3] [ref=e197]
+          - paragraph [ref=e198]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e200]:
+            - generic [ref=e201]: Progress
+            - generic [ref=e202]: 0%
+          - generic [ref=e204]: Explore Path →
+        - generic [ref=e206] [cursor=pointer]:
+          - generic [ref=e207]:
+            - generic [ref=e208]: Database Management Systems
+            - generic [ref=e209]: 52 Topics
+          - heading "Database Management Systems" [level=3] [ref=e210]
+          - paragraph [ref=e211]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e213]:
+            - generic [ref=e214]: Progress
+            - generic [ref=e215]: 0%
+          - generic [ref=e217]: Explore Path →
+        - generic [ref=e219] [cursor=pointer]:
+          - generic [ref=e220]:
+            - generic [ref=e221]: Docker & CI/CD
+            - generic [ref=e222]: 105 Topics
+          - heading "Docker & CI/CD" [level=3] [ref=e223]
+          - paragraph [ref=e224]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e226]:
+            - generic [ref=e227]: Progress
+            - generic [ref=e228]: 0%
+          - generic [ref=e230]: Explore Path →
+        - generic [ref=e232] [cursor=pointer]:
+          - generic [ref=e233]:
+            - generic [ref=e234]: Excel
+            - generic [ref=e235]: 110 Topics
+          - heading "Excel" [level=3] [ref=e236]
+          - paragraph [ref=e237]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e239]:
+            - generic [ref=e240]: Progress
+            - generic [ref=e241]: 0%
+          - generic [ref=e243]: Explore Path →
+        - generic [ref=e245] [cursor=pointer]:
+          - generic [ref=e246]:
+            - generic [ref=e247]: Flutter
+            - generic [ref=e248]: 105 Topics
+          - heading "Flutter" [level=3] [ref=e249]
+          - paragraph [ref=e250]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e252]:
+            - generic [ref=e253]: Progress
+            - generic [ref=e254]: 0%
+          - generic [ref=e256]: Explore Path →
+        - generic [ref=e258] [cursor=pointer]:
+          - generic [ref=e259]:
+            - generic [ref=e260]: Generative AI
+            - generic [ref=e261]: 105 Topics
+          - heading "Generative AI" [level=3] [ref=e262]
+          - paragraph [ref=e263]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e265]:
+            - generic [ref=e266]: Progress
+            - generic [ref=e267]: 0%
+          - generic [ref=e269]: Explore Path →
+        - generic [ref=e271] [cursor=pointer]:
+          - generic [ref=e272]:
+            - generic [ref=e273]: Git
+            - generic [ref=e274]: 105 Topics
+          - heading "Git" [level=3] [ref=e275]
+          - paragraph [ref=e276]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e278]:
+            - generic [ref=e279]: Progress
+            - generic [ref=e280]: 0%
+          - generic [ref=e282]: Explore Path →
+        - generic [ref=e284] [cursor=pointer]:
+          - generic [ref=e285]:
+            - generic [ref=e286]: HTML
+            - generic [ref=e287]: 105 Topics
+          - heading "HTML" [level=3] [ref=e288]
+          - paragraph [ref=e289]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e291]:
+            - generic [ref=e292]: Progress
+            - generic [ref=e293]: 0%
+          - generic [ref=e295]: Explore Path →
+        - generic [ref=e297] [cursor=pointer]:
+          - generic [ref=e298]:
+            - generic [ref=e299]: JavaScript
+            - generic [ref=e300]: 120 Topics
+          - heading "JavaScript" [level=3] [ref=e301]
+          - paragraph [ref=e302]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e304]:
+            - generic [ref=e305]: Progress
+            - generic [ref=e306]: 0%
+          - generic [ref=e308]: Explore Path →
+        - generic [ref=e310] [cursor=pointer]:
+          - generic [ref=e311]:
+            - generic [ref=e312]: LLMs
+            - generic [ref=e313]: 105 Topics
+          - heading "LLMs" [level=3] [ref=e314]
+          - paragraph [ref=e315]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e317]:
+            - generic [ref=e318]: Progress
+            - generic [ref=e319]: 0%
+          - generic [ref=e321]: Explore Path →
+        - generic [ref=e323] [cursor=pointer]:
+          - generic [ref=e324]:
+            - generic [ref=e325]: Machine Learning
+            - generic [ref=e326]: 110 Topics
+          - heading "Machine Learning" [level=3] [ref=e327]
+          - paragraph [ref=e328]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e330]:
+            - generic [ref=e331]: Progress
+            - generic [ref=e332]: 0%
+          - generic [ref=e334]: Explore Path →
+        - generic [ref=e336] [cursor=pointer]:
+          - generic [ref=e337]:
+            - generic [ref=e338]: Matplotlib
+            - generic [ref=e339]: 105 Topics
+          - heading "Matplotlib" [level=3] [ref=e340]
+          - paragraph [ref=e341]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e343]:
+            - generic [ref=e344]: Progress
+            - generic [ref=e345]: 0%
+          - generic [ref=e347]: Explore Path →
+        - generic [ref=e349] [cursor=pointer]:
+          - generic [ref=e350]:
+            - generic [ref=e351]: Node.js
+            - generic [ref=e352]: 105 Topics
+          - heading "Node.js" [level=3] [ref=e353]
+          - paragraph [ref=e354]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e356]:
+            - generic [ref=e357]: Progress
+            - generic [ref=e358]: 0%
+          - generic [ref=e360]: Explore Path →
+        - generic [ref=e362] [cursor=pointer]:
+          - generic [ref=e363]:
+            - generic [ref=e364]: NumPy
+            - generic [ref=e365]: 105 Topics
+          - heading "NumPy" [level=3] [ref=e366]
+          - paragraph [ref=e367]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e369]:
+            - generic [ref=e370]: Progress
+            - generic [ref=e371]: 0%
+          - generic [ref=e373]: Explore Path →
+        - generic [ref=e375] [cursor=pointer]:
+          - generic [ref=e376]:
+            - generic [ref=e377]: Object-Oriented Programming
+            - generic [ref=e378]: 47 Topics
+          - heading "Object-Oriented Programming" [level=3] [ref=e379]
+          - paragraph [ref=e380]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e382]:
+            - generic [ref=e383]: Progress
+            - generic [ref=e384]: 0%
+          - generic [ref=e386]: Explore Path →
+        - generic [ref=e388] [cursor=pointer]:
+          - generic [ref=e389]:
+            - generic [ref=e390]: Operating Systems
+            - generic [ref=e391]: 57 Topics
+          - heading "Operating Systems" [level=3] [ref=e392]
+          - paragraph [ref=e393]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e395]:
+            - generic [ref=e396]: Progress
+            - generic [ref=e397]: 0%
+          - generic [ref=e399]: Explore Path →
+        - generic [ref=e401] [cursor=pointer]:
+          - generic [ref=e402]:
+            - generic [ref=e403]: Pandas
+            - generic [ref=e404]: 105 Topics
+          - heading "Pandas" [level=3] [ref=e405]
+          - paragraph [ref=e406]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e408]:
+            - generic [ref=e409]: Progress
+            - generic [ref=e410]: 0%
+          - generic [ref=e412]: Explore Path →
+        - generic [ref=e414] [cursor=pointer]:
+          - generic [ref=e415]:
+            - generic [ref=e416]: Power BI
+            - generic [ref=e417]: 105 Topics
+          - heading "Power BI" [level=3] [ref=e418]
+          - paragraph [ref=e419]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e421]:
+            - generic [ref=e422]: Progress
+            - generic [ref=e423]: 0%
+          - generic [ref=e425]: Explore Path →
+        - generic [ref=e427] [cursor=pointer]:
+          - generic [ref=e428]:
+            - generic [ref=e429]: Python
+            - generic [ref=e430]: 120 Topics
+          - heading "Python" [level=3] [ref=e431]
+          - paragraph [ref=e432]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e434]:
+            - generic [ref=e435]: Progress
+            - generic [ref=e436]: 0%
+          - generic [ref=e438]: Explore Path →
+        - generic [ref=e440] [cursor=pointer]:
+          - generic [ref=e441]:
+            - generic [ref=e442]: RAG
+            - generic [ref=e443]: 105 Topics
+          - heading "RAG" [level=3] [ref=e444]
+          - paragraph [ref=e445]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e447]:
+            - generic [ref=e448]: Progress
+            - generic [ref=e449]: 0%
+          - generic [ref=e451]: Explore Path →
+        - generic [ref=e453] [cursor=pointer]:
+          - generic [ref=e454]:
+            - generic [ref=e455]: REST & GraphQL
+            - generic [ref=e456]: 105 Topics
+          - heading "REST & GraphQL" [level=3] [ref=e457]
+          - paragraph [ref=e458]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e460]:
+            - generic [ref=e461]: Progress
+            - generic [ref=e462]: 0%
+          - generic [ref=e464]: Explore Path →
+        - generic [ref=e466] [cursor=pointer]:
+          - generic [ref=e467]:
+            - generic [ref=e468]: React
+            - generic [ref=e469]: 120 Topics
+          - heading "React" [level=3] [ref=e470]
+          - paragraph [ref=e471]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e473]:
+            - generic [ref=e474]: Progress
+            - generic [ref=e475]: 0%
+          - generic [ref=e477]: Explore Path →
+        - generic [ref=e479] [cursor=pointer]:
+          - generic [ref=e480]:
+            - generic [ref=e481]: React Native
+            - generic [ref=e482]: 105 Topics
+          - heading "React Native" [level=3] [ref=e483]
+          - paragraph [ref=e484]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e486]:
+            - generic [ref=e487]: Progress
+            - generic [ref=e488]: 0%
+          - generic [ref=e490]: Explore Path →
+        - generic [ref=e492] [cursor=pointer]:
+          - generic [ref=e493]:
+            - generic [ref=e494]: SQL
+            - generic [ref=e495]: 110 Topics
+          - heading "SQL" [level=3] [ref=e496]
+          - paragraph [ref=e497]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e499]:
+            - generic [ref=e500]: Progress
+            - generic [ref=e501]: 0%
+          - generic [ref=e503]: Explore Path →
+        - generic [ref=e505] [cursor=pointer]:
+          - generic [ref=e506]:
+            - generic [ref=e507]: Scikit-learn
+            - generic [ref=e508]: 105 Topics
+          - heading "Scikit-learn" [level=3] [ref=e509]
+          - paragraph [ref=e510]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e512]:
+            - generic [ref=e513]: Progress
+            - generic [ref=e514]: 0%
+          - generic [ref=e516]: Explore Path →
+        - generic [ref=e518] [cursor=pointer]:
+          - generic [ref=e519]:
+            - generic [ref=e520]: Seaborn
+            - generic [ref=e521]: 105 Topics
+          - heading "Seaborn" [level=3] [ref=e522]
+          - paragraph [ref=e523]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e525]:
+            - generic [ref=e526]: Progress
+            - generic [ref=e527]: 0%
+          - generic [ref=e529]: Explore Path →
+        - generic [ref=e531] [cursor=pointer]:
+          - generic [ref=e532]:
+            - generic [ref=e533]: Security
+            - generic [ref=e534]: 105 Topics
+          - heading "Security" [level=3] [ref=e535]
+          - paragraph [ref=e536]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e538]:
+            - generic [ref=e539]: Progress
+            - generic [ref=e540]: 0%
+          - generic [ref=e542]: Explore Path →
+        - generic [ref=e544] [cursor=pointer]:
+          - generic [ref=e545]:
+            - generic [ref=e546]: System Design
+            - generic [ref=e547]: 109 Topics
+          - heading "System Design" [level=3] [ref=e548]
+          - paragraph [ref=e549]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e551]:
+            - generic [ref=e552]: Progress
+            - generic [ref=e553]: 0%
+          - generic [ref=e555]: Explore Path →
+        - generic [ref=e557] [cursor=pointer]:
+          - generic [ref=e558]:
+            - generic [ref=e559]: Three.js
+            - generic [ref=e560]: 105 Topics
+          - heading "Three.js" [level=3] [ref=e561]
+          - paragraph [ref=e562]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e564]:
+            - generic [ref=e565]: Progress
+            - generic [ref=e566]: 0%
+          - generic [ref=e568]: Explore Path →
+        - generic [ref=e570] [cursor=pointer]:
+          - generic [ref=e571]:
+            - generic [ref=e572]: UI Design Concepts
+            - generic [ref=e573]: 105 Topics
+          - heading "UI Design Concepts" [level=3] [ref=e574]
+          - paragraph [ref=e575]: Master foundational to pro concepts through bite-sized theory & MCQs.
+          - generic [ref=e577]:
+            - generic [ref=e578]: Progress
+            - generic [ref=e579]: 0%
+          - generic [ref=e581]: Explore Path →
+  - generic [ref=e584]:
+    - generic [ref=e585]: Successfully logged in using Dev Bypass!
+    - button "Dismiss notification" [ref=e586] [cursor=pointer]: ×

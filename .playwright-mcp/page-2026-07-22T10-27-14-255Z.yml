@@ -1,0 +1,16 @@
+- generic [ref=f127e3]:
+  - banner [ref=f127e4]:
+    - generic [ref=f127e5]:
+      - link "⬡ Codempress" [ref=f127e6] [cursor=pointer]:
+        - /url: /library
+      - link "Library" [ref=f127e7] [cursor=pointer]:
+        - /url: /library
+    - generic [ref=f127e8]:
+      - generic [ref=f127e9]: Lv. 1
+      - link "U" [ref=f127e11] [cursor=pointer]:
+        - /url: /profile
+  - generic [ref=f127e13]:
+    - heading "No quiz questions found" [level=2] [ref=f127e14]
+    - paragraph [ref=f127e15]: Generate theory and questions first for this topic.
+    - link "← Back to Topic" [ref=f127e16] [cursor=pointer]:
+      - /url: /topic/1

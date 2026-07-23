@@ -1,0 +1,5 @@
+[     288ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-342R7NCG.js?v=6f463b1c:21550
+[   17852ms] [LOG] Location: http://localhost:5173/subject/CSS @ :0
+[   43532ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/pages/Subject.jsx?t=1784691668795:0
+[   43535ms] [ERROR] [hmr] Failed to reload /src/pages/Subject.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/node_modules/.vite/deps/chunk-GPWO6QDY.js?v=6f463b1c:48992
+[   52021ms] [LOG] THREE.WebGLRenderer: Context Lost. @ http://localhost:5173/node_modules/.vite/deps/chunk-GPWO6QDY.js?v=6f463b1c:33268

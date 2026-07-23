@@ -1,0 +1,11 @@
+[    1124ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[    3431ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://accounts.google.com/gsi/button?theme=outline&size=large&width=280&text=continue_with&is_fedcm_supported=true&client_id=679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com&iframe_id=gsi_496909_777611&cas=YiLgll5ZnRh9tfqEKoy8Uy9NXxWmddQ5LwK%2FXt5YmK8:0
+[    3651ms] [ERROR] [GSI_LOGGER]: The given origin is not allowed for the given client ID. @ https://ssl.gstatic.com/_/gsi/_/js/k=gsi.gsi.en_GB.E_EE5Bfztos.O/am=AAAAAAQBmCwE/d=1/rs=AF0KOtVZ79ZrORUkFbb-AjlMUjPe_wWepg/m=credential_button_library:87
+[   31771ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   31934ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: C%20Programming, decoded: C Programming} @ http://127.0.0.1:5173/src/pages/Subject.jsx:33
+[   31949ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: C%20Programming, decoded: C Programming} @ http://127.0.0.1:5173/src/pages/Subject.jsx:33
+[   32569ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: C%20Programming, decoded: C Programming} @ http://127.0.0.1:5173/src/pages/Subject.jsx:33
+[   32584ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: C%20Programming, decoded: C Programming} @ http://127.0.0.1:5173/src/pages/Subject.jsx:33
+[   32697ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: C%20Programming, decoded: C Programming} @ http://127.0.0.1:5173/src/pages/Subject.jsx:33
+[   32702ms] [LOG] SUBJECT RENDER: {params: Object, rawCat: C%20Programming, decoded: C Programming} @ http://127.0.0.1:5173/src/pages/Subject.jsx:33
+[   43953ms] [LOG] THREE.WebGLRenderer: Context Lost. @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-BPI6V6JP.js?v=1444e9cd:33268

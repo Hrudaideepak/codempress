@@ -50,9 +50,13 @@ function HUD() {
             fontWeight: 800,
             fontSize: 16,
             letterSpacing: "0.5px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          ⬡ Codempress
+          <img src="/brand/android_adaptive_icon.png" alt="" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+          Codempress
         </Link>
         <Link to="/library" style={{ color: "#888", fontSize: 13 }}>
           Library

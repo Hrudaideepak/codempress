@@ -1,0 +1,42 @@
+- generic [ref=f27e3]:
+  - banner [ref=f27e4]:
+    - generic [ref=f27e5]:
+      - link "⬡ Codempress" [ref=f27e6] [cursor=pointer]:
+        - /url: /library
+      - link "Library" [ref=f27e7] [cursor=pointer]:
+        - /url: /library
+    - generic [ref=f27e8]: Lv. 1
+  - generic [ref=f27e11]:
+    - button "← Back" [ref=f27e12] [cursor=pointer]
+    - generic [ref=f27e13]:
+      - generic [ref=f27e14] [cursor=pointer]:
+        - generic [ref=f27e15]:
+          - generic [ref=f27e16]: 🛠️
+          - generic [ref=f27e17]:
+            - generic [ref=f27e18]: Dev Login Bypass
+            - generic [ref=f27e19]: Skip auth — log in instantly for local dev
+        - generic [ref=f27e20]: Enter →
+      - generic [ref=f27e21]:
+        - img "Codempress" [ref=f27e22]
+        - paragraph [ref=f27e23]: Unlock your Arcane Library
+      - generic [ref=f27e24]:
+        - button "Sign in" [ref=f27e25] [cursor=pointer]
+        - button "Create account" [ref=f27e26] [cursor=pointer]
+      - generic [ref=f27e27]:
+        - generic [ref=f27e28]:
+          - generic [ref=f27e29]: Email
+          - textbox "Email" [ref=f27e30]:
+            - /placeholder: you@example.com
+        - generic [ref=f27e31]:
+          - generic [ref=f27e32]: Password
+          - generic [ref=f27e33]:
+            - textbox "Password Show password" [ref=f27e34]:
+              - /placeholder: ••••••••
+            - button "Show password" [ref=f27e35] [cursor=pointer]: Show
+        - button "Sign in" [disabled] [ref=f27e36]
+      - generic [ref=f27e37]: or
+      - generic "Sign in with Google" [ref=f27e40]:
+        - generic [ref=f27e41]:
+          - button "Continue with Google. Opens in new tab" [ref=f27e43] [cursor=pointer]:
+            - generic [ref=f27e45]: Continue with Google
+          - iframe

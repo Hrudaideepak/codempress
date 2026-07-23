@@ -1,4 +1,5 @@
 {
+  "name": "codempress",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {

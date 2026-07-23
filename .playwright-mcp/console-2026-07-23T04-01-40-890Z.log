@@ -1,0 +1,223 @@
+[      63ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[    2223ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[    2224ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[    2280ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[    6749ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[    6749ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[    6809ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[    9701ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[    9701ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[    9750ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   12136ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   12136ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   12188ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   13988ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   13988ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   14041ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   17029ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   17030ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   17089ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   21300ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   21301ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   21362ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   23199ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   23199ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   23255ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   26855ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   26856ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   26915ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   31564ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   31564ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   31616ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   35585ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   35585ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   35667ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   40327ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   40327ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   40381ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   44520ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   44520ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   44575ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   46466ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   46466ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   46518ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   51251ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   51252ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   51308ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   52773ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   52773ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   52832ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   56502ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   56502ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   56558ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   59837ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   59838ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   59902ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   61925ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   61925ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   61982ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   63658ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   63659ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   63722ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   67301ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   67301ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   67355ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   69503ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   69505ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   69562ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   73861ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   73861ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   73918ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   75997ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   75997ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   76047ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   80397ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   80397ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   80459ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   83488ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   83489ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   83544ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   87078ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   87078ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   87131ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   91923ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   91923ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   91980ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   94914ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   94914ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   94963ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[   99152ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[   99152ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[   99214ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  102313ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  102313ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  102373ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  106122ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  106123ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  106175ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  108716ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  108716ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  108775ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  112873ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  112874ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  112932ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  115564ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  115565ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  115622ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  118975ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  118975ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  119041ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  120685ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  120685ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  120742ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  125369ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  125370ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  125430ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  129573ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  129573ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  129642ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  133074ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  133074ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  133143ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  137239ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  137239ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  137292ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  139505ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  139505ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  139556ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  143676ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  143676ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  143731ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  146180ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  146180ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  146239ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  150891ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  150892ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  150952ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  155763ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  155764ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  155845ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  157271ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  157271ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  157326ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  161442ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  161442ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  161520ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  165433ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  165433ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  165493ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  167457ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  167457ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  167524ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  169491ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  169492ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  169551ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  171023ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  171023ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  171078ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  173025ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  173025ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  173084ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  176689ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  176689ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  176756ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  181086ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  181086ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  181160ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  185780ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  185781ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  185845ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  188655ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  188655ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  188708ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  190528ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  190529ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  190594ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  192291ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  192291ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  192350ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  197109ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  197109ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  197161ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  198813ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  198813ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  198864ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  202992ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  202992ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  203050ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  205024ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  205024ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  205080ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  206719ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  206719ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  206777ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  210009ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  210009ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  210061ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  213782ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  213782ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  213837ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  216557ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  216557ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  216615ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  219847ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  219848ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  219907ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  222533ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  222533ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  222602ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  226958ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  226958ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  227022ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  228689ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  228689ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  228738ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  231203ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  231203ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  231273ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  235654ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  235654ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  235714ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550
+[  238957ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:5173/?token=pPm3A7EXfL5j' failed: Error during WebSocket handshake: Unexpected response code: 400 @ http://127.0.0.1:5173/@vite/client:535
+[  238957ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5173/@vite/client:559
+[  239012ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=1444e9cd:21550

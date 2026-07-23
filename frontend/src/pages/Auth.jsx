@@ -209,9 +209,9 @@ export default function Auth() {
 
         <div className="auth-head" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <img
-            src="/full_logo.png"
+            src="/brand/android_adaptive_icon.png"
             alt="Codempress"
-            style={{ width: "160px", height: "auto", marginBottom: "16px", display: "block" }}
+            style={{ width: "96px", height: "96px", borderRadius: "20px", marginBottom: "16px", display: "block" }}
           />
           <p>Unlock your Arcane Library</p>
         </div>

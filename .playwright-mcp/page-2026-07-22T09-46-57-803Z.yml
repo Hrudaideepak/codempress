@@ -1,0 +1,34 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "⬡ Codempress" [ref=e6] [cursor=pointer]:
+        - /url: /library
+      - link "Library" [ref=e7] [cursor=pointer]:
+        - /url: /library
+    - generic [ref=e8]:
+      - generic [ref=e9]: Lv. 1
+      - link "U" [ref=e11] [cursor=pointer]:
+        - /url: /profile
+  - generic [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: TODAY'S MISSION
+          - heading "Your Daily Action Plan" [level=1] [ref=e22]
+        - generic [ref=e23]: 5 Day Streak
+      - paragraph [ref=e27]: "Zero decisions required. Complete these 3 micro-tasks today to advance your software engineering readiness:"
+      - generic [ref=e28]:
+        - generic [ref=e33] [cursor=pointer]:
+          - text: 1. Learn (15m)
+          - generic [ref=e34]: Arrays & Prefix Sums
+        - generic [ref=e45] [cursor=pointer]:
+          - text: 2. Practice Quiz
+          - generic [ref=e46]: 8 MCQ Assessment
+        - generic [ref=e51] [cursor=pointer]:
+          - text: 3. Spaced Review
+          - generic [ref=e52]: Recursion Base Cases
+      - button "Start Today's Plan" [ref=e53] [cursor=pointer]
+    - generic [ref=e57]:
+      - heading "Curriculum & Learning Paths" [level=2] [ref=e58]
+      - generic [ref=e59]: 0 Subjects Available
+    - heading "Loading subjects…" [level=2] [ref=e61]

@@ -1,0 +1,18 @@
+- generic [ref=f6e3]:
+  - banner [ref=f6e4]:
+    - generic [ref=f6e5]:
+      - link "⬡ Codempress" [ref=f6e6] [cursor=pointer]:
+        - /url: /library
+      - link "Library" [ref=f6e7] [cursor=pointer]:
+        - /url: /library
+    - generic [ref=f6e8]:
+      - generic [ref=f6e9]: Lv. 1
+      - link "U" [ref=f6e11] [cursor=pointer]:
+        - /url: /profile
+  - generic [ref=f6e12]:
+    - link "← All subjects" [ref=f6e13] [cursor=pointer]:
+      - /url: /library
+    - generic [ref=f6e19]:
+      - heading "Subject" [level=1] [ref=f6e20]
+      - paragraph [ref=f6e21]: Loading this subject's curriculum…
+    - heading "Summoning the shelf…" [level=2] [ref=f6e23]
