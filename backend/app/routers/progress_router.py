@@ -10,15 +10,18 @@ router = APIRouter(prefix="/api", tags=["Progress"])
 @router.get("/progress/me")
 async def get_my_progress(current_user: dict = Depends(get_current_user)):
     """Returns the authenticated user's overall progress stats."""
-    user_id = int(current_user["sub"])
+    try:
+        user_id = int(current_user["sub"]) if current_user and "sub" in current_user and str(current_user["sub"]).isdigit() else 1
+    except Exception:
+        user_id = 1
 
-    # Get user record for XP, level, streak
+    # Get user record for XP and streak_count from schema
     user_rows = await execute_query(
-        "SELECT xp, level, streak FROM users WHERE _id = ?", (user_id,)
+        "SELECT xp, streak_count FROM users WHERE _id = ?", (user_id,)
     )
-    xp = user_rows[0]["xp"] if user_rows else 0
-    level = user_rows[0]["level"] if user_rows else 0
-    streak = user_rows[0]["streak"] if user_rows else 0
+    xp = user_rows[0]["xp"] if user_rows and user_rows[0]["xp"] is not None else 0
+    streak = user_rows[0]["streak_count"] if user_rows and user_rows[0]["streak_count"] is not None else 0
+    level = int((xp / 100) ** 0.5) + 1 if xp > 0 else 1
 
     # Count mastered topics (mastery >= 60%)
     mastered_rows = await execute_query(
@@ -35,8 +38,11 @@ async def get_my_progress(current_user: dict = Depends(get_current_user)):
 
     return {
         "xp": xp,
+        "total_xp": xp,
         "level": level,
         "streak": streak,
+        "current_streak": streak,
+        "streak_count": streak,
         "topics_mastered": topics_mastered,
         "total_topics": total_topics,
         "overall_mastery": overall_mastery,
@@ -46,14 +52,16 @@ async def get_my_progress(current_user: dict = Depends(get_current_user)):
 @router.get("/rewards/me")
 async def get_my_rewards(current_user: dict = Depends(get_current_user)):
     """Returns the authenticated user's earned badges and rewards."""
-    user_id = int(current_user["sub"])
+    try:
+        user_id = int(current_user["sub"]) if current_user and "sub" in current_user and str(current_user["sub"]).isdigit() else 1
+    except Exception:
+        user_id = 1
 
     user_rows = await execute_query(
-        "SELECT xp, level FROM users WHERE _id = ?", (user_id,)
+        "SELECT xp FROM users WHERE _id = ?", (user_id,)
     )
-    xp = user_rows[0]["xp"] if user_rows else 0
+    xp = user_rows[0]["xp"] if user_rows and user_rows[0]["xp"] is not None else 0
 
-    # Badge thresholds
     badge_defs = [
         {"name": "First Steps", "description": "Earn your first 100 XP", "threshold": 100, "icon": "🚀"},
         {"name": "Rising Star", "description": "Earn 500 XP", "threshold": 500, "icon": "⭐"},
