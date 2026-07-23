@@ -41,17 +41,8 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const loginDevBypass = async () => {
-    setLoading(true);
-    try {
-      const res = await api.devLogin();
-      setSession(res.token, res.user);
-      setUser(res.user);
-      return res.user;
-    } finally {
-      setLoading(false);
-    }
-  };
+
+
 
   const loginWithEmail = async (token, user) => {
     setSession(token, user);
@@ -94,7 +85,6 @@ export function AuthProvider({ children }) {
         user,
         loading,
         loginWithGoogle,
-        loginDevBypass,
         loginWithEmail,
         signup,
         login,

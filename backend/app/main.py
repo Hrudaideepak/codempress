@@ -22,6 +22,7 @@ from backend.app.routers.curriculum_router import router as curriculum_router
 from backend.app.routers.generation_router import router as generation_router
 from backend.app.routers.quiz_router import router as quiz_router
 from backend.app.routers.ai_router import router as ai_router
+from backend.app.routers.progress_router import router as progress_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s")
 logger = logging.getLogger("codempress.app")
@@ -146,6 +147,7 @@ app.include_router(curriculum_router)
 app.include_router(generation_router)
 app.include_router(quiz_router)
 app.include_router(ai_router)
+app.include_router(progress_router)
 
 @app.get("/health")
 def health_check():

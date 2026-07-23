@@ -226,3 +226,42 @@ async def mark_theory_read(topic_id: int, current_user: dict = Depends(get_curre
         "theory_read": True,
         "mastery": mastery_percent
     }
+
+@router.get("/topics/{topic_id}/quiz")
+async def get_topic_quiz(topic_id: int, current_user: Optional[dict] = Depends(get_current_user_optional)):
+    """Returns quiz questions for a specific topic."""
+    topic_rows = await execute_query("SELECT _id, title, subject_name FROM topics WHERE _id = ?", (topic_id,))
+    if not topic_rows:
+        raise HTTPException(status_code=404, detail="Topic not found")
+
+    topic = topic_rows[0]
+    questions_rows = await execute_query(
+        "SELECT _id, question_text, code_snippet, options_json, correct_answer FROM questions WHERE topic_id = ?",
+        (topic_id,),
+    )
+
+    return {
+        "topic_id": topic_id,
+        "title": topic["title"],
+        "subject_name": topic["subject_name"],
+        "questions": [
+            {
+                "_id": q["_id"],
+                "question_text": q["question_text"],
+                "code_snippet": q["code_snippet"],
+                "options": json.loads(q["options_json"]) if q["options_json"] else [],
+                "correct_answer": q["correct_answer"] if q["correct_answer"] is not None else 0,
+            }
+            for q in questions_rows
+        ],
+    }
+
+@router.get("/topics/{topic_id}/challenges")
+async def get_topic_challenges(topic_id: int, current_user: Optional[dict] = Depends(get_current_user_optional)):
+    """Returns coding challenges for a topic. Currently returns an empty list as challenges are not yet implemented."""
+    topic_rows = await execute_query("SELECT _id FROM topics WHERE _id = ?", (topic_id,))
+    if not topic_rows:
+        raise HTTPException(status_code=404, detail="Topic not found")
+
+    return {"topic_id": topic_id, "challenges": []}
+
