@@ -84,7 +84,7 @@ jobs:
           cd frontend
           npm install
           npm run build
-          npx cap sync android
+          npx @capacitor/cli sync android
 
       - name: Build Android APK with Gradle
         run: |
