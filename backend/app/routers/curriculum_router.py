@@ -217,7 +217,7 @@ async def mark_theory_read(topic_id: int, current_user: dict = Depends(get_curre
         )
         
     # Recalculate topic mastery
-    from backend.quiz_router import recalculate_topic_mastery
+    from backend.app.routers.quiz_router import recalculate_topic_mastery
     mastery_percent = await recalculate_topic_mastery(user_id, topic_id)
     
     return {
