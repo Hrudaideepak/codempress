@@ -18,9 +18,10 @@ COPY . /app
 
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONUNBUFFERED=1
-EXPOSE 8008
+ENV PORT=10000
+EXPOSE 10000
 
 RUN useradd -u 8888 appuser && chown -R appuser:appuser /app
 USER appuser
 
-CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8008}"]
+CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "10000"]
