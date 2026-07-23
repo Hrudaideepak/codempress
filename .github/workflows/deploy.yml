@@ -79,15 +79,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Frontend Dependencies & Build Web Bundle
+      - name: Build Web Bundle & Sync Capacitor Android
         run: |
           cd frontend
-          npm install --legacy-peer-deps
+          npm install
           npm run build
-
-      - name: Sync Capacitor Android Project
-        run: |
-          cd frontend
           npx cap sync android
 
       - name: Build Android APK with Gradle
