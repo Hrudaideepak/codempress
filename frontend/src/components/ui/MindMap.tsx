@@ -91,7 +91,7 @@ export default function MindMap({ topics, onSelectTopic }: MindMapProps) {
                     : isCleared
                     ? "linear-gradient(135deg, #10B981, #059669)"
                     : "linear-gradient(135deg, #6366F1, #8B5CF6)",
-                  border: "4px solid #0B0F17",
+                  border: "3px solid #E2E8F0",
                   boxShadow: isLocked
                     ? "none"
                     : isCleared
@@ -117,10 +117,10 @@ export default function MindMap({ topics, onSelectTopic }: MindMapProps) {
                   cursor: isLocked ? "not-allowed" : "pointer",
                   opacity: isLocked ? 0.5 : 1,
                   borderColor: isCleared
-                    ? "rgba(16, 185, 129, 0.4)"
+                    ? "#A7F3D0"
                     : isLocked
-                    ? "rgba(255, 255, 255, 0.08)"
-                    : "rgba(139, 92, 246, 0.4)"
+                    ? "#E2E8F0"
+                    : "#DDD6FE"
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", alignItems: "center" }}>
@@ -140,7 +140,7 @@ export default function MindMap({ topics, onSelectTopic }: MindMapProps) {
                   )}
                 </div>
 
-                <h4 style={{ fontSize: "16px", color: "#fff", marginBottom: "6px" }}>
+                <h4 style={{ fontSize: "16px", color: "#0F172A", marginBottom: "6px" }}>
                   {topic.title}
                 </h4>
                 <p style={{ fontSize: "13px", color: "var(--ink-soft)", lineHeight: 1.5, marginBottom: "12px" }}>
@@ -148,7 +148,7 @@ export default function MindMap({ topics, onSelectTopic }: MindMapProps) {
                 </p>
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "12px", color: "#C084FC", fontWeight: 700 }}>+{topic.xp || 25} XP</span>
+                  <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: 700 }}>+{topic.xp || 25} XP</span>
                   {!isLocked && typeof topic.mastery === "number" && (
                     <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 600 }}>
                       {topic.mastery}%

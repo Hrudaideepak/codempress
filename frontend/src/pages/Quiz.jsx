@@ -135,7 +135,7 @@ export default function Quiz() {
             {passed ? <Award size={36} /> : <XCircle size={36} />}
           </div>
 
-          <h2 style={{ fontSize: "28px", color: "#fff", marginBottom: "8px" }}>
+          <h2 style={{ fontSize: "28px", color: "#0F172A", marginBottom: "8px" }}>
             {passed ? "Assessment Passed! 🎉" : "Keep Practicing"}
           </h2>
 
@@ -145,7 +145,7 @@ export default function Quiz() {
 
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.04)",
+              background: "#F8FAFC",
               padding: "16px 20px",
               borderRadius: "14px",
               border: "1px solid var(--border)",
@@ -156,7 +156,7 @@ export default function Quiz() {
             }}
           >
             <span style={{ fontWeight: 600, color: "var(--ink-soft)" }}>Topic Mastery Level</span>
-            <span style={{ fontWeight: 800, color: "#C084FC", fontSize: "18px" }}>
+            <span style={{ fontWeight: 800, color: "var(--primary)", fontSize: "18px" }}>
               {masteryResult.topic_mastery_percent}%
             </span>
           </div>
@@ -201,7 +201,7 @@ export default function Quiz() {
       </div>
 
       <Card glass padding="32px">
-        <h3 style={{ fontSize: "20px", color: "#fff", marginBottom: "20px", lineHeight: 1.5 }}>
+        <h3 style={{ fontSize: "20px", color: "#0F172A", marginBottom: "20px", lineHeight: 1.5 }}>
           {current.question_text}
         </h3>
 
@@ -228,7 +228,7 @@ export default function Quiz() {
             return (
               <div key={i} className={cardClass} onClick={() => handleSelect(i)}>
                 <span className="option-idx">{String.fromCharCode(65 + i)}</span>
-                <span style={{ flex: 1, color: "#fff", fontSize: "15px" }}>{opt}</span>
+                <span style={{ flex: 1, color: "#0F172A", fontSize: "15px" }}>{opt}</span>
                 {hasAnswered && isCorrect && <CheckCircle2 size={20} color="#34D399" />}
                 {hasAnswered && isSelected && !isCorrect && <XCircle size={20} color="#EF4444" />}
               </div>

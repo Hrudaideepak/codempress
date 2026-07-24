@@ -85,10 +85,9 @@ export default function Button({
         : "0 4px 14px rgba(16, 185, 129, 0.2)"
     },
     secondary: {
-      background: "var(--bg-glass-subtle, rgba(255, 255, 255, 0.06))",
-      border: "1px solid var(--border, rgba(255, 255, 255, 0.12))",
-      backdropFilter: "blur(12px)",
-      color: "var(--ink, #F8FAFC)"
+      background: "#FFFFFF",
+      border: "1.5px solid var(--border, #E2E8F0)",
+      color: "var(--ink, #0F172A)"
     },
     ghost: {
       background: isHovered ? "rgba(99, 102, 241, 0.1)" : "transparent",

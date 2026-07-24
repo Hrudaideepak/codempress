@@ -134,7 +134,7 @@ export default function Profile() {
             )}
 
             <div>
-              <h1 style={{ fontSize: "28px", color: "#fff", marginBottom: "4px" }}>
+              <h1 style={{ fontSize: "28px", color: "#0F172A", marginBottom: "4px" }}>
                 {profileUser?.name || "Software Engineer"}
               </h1>
               <p style={{ color: "var(--ink-soft)", fontSize: "14px", marginBottom: "8px" }}>
@@ -148,7 +148,7 @@ export default function Profile() {
           </div>
 
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: "36px", fontWeight: 800, color: "#C084FC" }}>{xp} XP</div>
+            <div style={{ fontSize: "36px", fontWeight: 800, color: "var(--primary)" }}>{xp} XP</div>
             <div style={{ fontSize: "13px", color: "var(--ink-soft)", marginTop: "4px" }}>
               {level >= 5 ? "Max Level Reached 🏆" : `${xpNeededForNext} XP to ${nextLevelName}`}
             </div>
@@ -193,7 +193,7 @@ export default function Profile() {
 
       {/* Achievement Badges */}
       <div style={{ marginBottom: "32px" }}>
-        <h2 style={{ fontSize: "22px", color: "#fff", marginBottom: "16px" }}>Achievement Badges</h2>
+        <h2 style={{ fontSize: "22px", color: "#0F172A", marginBottom: "16px" }}>Achievement Badges</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
           {achievements.map((ach) => {
             const Icon = ach.icon;
@@ -215,15 +215,15 @@ export default function Profile() {
                     width: "44px",
                     height: "44px",
                     borderRadius: "12px",
-                    background: ach.unlocked ? ach.color : "rgba(255, 255, 255, 0.05)",
+                    background: ach.unlocked ? ach.color : "#F1F5F9",
                     display: "grid",
                     placeItems: "center"
                   }}
                 >
-                  <Icon size={22} color="#ffffff" />
+                  <Icon size={22} color={ach.unlocked ? "#ffffff" : "#94A3B8"} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: "16px", color: "#fff", marginBottom: "4px" }}>{ach.title}</h4>
+                  <h4 style={{ fontSize: "16px", color: "#0F172A", marginBottom: "4px" }}>{ach.title}</h4>
                   <p style={{ fontSize: "13px", color: "var(--ink-soft)" }}>{ach.description}</p>
                 </div>
               </Card>
@@ -234,13 +234,13 @@ export default function Profile() {
 
       {/* Subject Progress Breakdown */}
       <div>
-        <h2 style={{ fontSize: "22px", color: "#fff", marginBottom: "16px" }}>Subject Progress</h2>
+        <h2 style={{ fontSize: "22px", color: "#0F172A", marginBottom: "16px" }}>Subject Progress</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
           {subjects.map((sub) => (
             <Card key={sub.name} glass padding="20px">
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
-                <span style={{ fontWeight: 700, color: "#fff" }}>{sub.name}</span>
-                <span style={{ fontSize: "13px", color: "#C084FC", fontWeight: 700 }}>
+                <span style={{ fontWeight: 700, color: "#0F172A" }}>{sub.name}</span>
+                <span style={{ fontSize: "13px", color: "var(--primary)", fontWeight: 700 }}>
                   {sub.mastered_topics} / {sub.total_topics} Mastered
                 </span>
               </div>

@@ -48,9 +48,9 @@ export default function Landing() {
       <div className="features-grid">
         <Card hoverLift clickable onClick={enter}>
           <div className="feature-icon">
-            <Layers size={24} color="#8B5CF6" />
+            <Layers size={24} color="#7C3AED" />
           </div>
-          <h3 style={{ fontSize: "18px", color: "#fff", marginBottom: "8px" }}>
+          <h3 style={{ fontSize: "18px", color: "#0F172A", marginBottom: "8px", fontFamily: "var(--font-heading)" }}>
             Interactive Subject Mind Maps
           </h3>
           <p style={{ color: "var(--ink-soft)", fontSize: "14px", lineHeight: "1.6" }}>
@@ -59,10 +59,10 @@ export default function Landing() {
         </Card>
 
         <Card hoverLift clickable onClick={enter}>
-          <div className="feature-icon" style={{ background: "rgba(6, 182, 212, 0.15)", borderColor: "rgba(6, 182, 212, 0.3)" }}>
-            <Terminal size={24} color="#06B6D4" />
+          <div className="feature-icon" style={{ background: "#E0F2FE", borderColor: "#BAE6FD" }}>
+            <Terminal size={24} color="#0284C7" />
           </div>
-          <h3 style={{ fontSize: "18px", color: "#fff", marginBottom: "8px" }}>
+          <h3 style={{ fontSize: "18px", color: "#0F172A", marginBottom: "8px", fontFamily: "var(--font-heading)" }}>
             Code Forge Playground
           </h3>
           <p style={{ color: "var(--ink-soft)", fontSize: "14px", lineHeight: "1.6" }}>
@@ -71,10 +71,10 @@ export default function Landing() {
         </Card>
 
         <Card hoverLift clickable onClick={enter}>
-          <div className="feature-icon" style={{ background: "rgba(16, 185, 129, 0.15)", borderColor: "rgba(16, 185, 129, 0.3)" }}>
-            <Zap size={24} color="#10B981" />
+          <div className="feature-icon" style={{ background: "#ECFDF5", borderColor: "#A7F3D0" }}>
+            <Zap size={24} color="#059669" />
           </div>
-          <h3 style={{ fontSize: "18px", color: "#fff", marginBottom: "8px" }}>
+          <h3 style={{ fontSize: "18px", color: "#0F172A", marginBottom: "8px", fontFamily: "var(--font-heading)" }}>
             Gamified Quiz Arenas
           </h3>
           <p style={{ color: "var(--ink-soft)", fontSize: "14px", lineHeight: "1.6" }}>
@@ -84,9 +84,9 @@ export default function Landing() {
       </div>
 
       {/* Call to Action Bar */}
-      <div className="glass-panel" style={{ marginTop: "64px", textAlignment: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-        <Award size={36} color="#FBBF24" />
-        <h2 style={{ fontSize: "28px", color: "#fff" }}>Ready to elevate your engineering skills?</h2>
+      <div className="glass-panel" style={{ marginTop: "64px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", textAlign: "center" }}>
+        <Award size={36} color="#D97706" />
+        <h2 style={{ fontSize: "28px", color: "#0F172A" }}>Ready to elevate your engineering skills?</h2>
         <p style={{ color: "var(--ink-soft)", maxWidth: "560px", textAlign: "center" }}>
           Join thousands of CS students learning with structured AI theory and real code execution.
         </p>

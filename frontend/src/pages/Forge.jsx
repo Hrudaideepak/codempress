@@ -224,7 +224,7 @@ export default function Forge() {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
         <div>
-          <h2 style={{ fontSize: "28px", color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
+          <h2 style={{ fontSize: "28px", color: "#0F172A", display: "flex", alignItems: "center", gap: "10px" }}>
             <Terminal color="#C084FC" /> Code Forge Playground
           </h2>
           <p style={{ color: "var(--ink-soft)", fontSize: "14px" }}>

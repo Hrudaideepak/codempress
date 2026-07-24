@@ -88,7 +88,7 @@ export default function Subject() {
               <Sparkles size={14} />
               <span>{decoded} Path</span>
             </div>
-            <h1 style={{ fontSize: "32px", color: "#fff", marginBottom: "8px" }}>{decoded}</h1>
+            <h1 style={{ fontSize: "32px", color: "#0F172A", marginBottom: "8px" }}>{decoded}</h1>
             <p style={{ color: "var(--ink-soft)", fontSize: "15px", maxWidth: "600px" }}>
               {cat
                 ? `${cat.topic_count} topics structured in progressive order.`

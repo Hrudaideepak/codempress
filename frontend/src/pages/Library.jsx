@@ -61,7 +61,7 @@ export default function Library() {
               <Target size={18} />
               <span>DAILY ENGINEERING MISSION</span>
             </div>
-            <h1 style={{ fontSize: "28px", color: "#fff", margin: 0, fontWeight: 800 }}>
+            <h1 style={{ fontSize: "28px", color: "#0F172A", margin: 0, fontWeight: 800 }}>
               Your Daily Action Plan
             </h1>
           </div>
@@ -79,36 +79,36 @@ export default function Library() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px", marginBottom: "28px" }}>
           <Card hoverLift clickable onClick={() => navigate("/topic/1")}>
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(99, 102, 241, 0.2)", color: "#818CF8", display: "grid", placeItems: "center", flexShrink: 0 }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "#EDE9FE", color: "#7C3AED", display: "grid", placeItems: "center", flexShrink: 0 }}>
                 <BookOpen size={20} />
               </div>
               <div>
-                <span style={{ fontSize: "11px", fontWeight: 800, color: "#818CF8", textTransform: "uppercase" }}>1. Learn (15m)</span>
-                <div style={{ fontWeight: 700, fontSize: "14px", color: "#fff" }}>Arrays & Prefix Sums</div>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#7C3AED", textTransform: "uppercase" }}>1. Learn (15m)</span>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#0F172A" }}>Arrays & Prefix Sums</div>
               </div>
             </div>
           </Card>
 
           <Card hoverLift clickable onClick={() => navigate("/quiz/1")}>
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.2)", color: "#FBBF24", display: "grid", placeItems: "center", flexShrink: 0 }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "#FEF3C7", color: "#D97706", display: "grid", placeItems: "center", flexShrink: 0 }}>
                 <Brain size={20} />
               </div>
               <div>
-                <span style={{ fontSize: "11px", fontWeight: 800, color: "#FBBF24", textTransform: "uppercase" }}>2. MCQ Challenge</span>
-                <div style={{ fontWeight: 700, fontSize: "14px", color: "#fff" }}>8 Question Assessment</div>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#D97706", textTransform: "uppercase" }}>2. MCQ Challenge</span>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#0F172A" }}>8 Question Assessment</div>
               </div>
             </div>
           </Card>
 
           <Card hoverLift clickable onClick={() => navigate("/forge")}>
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(16, 185, 129, 0.2)", color: "#34D399", display: "grid", placeItems: "center", flexShrink: 0 }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "#ECFDF5", color: "#059669", display: "grid", placeItems: "center", flexShrink: 0 }}>
                 <Zap size={20} />
               </div>
               <div>
-                <span style={{ fontSize: "11px", fontWeight: 800, color: "#34D399", textTransform: "uppercase" }}>3. Code Playground</span>
-                <div style={{ fontWeight: 700, fontSize: "14px", color: "#fff" }}>Interactive Execution</div>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#059669", textTransform: "uppercase" }}>3. Code Playground</span>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#0F172A" }}>Interactive Execution</div>
               </div>
             </div>
           </Card>
@@ -123,7 +123,7 @@ export default function Library() {
       <div className="library-header">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
           <div>
-            <h2 style={{ fontSize: "24px", color: "#fff" }}>Curriculum & Subjects</h2>
+            <h2 style={{ fontSize: "24px", color: "#0F172A" }}>Curriculum & Subjects</h2>
             <p style={{ color: "var(--ink-soft)", fontSize: "14px" }}>
               {subjects.length} subjects covering full Computer Science fundamentals
             </p>
