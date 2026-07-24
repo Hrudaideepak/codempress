@@ -5,9 +5,15 @@ from pathlib import Path
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_DIR = BASE_DIR / "database"
-DB_PATH = DB_DIR / "skillforge.db"
-SCHEMA_PATH = DB_DIR / "schema.sql"
+raw_db_path = os.environ.get("DB_PATH") or os.environ.get("DATABASE_PATH")
+if raw_db_path:
+    DB_PATH = Path(raw_db_path)
+    DB_DIR = DB_PATH.parent
+else:
+    DB_DIR = BASE_DIR / "database"
+    DB_PATH = DB_DIR / "skillforge.db"
+SCHEMA_PATH = BASE_DIR / "database" / "schema.sql"
+
 
 # Add root directory to sys.path to import curriculum modules
 sys.path.insert(0, str(BASE_DIR))

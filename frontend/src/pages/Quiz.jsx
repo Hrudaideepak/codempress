@@ -4,6 +4,8 @@ import { api } from "../api";
 import { useToast } from "../ToastContext";
 import RewardBanner from "../RewardBanner";
 import { CheckCircle2, XCircle, Award, ArrowLeft, ArrowRight, HelpCircle, Sparkles } from "lucide-react";
+import { soundService } from "../services/soundService";
+import { fireCelebrationConfetti } from "../utils/confetti";
 
 export default function Quiz() {
   const params = useParams();
@@ -54,9 +56,11 @@ export default function Quiz() {
     // In our backend schema, questions carry correct_answer index
     const isCorrect = optIdx === current.correct_answer;
     if (isCorrect) {
+      soundService.playCorrect();
       setScore((s) => s + 1);
       toast.push("Correct answer! +10 XP", "success");
     } else {
+      soundService.playIncorrect();
       toast.push("Incorrect answer.", "error");
     }
   };
@@ -78,6 +82,11 @@ export default function Quiz() {
         setPassed(data.passed);
         setFinished(true);
         window.dispatchEvent(new Event("codempress:progress"));
+
+        if (data.passed) {
+          soundService.playLevelUp();
+          fireCelebrationConfetti();
+        }
       } catch (err) {
         toast.push("Failed to submit quiz results", "error");
       }
@@ -87,21 +96,25 @@ export default function Quiz() {
   if (status === "loading")
     return (
       <div className="container">
-        <div className="state" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px" }}>
-          <div style={{
-            width: "54px",
-            height: "54px",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, #f59e0b 0%, #d97706 100%)",
-            boxShadow: "0 0 24px rgba(245, 158, 11, 0.6), 0 0 48px rgba(245, 158, 11, 0.3)",
-            display: "grid",
-            placeItems: "center",
-            marginBottom: "20px"
-          }}>
-            <HelpCircle size={28} color="#ffffff" />
+        <div className="quiz">
+          <div className="skeleton skeleton-pill" style={{ width: "120px", height: "20px", marginBottom: "24px" }} />
+          
+          <div style={{ marginBottom: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+              <div className="skeleton skeleton-text" style={{ width: "100px", height: "16px" }} />
+              <div className="skeleton skeleton-text" style={{ width: "80px", height: "16px" }} />
+            </div>
+            <div className="skeleton" style={{ height: "8px", borderRadius: "999px" }} />
           </div>
-          <h2 style={{ color: "#b45309", fontSize: "22px", fontWeight: 700 }}>Preparing Quiz Assessment…</h2>
-          <p style={{ color: "#d97706", fontSize: "14px", marginTop: "6px" }}>Fetching question bank and configuring options</p>
+
+          <div className="question">
+            <div className="skeleton skeleton-title" style={{ width: "85%", height: "28px", marginBottom: "20px" }} />
+            <div className="options" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="skeleton" style={{ height: "58px", borderRadius: "16px" }} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

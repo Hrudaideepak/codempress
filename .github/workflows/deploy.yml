@@ -97,3 +97,62 @@ jobs:
         with:
           name: codempress-android-app
           path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+
+  deploy-render:
+    name: Deploy Backend to Render
+    needs: [test, build-containers]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Trigger Render Deployment Hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Triggering Render deploy..."
+            curl -X POST "$RENDER_DEPLOY_HOOK_URL"
+          else
+            echo "RENDER_DEPLOY_HOOK_URL secret not set, skipping automatic Render webhook trigger."
+          fi
+
+  deploy-vercel:
+    name: Deploy Frontend to Vercel
+    needs: [test, build-containers]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./frontend
+
+  verify-deployment:
+    name: Verify Production Deployment
+    needs: [deploy-render, deploy-vercel]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Wait for services to stabilize & Verify Deployment
+        run: |
+          echo "Waiting 30 seconds for Render and Vercel rollouts..."
+          sleep 30
+          python scripts/verify_deployment.py --backend https://codempress-backend.onrender.com --frontend https://codempress.vercel.app || true
+

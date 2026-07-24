@@ -1,10 +1,15 @@
 import { useEffect } from "react";
+import { soundService } from "./services/soundService";
+import { fireCelebrationConfetti } from "./utils/confetti";
 
 // Celebratory banner shown when the user earns a new reward.
 // `reward` is the new_reward object from an API response.
 export default function RewardBanner({ reward, onClose }) {
   useEffect(() => {
     if (!reward) return;
+    soundService.playLevelUp();
+    fireCelebrationConfetti();
+
     const t = setTimeout(() => onClose?.(), 6000);
     return () => clearTimeout(t);
   }, [reward, onClose]);

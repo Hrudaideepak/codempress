@@ -4,6 +4,8 @@ import { api } from "../api";
 import { useToast } from "../ToastContext";
 import RewardBanner from "../RewardBanner";
 import { ArrowLeft, BookOpen, CheckCircle2, HelpCircle, Sparkles, Send, Play } from "lucide-react";
+import { soundService } from "../services/soundService";
+import { fireCelebrationConfetti } from "../utils/confetti";
 
 function renderBody(text) {
   if (!text) return null;
@@ -73,11 +75,16 @@ export default function TopicReader() {
 
   const finishTheory = async () => {
     try {
+      soundService.playCorrect();
       const res = await api.markTheoryRead(id);
       setMarked(true);
       window.dispatchEvent(new Event("codempress:progress"));
       toast.push(`Theory complete! Mastery: ${res.mastery}%`, "success");
-      if (res.new_reward) setReward(res.new_reward);
+      if (res.new_reward) {
+        soundService.playLevelUp();
+        fireCelebrationConfetti();
+        setReward(res.new_reward);
+      }
     } catch (e) {
       toast.push(e.message, "error");
     }
@@ -102,8 +109,24 @@ export default function TopicReader() {
   if (status === "loading")
     return (
       <div className="container">
-        <div className="state">
-          <h2>Opening the lesson…</h2>
+        <div className="skeleton skeleton-pill" style={{ width: "180px", height: "20px", marginBottom: "24px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }}>
+          <div className="reader">
+            <div className="skeleton skeleton-title" style={{ width: "70%", height: "36px", marginBottom: "20px" }} />
+            <div className="skeleton skeleton-block" style={{ height: "80px", borderRadius: "16px", marginBottom: "24px" }} />
+            <div className="skeleton skeleton-text" style={{ width: "100%" }} />
+            <div className="skeleton skeleton-text" style={{ width: "95%" }} />
+            <div className="skeleton skeleton-text" style={{ width: "90%" }} />
+            <div className="skeleton skeleton-text short" style={{ marginBottom: "24px" }} />
+            <div className="skeleton skeleton-block" style={{ height: "140px", borderRadius: "12px" }} />
+          </div>
+          <div className="skeleton-card" style={{ height: "320px", borderRadius: "24px" }}>
+            <div className="skeleton skeleton-title" style={{ width: "60%", height: "24px", marginBottom: "16px" }} />
+            <div className="skeleton skeleton-text" style={{ width: "100%", marginBottom: "12px" }} />
+            <div className="skeleton skeleton-text" style={{ width: "80%", marginBottom: "20px" }} />
+            <div className="skeleton" style={{ height: "40px", borderRadius: "12px", marginBottom: "10px" }} />
+            <div className="skeleton" style={{ height: "40px", borderRadius: "12px" }} />
+          </div>
         </div>
       </div>
     );

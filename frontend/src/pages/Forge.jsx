@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { soundService } from "../services/soundService";
+import { fireCelebrationConfetti } from "../utils/confetti";
 
 const JS_TEMPLATES = [
   {
@@ -141,13 +143,17 @@ export default function Forge() {
         worker.onmessage = (e) => {
           if (e.data.status === 'success') {
             setOutput(e.data.output);
+            soundService.playCorrect();
+            fireCelebrationConfetti();
           } else {
+            soundService.playIncorrect();
             setOutput(`⚠️ JS Evaluation Error: ${e.data.error}`);
           }
           worker.terminate();
         };
 
         worker.onerror = (err) => {
+          soundService.playIncorrect();
           setOutput(`⚠️ JS Execution Error: ${err.message}`);
           worker.terminate();
         };
@@ -165,7 +171,10 @@ export default function Forge() {
             logs.push(`→ Return: ${typeof result === 'object' ? JSON.stringify(result) : String(result)}`);
           }
           setOutput(logs.join("\n") || "Script ran successfully with no log outputs.");
+          soundService.playCorrect();
+          fireCelebrationConfetti();
         } catch (e) {
+          soundService.playIncorrect();
           setOutput(`⚠️ JS Evaluation Error: ${e.message}`);
         } finally {
           console.log = oldLog;
@@ -189,7 +198,10 @@ export default function Forge() {
           outText += `\n→ Return: ${result}`;
         }
         setOutput(outText.trim() || "Python script completed with no prints.");
+        soundService.playCorrect();
+        fireCelebrationConfetti();
       } catch (err) {
+        soundService.playIncorrect();
         setOutput(`⚠️ Python Error: ${err.message}`);
       }
     }

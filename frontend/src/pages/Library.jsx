@@ -158,8 +158,18 @@ export default function Library() {
       </div>
 
       {status === "loading" && (
-        <div className="state">
-          <h2>Loading subjects…</h2>
+        <div className="grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton-card" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="skeleton skeleton-pill" style={{ width: "90px", height: "20px" }} />
+                <div className="skeleton skeleton-text" style={{ width: "60px", height: "18px" }} />
+              </div>
+              <div className="skeleton skeleton-title" style={{ width: "75%", height: "24px" }} />
+              <div className="skeleton skeleton-text" style={{ width: "100%" }} />
+              <div className="skeleton skeleton-text short" style={{ width: "50%" }} />
+            </div>
+          ))}
         </div>
       )}
 

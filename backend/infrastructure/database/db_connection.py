@@ -6,9 +6,17 @@ import sys
 from pathlib import Path
 from starlette.concurrency import run_in_threadpool
 
+import os
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-DB_DIR = BASE_DIR / "database"
-DB_PATH = DB_DIR / "skillforge.db"
+raw_db_path = os.environ.get("DB_PATH") or os.environ.get("DATABASE_PATH")
+if raw_db_path:
+    DB_PATH = Path(raw_db_path)
+    DB_DIR = DB_PATH.parent
+else:
+    DB_DIR = BASE_DIR / "database"
+    DB_PATH = DB_DIR / "skillforge.db"
+
 
 # Ensure BASE_DIR and content are in sys.path
 if str(BASE_DIR) not in sys.path:

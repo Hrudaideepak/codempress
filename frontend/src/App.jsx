@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { Volume2, VolumeX } from "lucide-react";
 import { api } from "./api";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ToastProvider, useToast } from "./ToastContext";
 import ErrorBoundary from "./ErrorBoundary";
 import Spinner from "./components/ui/Spinner";
+import { soundService } from "./services/soundService";
 
 // Route-based code-splitting via dynamic imports
 const Landing = lazy(() => import("./pages/Landing"));
@@ -20,6 +22,7 @@ const Forge = lazy(() => import("./pages/Forge"));
 function TopBar() {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState({ total_xp: 0, current_streak: 0 });
+  const [muted, setMuted] = useState(soundService.isMuted());
 
   const scheduleStreakReminder = () => {
     if (!window.Capacitor) return;
@@ -41,6 +44,14 @@ function TopBar() {
       });
     });
   };
+
+  useEffect(() => {
+    const handleSoundToggle = (e) => {
+      setMuted(e.detail.muted);
+    };
+    window.addEventListener("codempress:sound-toggle", handleSoundToggle);
+    return () => window.removeEventListener("codempress:sound-toggle", handleSoundToggle);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -79,6 +90,23 @@ function TopBar() {
             Forge 🛠️
           </Link>
         )}
+        <button
+          className="btn btn-ghost"
+          onClick={() => soundService.toggleMute()}
+          style={{
+            padding: "6px 12px",
+            fontSize: "12px",
+            marginRight: "10px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px"
+          }}
+          title={muted ? "Unmute audio feedback" : "Mute audio feedback"}
+          aria-label={muted ? "Unmute audio feedback" : "Mute audio feedback"}
+        >
+          {muted ? <VolumeX size={16} color="#94a3b8" /> : <Volume2 size={16} color="#7c3aed" />}
+          <span>{muted ? "Muted" : "Sound"}</span>
+        </button>
         <div className="stat-pills">
           <span className="pill xp">✦ {stats.total_xp} XP</span>
           <span className="pill streak">🔥 {stats.current_streak}</span>
