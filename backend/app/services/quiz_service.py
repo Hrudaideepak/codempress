@@ -11,6 +11,8 @@ class QuizService:
 
     async def process_quiz_submission(self, user_id: int, submission: QuizSubmission) -> QuizResultDTO:
         """Evaluates submitted answers, calculates score/XP/mastery, and commits database transaction."""
+        from backend.database import ensure_user_exists
+        user_id = await ensure_user_exists(user_id)
         topic_id = submission.topic_id
         answers = submission.answers
         
@@ -68,6 +70,8 @@ class QuizService:
 
     async def recalculate_topic_mastery(self, user_id: int, topic_id: int) -> int:
         """Calculates mastery: 30% for reading theory + up to 70% based on quiz accuracy."""
+        from backend.database import ensure_user_exists
+        user_id = await ensure_user_exists(user_id)
         prog = await self.repo.get_user_topic_progress(user_id, topic_id)
         has_progress = bool(prog)
         theory_score = 30 if (has_progress and prog.get("theory_read")) else 0
