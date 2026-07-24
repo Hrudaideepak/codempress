@@ -20,7 +20,18 @@ function FloatingGem({ position, color, scale }) {
 export default function HeroScene() {
   return (
     <div className="hero-3d" aria-hidden="true">
-      <Canvas camera={{ position: [0, 0, 6], fov: 50 }} dpr={[1, 2]} tabIndex={-1} style={{ outline: 'none' }}>
+      <Canvas
+        camera={{ position: [0, 0, 6], fov: 50 }}
+        dpr={[1, 1.5]}
+        gl={{ powerPreference: "high-performance", antialias: true, failIfMajorPerformanceCaveat: false }}
+        onCreated={({ gl }) => {
+          gl.domElement.addEventListener("webglcontextlost", (event) => {
+            event.preventDefault();
+          }, false);
+        }}
+        tabIndex={-1}
+        style={{ outline: 'none' }}
+      >
         <ambientLight intensity={0.9} />
         <directionalLight position={[5, 5, 5]} intensity={1.1} />
         <pointLight position={[-5, -3, 2]} intensity={0.6} color="#f43f5e" />

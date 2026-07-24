@@ -189,14 +189,40 @@ async def get_library(current_user: Optional[dict] = Depends(get_current_user_op
         
     return {"categories": categories}
 
+async def ensure_user_in_db(user_id: int, current_user: Optional[dict] = None) -> int:
+    """Ensures user record exists in database table to prevent foreign key constraint failures."""
+    try:
+        user_rows = await execute_query("SELECT _id FROM users WHERE _id = ?", (user_id,))
+        if not user_rows:
+            email = (current_user and current_user.get("email")) or f"user_{user_id}@codempress.app"
+            name = (current_user and current_user.get("name")) or "Explorer"
+            sub_val = (current_user and str(current_user.get("sub"))) or f"sub_{user_id}"
+            try:
+                await execute_write(
+                    "INSERT INTO users (_id, google_sub, email, name) VALUES (?, ?, ?, ?)",
+                    (user_id, sub_val, email, name)
+                )
+            except Exception:
+                row_id = await execute_write(
+                    "INSERT INTO users (google_sub, email, name) VALUES (?, ?, ?)",
+                    (f"anon_{time.time()}", email, name)
+                )
+                user_id = row_id
+    except Exception as e:
+        logger.warning(f"ensure_user_in_db error: {e}")
+    return user_id
+
 @router.post("/topics/{topic_id}/theory-read")
 async def mark_theory_read(topic_id: int, current_user: dict = Depends(get_current_user)):
     """Marks a topic's theory as read and recalculates mastery."""
     try:
-        user_id = int(current_user["sub"]) if current_user and "sub" in current_user and str(current_user["sub"]).isdigit() else 1
+        sub_str = str(current_user.get("sub", "1"))
+        user_id = int(sub_str) if sub_str.isdigit() else 1
     except Exception:
         user_id = 1
     
+    user_id = await ensure_user_in_db(user_id, current_user)
+
     # Verify topic exists
     topic_rows = await execute_query("SELECT _id FROM topics WHERE _id = ?", (topic_id,))
     if not topic_rows:
