@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, Terminal, Shield, Sparkles } from "lucide-react";
 import { api } from "./api";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ToastProvider, useToast } from "./ToastContext";
@@ -23,6 +23,7 @@ function TopBar() {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState({ total_xp: 0, current_streak: 0 });
   const [muted, setMuted] = useState(soundService.isMuted());
+  const location = useLocation();
 
   const scheduleStreakReminder = () => {
     if (!window.Capacitor) return;
@@ -33,7 +34,7 @@ function TopBar() {
           LocalNotifications.schedule({
             notifications: [
               {
-                title: "Maintain your CodeEmpress streak! 🔥",
+                title: "Maintain your Codempress streak! 🔥",
                 body: "Don't let your code magic fade! Complete a quick topic now to keep your streak active.",
                 id: 42,
                 schedule: { at: new Date(Date.now() + 24 * 3600 * 1000) }
@@ -81,14 +82,27 @@ function TopBar() {
         <img
           src="/brand/android_adaptive_icon.png"
           alt="Codempress"
-          style={{ height: "36px", width: "36px", borderRadius: "8px", display: "block" }}
+          style={{ height: "36px", width: "36px", borderRadius: "10px", display: "block" }}
         />
+        <span className="brand-text">Codempress</span>
       </Link>
       <div className="topbar-right">
         {user && (
-          <Link to="/forge" className="btn btn-ghost" style={{ padding: "6px 12px", fontSize: "12px", marginRight: "10px", textDecoration: "none" }} title="Code Forge Playground">
-            Forge 🛠️
-          </Link>
+          <div style={{ display: "flex", gap: "8px", marginRight: "12px" }}>
+            <Link
+              to="/library"
+              className={`nav-link ${location.pathname === "/library" ? "active" : ""}`}
+            >
+              Library
+            </Link>
+            <Link
+              to="/forge"
+              className={`nav-link ${location.pathname === "/forge" ? "active" : ""}`}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <Terminal size={14} /> Forge
+            </Link>
+          </div>
         )}
         <button
           className="btn btn-ghost"
@@ -96,21 +110,28 @@ function TopBar() {
           style={{
             padding: "6px 12px",
             fontSize: "12px",
-            marginRight: "10px",
+            marginRight: "6px",
             display: "inline-flex",
             alignItems: "center",
-            gap: "6px"
+            gap: "6px",
+            borderRadius: "10px",
+            background: "rgba(255, 255, 255, 0.05)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            color: muted ? "#94A3B8" : "#C084FC",
+            cursor: "pointer"
           }}
           title={muted ? "Unmute audio feedback" : "Mute audio feedback"}
           aria-label={muted ? "Unmute audio feedback" : "Mute audio feedback"}
         >
-          {muted ? <VolumeX size={16} color="#94a3b8" /> : <Volume2 size={16} color="#7c3aed" />}
+          {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
           <span>{muted ? "Muted" : "Sound"}</span>
         </button>
+
         <div className="stat-pills">
           <span className="pill xp">✦ {stats.total_xp} XP</span>
           <span className="pill streak">🔥 {stats.current_streak}</span>
         </div>
+
         {user && (
           <div className="user-chip">
             <Link to="/profile" className="profile-link" title="Your profile">
@@ -122,9 +143,8 @@ function TopBar() {
                 </span>
               )}
             </Link>
-            <button className="logout-btn" onClick={logout} title="Sign out of your Codempress account">
-              <span className="logout-text">Sign out</span>
-              <span className="logout-icon">🚪</span>
+            <button className="logout-btn" onClick={logout} title="Sign out of your account">
+              <span>Sign out</span>
             </button>
           </div>
         )}
@@ -148,8 +168,9 @@ function AppShell() {
   const [updateInfo, setUpdateInfo] = useState(null);
 
   useEffect(() => {
-    const CURRENT_VERSION = "1.0.0"; // Local client version (triggers banner for testing)
-    api.getAppStatus()
+    const CURRENT_VERSION = "1.0.0";
+    api
+      .getAppStatus()
       .then((status) => {
         if (status && status.latest_version !== CURRENT_VERSION) {
           setUpdateInfo(status);
@@ -190,21 +211,22 @@ function AppShell() {
   return (
     <div className="app-shell">
       {updateInfo && (
-        <div style={{
-          backgroundColor: "#f59e0b",
-          color: "#ffffff",
-          padding: "10px 15px",
-          textAlign: "center",
-          fontWeight: "700",
-          fontSize: "14px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "10px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          zIndex: 1000,
-          position: "relative"
-        }}>
+        <div
+          style={{
+            backgroundColor: "#F59E0B",
+            color: "#ffffff",
+            padding: "10px 15px",
+            textAlign: "center",
+            fontWeight: "700",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            zIndex: 1000,
+            position: "relative"
+          }}
+        >
           <span>✨ A new update (v{updateInfo.latest_version}) is available!</span>
           <a
             href={updateInfo.apk_url}
@@ -240,11 +262,20 @@ function AppShell() {
         </div>
       )}
       <main className="main-content">
-        <Suspense fallback={
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
-            <Spinner size="lg" color="var(--primary)" />
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "60vh"
+              }}
+            >
+              <Spinner size="lg" color="var(--primary)" />
+            </div>
+          }
+        >
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={user ? <Navigate to="/library" replace /> : <Auth />} />

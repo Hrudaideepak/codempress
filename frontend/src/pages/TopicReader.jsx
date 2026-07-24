@@ -1,21 +1,61 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { useToast } from "../ToastContext";
 import RewardBanner from "../RewardBanner";
-import { ArrowLeft, BookOpen, CheckCircle2, HelpCircle, Sparkles, Send, Play } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Sparkles, Send, Play, Copy, Check } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Skeleton from "../components/ui/SkeletonLoader";
 import { soundService } from "../services/soundService";
 import { fireCelebrationConfetti } from "../utils/confetti";
+
+function CodeBlock({ code, language = "python" }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="code-block-container">
+      <div className="code-header">
+        <span>{language.toUpperCase()}</span>
+        <button
+          onClick={handleCopy}
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--ink-soft)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            fontSize: "12px"
+          }}
+        >
+          {copied ? <Check size={14} color="#34D399" /> : <Copy size={14} />}
+          <span>{copied ? "Copied" : "Copy"}</span>
+        </button>
+      </div>
+      <pre><code>{code}</code></pre>
+    </div>
+  );
+}
 
 function renderBody(text) {
   if (!text) return null;
   const html = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    .replace(/\*\*(.+?)\*\*/g, "<strong style='color:#fff;'>$1</strong>");
   return html
     .split(/\n{2,}/)
-    .map((p, i) => <p key={i} dangerouslySetInnerHTML={{ __html: p }} />);
+    .map((p, i) => (
+      <p key={i} style={{ marginBottom: "16px" }} dangerouslySetInnerHTML={{ __html: p }} />
+    ));
 }
 
 export default function TopicReader() {
@@ -29,7 +69,6 @@ export default function TopicReader() {
   const [marked, setMarked] = useState(false);
   const [reward, setReward] = useState(null);
   
-  // AI Doubt Chat State
   const [aiQuery, setAiQuery] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -60,16 +99,17 @@ export default function TopicReader() {
       .catch(() => setStatus("error"));
   }, [id]);
 
-  const runGeneration = async () => {
+  const runGeneration = async (topicId) => {
+    const targetId = topicId || id;
     setGenState("generating");
     try {
-      const generated = await api.generateTopic(id);
+      const generated = await api.generateTopic(targetId);
       setContent(generated);
       setTopic((prev) => ({ ...prev, ...generated }));
       setGenState("idle");
     } catch (e) {
       setGenState("error");
-      toast.push(e.message, "error");
+      toast.push(e.message || "AI generation failed", "error");
     }
   };
 
@@ -86,7 +126,7 @@ export default function TopicReader() {
         setReward(res.new_reward);
       }
     } catch (e) {
-      toast.push(e.message, "error");
+      toast.push(e.message || "Failed to save theory completion", "error");
     }
   };
 
@@ -106,210 +146,201 @@ export default function TopicReader() {
     }
   };
 
-  if (status === "loading")
+  if (status === "loading") {
     return (
-      <div className="container">
-        <div className="skeleton skeleton-pill" style={{ width: "180px", height: "20px", marginBottom: "24px" }} />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }}>
-          <div className="reader">
-            <div className="skeleton skeleton-title" style={{ width: "70%", height: "36px", marginBottom: "20px" }} />
-            <div className="skeleton skeleton-block" style={{ height: "80px", borderRadius: "16px", marginBottom: "24px" }} />
-            <div className="skeleton skeleton-text" style={{ width: "100%" }} />
-            <div className="skeleton skeleton-text" style={{ width: "95%" }} />
-            <div className="skeleton skeleton-text" style={{ width: "90%" }} />
-            <div className="skeleton skeleton-text short" style={{ marginBottom: "24px" }} />
-            <div className="skeleton skeleton-block" style={{ height: "140px", borderRadius: "12px" }} />
+      <div style={{ paddingBottom: "64px" }}>
+        <Skeleton width="180px" height="20px" style={{ marginBottom: "24px" }} />
+        <div className="reader-layout">
+          <div>
+            <Skeleton width="60%" height="36px" style={{ marginBottom: "20px" }} />
+            <Skeleton width="100%" height="100px" style={{ marginBottom: "24px" }} />
+            <Skeleton width="100%" height="200px" />
           </div>
-          <div className="skeleton-card" style={{ height: "320px", borderRadius: "24px" }}>
-            <div className="skeleton skeleton-title" style={{ width: "60%", height: "24px", marginBottom: "16px" }} />
-            <div className="skeleton skeleton-text" style={{ width: "100%", marginBottom: "12px" }} />
-            <div className="skeleton skeleton-text" style={{ width: "80%", marginBottom: "20px" }} />
-            <div className="skeleton" style={{ height: "40px", borderRadius: "12px", marginBottom: "10px" }} />
-            <div className="skeleton" style={{ height: "40px", borderRadius: "12px" }} />
+          <div>
+            <Skeleton width="100%" height="300px" borderRadius="16px" />
           </div>
         </div>
       </div>
     );
+  }
 
-  if (status === "error" || !topic)
+  if (status === "error" || !topic) {
     return (
-      <div className="container">
-        <div className="state">
-          <h2>Topic not found</h2>
-          <Link className="back-link" to="/library">
-            ← Back to Command Center
-          </Link>
-        </div>
+      <div style={{ paddingBottom: "64px" }}>
+        <button
+          onClick={() => navigate("/library")}
+          style={{ background: "none", border: "none", color: "var(--ink-soft)", cursor: "pointer" }}
+        >
+          ← Back to Library
+        </button>
+        <h2 style={{ color: "#fff", marginTop: "20px" }}>Topic not found</h2>
       </div>
     );
+  }
 
   const parsedTheory = topic.theory_json ? (typeof topic.theory_json === "string" ? JSON.parse(topic.theory_json) : topic.theory_json) : null;
   const view = (content && content.theory) ? content.theory : (parsedTheory || topic);
 
   return (
-    <div className="container">
+    <div style={{ paddingBottom: "64px" }}>
       <RewardBanner reward={reward} onClose={() => setReward(null)} />
-      
-      <Link className="back-link" to="/library" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-        <ArrowLeft size={16} />
-        <span>Back to Command Center</span>
-      </Link>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }}>
-        
-        {/* Left Column: Theory Prose & Code Examples */}
-        <div className="reader">
-          <h1 style={{ fontSize: "32px", fontWeight: 800, color: "#1f2937", marginBottom: "16px" }}>{topic.title}</h1>
+      <button
+        onClick={() => navigate("/library")}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--ink-soft)",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          fontSize: "14px",
+          fontWeight: 600,
+          cursor: "pointer",
+          marginBottom: "20px"
+        }}
+      >
+        <ArrowLeft size={16} /> Back to Library
+      </button>
+
+      <div className="reader-layout">
+        {/* Main Theory Section */}
+        <div className="glass-panel">
+          <div className="hero-badge" style={{ marginBottom: "12px" }}>
+            <BookOpen size={14} />
+            <span>Theory Module</span>
+          </div>
+
+          <h1 style={{ fontSize: "32px", color: "#fff", marginBottom: "20px" }}>{topic.title}</h1>
 
           {genState === "generating" && (
-            <div className="ai-gen-state">
-              <div className="ai-spinner" />
-              <h2>Generating lesson with AI…</h2>
-              <p>Our server-side AI failover engine is forging a complete lesson for this topic.</p>
+            <div style={{ textAlign: "center", padding: "40px 0" }}>
+              <div className="skeleton-shimmer" style={{ width: "48px", height: "48px", borderRadius: "50%", margin: "0 auto 16px" }} />
+              <h3 style={{ color: "#fff" }}>Generating theory with GitHub Models AI…</h3>
+              <p style={{ color: "var(--ink-soft)", fontSize: "14px", marginTop: "6px" }}>
+                Forging deep engineering explanations for this topic.
+              </p>
             </div>
           )}
 
           {genState === "error" && (
-            <div className="ai-gen-error">
-              <h2>⚠️ Couldn't generate the lesson</h2>
-              <p>The AI service failed to respond. Please try again.</p>
-              <button className="btn btn-primary" onClick={() => runGeneration()}>
+            <div style={{ padding: "24px", background: "rgba(239, 68, 68, 0.1)", borderRadius: "12px", border: "1px solid rgba(239, 68, 68, 0.3)" }}>
+              <h3 style={{ color: "#EF4444" }}>⚠️ Could not generate lesson content</h3>
+              <p style={{ color: "var(--ink-soft)", fontSize: "14px", margin: "8px 0 16px" }}>
+                The AI service failed to respond. Please try again.
+              </p>
+              <Button variant="danger" size="sm" onClick={() => runGeneration()}>
                 Retry Generation
-              </button>
+              </Button>
             </div>
           )}
 
           {genState === "idle" && (
             <>
-              {view.markdown ? (
-                <div className="body">{renderBody(view.markdown)}</div>
-              ) : (
-                <>
-                  {view.theory_intro && <div className="intro">{view.theory_intro}</div>}
-                  <div className="body">{renderBody(view.theory_body)}</div>
-                </>
-              )}
+              <div className="reader-content">
+                {view.markdown ? (
+                  renderBody(view.markdown)
+                ) : (
+                  <>
+                    {view.theory_intro && (
+                      <div style={{ padding: "16px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "12px", borderLeft: "4px solid var(--primary)", marginBottom: "20px" }}>
+                        <p style={{ margin: 0, color: "#E2E8F0" }}>{view.theory_intro}</p>
+                      </div>
+                    )}
+                    {renderBody(view.theory_body)}
+                  </>
+                )}
 
-              {/* Code Snippet Example */}
-              {(view.code_example || view.theory_syntax) && (
-                <div style={{ marginTop: "28px" }}>
-                  <h3 className="block-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Play size={18} color="#7c3aed" />
-                    <span>Interactive Code Snippet</span>
-                  </h3>
-                  <div className="code-block">
-                    {view.code_example?.code || view.theory_syntax}
+                {(view.code_example || view.theory_syntax) && (
+                  <div style={{ marginTop: "32px" }}>
+                    <h3 style={{ fontSize: "18px", color: "#fff", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <Play size={18} color="var(--primary)" /> Interactive Code Snippet
+                    </h3>
+                    <CodeBlock code={view.code_example?.code || view.theory_syntax} />
+                    {view.code_example?.explanation && (
+                      <p style={{ fontSize: "14px", color: "var(--ink-soft)", marginTop: "8px" }}>
+                        <strong>Explanation:</strong> {view.code_example.explanation}
+                      </p>
+                    )}
                   </div>
-                  {view.code_example?.explanation && (
-                    <div style={{ fontSize: "14px", color: "#6b7280", marginTop: "8px", background: "#f4f1ff", padding: "12px 16px", borderRadius: "12px" }}>
-                      <strong>Explanation:</strong> {view.code_example.explanation}
-                    </div>
-                  )}
-                  {view.code_example?.expected_output && (
-                    <div className="out" style={{ marginTop: "8px" }}>
-                      <strong>Output:</strong> {view.code_example.expected_output}
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
 
-              <div className="cta-row" style={{ marginTop: "36px" }}>
-                <button className="btn btn-ghost" onClick={finishTheory} disabled={marked}>
-                  {marked ? "✓ Theory Read" : "Mark Theory Complete"}
-                </button>
-                <button className="btn btn-primary" onClick={() => navigate(`/quiz/${topic?._id || topic?.id || id}`)}>
-                  Start Practice Quiz →
-                </button>
+              <div style={{ marginTop: "40px", paddingTop: "20px", borderTop: "1px solid var(--border)", display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                <Button
+                  variant={marked ? "secondary" : "primary"}
+                  onClick={finishTheory}
+                  disabled={marked}
+                  leftIcon={marked ? <CheckCircle2 size={16} color="#34D399" /> : null}
+                >
+                  {marked ? "Theory Read ✓" : "Mark Theory Complete"}
+                </Button>
+                <Button
+                  variant="glowing"
+                  onClick={() => navigate(`/quiz/${topic?._id || topic?.id || id}`)}
+                >
+                  Take Practice Quiz →
+                </Button>
               </div>
             </>
           )}
         </div>
 
-        {/* Right Column: Embedded Socratic AI Mentor Dock */}
-        <div style={{
-          background: "#ffffff",
-          border: "1.5px solid #ddd6fe",
-          borderRadius: "24px",
-          padding: "24px",
-          boxShadow: "0 10px 40px rgba(124,58,237,0.08)",
-          position: "sticky",
-          top: "88px"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#7c3aed", fontWeight: "700", fontSize: "15px", marginBottom: "16px" }}>
-            <Sparkles size={18} />
-            <span>AI Socratic Mentor</span>
-          </div>
-
-          <p style={{ fontSize: "13px", color: "#6b7280", marginBottom: "16px" }}>
-            Have a doubt about <strong>{topic.title}</strong>? Ask our AI mentor for a guided explanation.
-          </p>
-
-          {/* Quick Doubt Buttons */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-            <button
-              onClick={() => handleAskAI(`Explain ${topic.title} using a real-world analogy`)}
-              style={{ padding: "8px 12px", borderRadius: "12px", border: "1px solid #ddd6fe", background: "#f4f1ff", color: "#7c3aed", fontSize: "12px", fontWeight: 600, textAlign: "left", cursor: "pointer" }}
-            >
-              💡 "Explain using a real-world analogy"
-            </button>
-            <button
-              onClick={() => handleAskAI(`What are the common edge cases in ${topic.title}?`)}
-              style={{ padding: "8px 12px", borderRadius: "12px", border: "1px solid #ddd6fe", background: "#f4f1ff", color: "#7c3aed", fontSize: "12px", fontWeight: 600, textAlign: "left", cursor: "pointer" }}
-            >
-              ⚠️ "What are common edge cases?"
-            </button>
-          </div>
-
-          {/* Chat Response Area */}
-          {aiLoading && (
-            <div style={{ fontSize: "13px", color: "#7c3aed", fontWeight: 600, padding: "12px", background: "#f4f1ff", borderRadius: "12px", marginBottom: "12px" }}>
-              AI Mentor is thinking…
+        {/* AI Socratic Mentor Sidebar */}
+        <div>
+          <Card glass padding="24px" style={{ position: "sticky", top: "100px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#C084FC", fontWeight: 700, fontSize: "15px", marginBottom: "12px" }}>
+              <Sparkles size={18} />
+              <span>AI Socratic Mentor</span>
             </div>
-          )}
 
-          {aiResponse && (
-            <div style={{ fontSize: "13px", color: "#1f2937", lineHeight: 1.5, padding: "14px", background: "#f4f1ff", borderRadius: "12px", marginBottom: "16px", maxHeight: "200px", overflowY: "auto" }}>
-              {aiResponse}
+            <p style={{ fontSize: "13px", color: "var(--ink-soft)", marginBottom: "16px" }}>
+              Have a doubt about <strong>{topic.title}</strong>? Ask for a guided explanation.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+              <button
+                onClick={() => handleAskAI(`Explain ${topic.title} using a real-world analogy`)}
+                style={{ padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border)", background: "rgba(255, 255, 255, 0.04)", color: "#C084FC", fontSize: "12px", fontWeight: 600, textAlign: "left", cursor: "pointer" }}
+              >
+                💡 Real-world analogy
+              </button>
+              <button
+                onClick={() => handleAskAI(`What are common edge cases in ${topic.title}?`)}
+                style={{ padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border)", background: "rgba(255, 255, 255, 0.04)", color: "#C084FC", fontSize: "12px", fontWeight: 600, textAlign: "left", cursor: "pointer" }}
+              >
+                ⚠️ Edge cases to watch for
+              </button>
             </div>
-          )}
 
-          {/* Query Input */}
-          <div style={{ display: "flex", gap: "8px" }}>
-            <input
-              id="ai-query-input"
-              name="aiQuery"
-              type="text"
-              placeholder="Ask a doubt..."
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAskAI()}
-              style={{
-                flex: 1,
-                padding: "10px 14px",
-                borderRadius: "14px",
-                border: "1px solid #ddd6fe",
-                fontSize: "13px",
-                outline: "none"
-              }}
-            />
-            <button
-              onClick={() => handleAskAI()}
-              style={{
-                background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "14px",
-                padding: "10px 14px",
-                cursor: "pointer",
-                display: "grid",
-                placeItems: "center"
-              }}
-            >
-              <Send size={16} />
-            </button>
-          </div>
+            {aiLoading && (
+              <div style={{ fontSize: "13px", color: "#C084FC", padding: "12px", background: "rgba(139, 92, 246, 0.1)", borderRadius: "10px", marginBottom: "12px" }}>
+                AI Mentor is thinking…
+              </div>
+            )}
+
+            {aiResponse && (
+              <div style={{ fontSize: "13px", color: "#E2E8F0", lineHeight: 1.5, padding: "12px", background: "rgba(255, 255, 255, 0.04)", borderRadius: "10px", marginBottom: "16px", maxHeight: "180px", overflowY: "auto" }}>
+                {aiResponse}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                type="text"
+                placeholder="Ask a question..."
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAskAI()}
+                className="search-input"
+                style={{ fontSize: "13px", padding: "10px 12px" }}
+              />
+              <Button variant="primary" size="sm" onClick={() => handleAskAI()}>
+                <Send size={14} />
+              </Button>
+            </div>
+          </Card>
         </div>
-
       </div>
     </div>
   );

@@ -1,29 +1,40 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GOOGLE_CLIENT_ID, loadGoogleScript } from "../auth";
 import { useAuth } from "../AuthContext";
 import { useToast } from "../ToastContext";
+import { ArrowLeft, Lock, Mail, User, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import Button from "../components/ui/Button";
 
 function PasswordChecklist({ password }) {
   const rules = [
     { label: "At least 8 characters", test: (v) => v.length >= 8 },
-    { label: "No more than 200 characters", test: (v) => v.length <= 200 },
     { label: "An uppercase letter", test: (v) => /[A-Z]/.test(v) },
     { label: "A lowercase letter", test: (v) => /[a-z]/.test(v) },
     { label: "A number", test: (v) => /\d/.test(v) },
-    {
-      label: "A special character (!@#$…)",
-      test: (v) => /[^A-Za-z0-9]/.test(v),
-    },
+    { label: "Special character (!@#$…)", test: (v) => /[^A-Za-z0-9]/.test(v) }
   ];
   return (
-    <ul className="pwd-checklist">
+    <ul
+      style={{
+        listStyle: "none",
+        padding: "12px 14px",
+        background: "rgba(255, 255, 255, 0.03)",
+        borderRadius: "10px",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+        margin: "12px 0",
+        display: "flex",
+        flexDirection: "column",
+        gap: "6px",
+        fontSize: "12px"
+      }}
+    >
       {rules.map((r) => {
         const ok = password ? r.test(password) : false;
         return (
-          <li key={r.label} className={ok ? "ok" : ""}>
-            <span className="tick">{ok ? "✓" : "○"}</span>
-            {r.label}
+          <li key={r.label} style={{ color: ok ? "#34D399" : "var(--ink-faint)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <span>{ok ? "✓" : "○"}</span>
+            <span>{r.label}</span>
           </li>
         );
       })}
@@ -59,19 +70,11 @@ export default function Auth() {
   const formValid = emailValid && passwordValid && nameValid && !submitting;
 
   useEffect(() => {
-    // Skip loading the web script on native Capacitor builds to prevent network errors.
-    if (window.Capacitor) {
-      return;
-    }
-
+    if (window.Capacitor) return;
     if (!GOOGLE_CLIENT_ID) {
-      toast.push(
-        "Set VITE_GOOGLE_CLIENT_ID to enable Google sign-in.",
-        "error"
-      );
+      toast.push("Set VITE_GOOGLE_CLIENT_ID to enable Google sign-in.", "error");
       return;
     }
-    let cancelled = false;
     loadGoogleScript()
       .then((google) => {
         if (!window.__gsiInitialized) {
@@ -85,27 +88,24 @@ export default function Auth() {
               } catch (e) {
                 toast.push(e.message || "Sign-in failed", "error");
               }
-            },
+            }
           });
           window.__gsiInitialized = true;
         }
         if (gbtnRef.current) {
           google.accounts.id.renderButton(gbtnRef.current, {
-            theme: "outline",
+            theme: "filled_blue",
             size: "large",
             width: 280,
-            text: "continue_with",
+            text: "continue_with"
           });
         }
         setGoogleReady(true);
       })
       .catch((e) => {
-        console.warn("Google Web Script load blocked (common if using ad-blockers or offline):", e);
+        console.warn("Google Web Script load issue:", e);
       });
-    return () => {
-      cancelled = true;
-    };
-  }, []); // run once on mount — loginWithGoogle/navigate/toast refs are stable
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -135,7 +135,7 @@ export default function Auth() {
         clientId: "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com",
         serverClientId: "679239699589-urpbqdd50nvop2hgkeuc508q850glfj1.apps.googleusercontent.com",
         grantOfflineAccess: true,
-        scopes: ["profile", "email"],
+        scopes: ["profile", "email"]
       });
       const googleUser = await GoogleAuth.signIn();
       const token =
@@ -161,149 +161,176 @@ export default function Auth() {
   };
 
   return (
-    <div className="auth-page">
-      <button className="auth-home" onClick={() => navigate("/")}>
-        ← Back
-      </button>
-      <div className="auth-card">
-        <div className="auth-head" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <img
-            src="/brand/android_adaptive_icon.png"
-            alt="Codempress"
-            style={{ width: "96px", height: "96px", borderRadius: "20px", marginBottom: "16px", display: "block" }}
-          />
-          <p>Unlock your Arcane Library</p>
-        </div>
+    <div style={{ minHeight: "80vh", display: "grid", placeItems: "center", padding: "24px" }}>
+      <div style={{ width: "100%", maxWidth: "440px" }}>
+        <button
+          onClick={() => navigate("/")}
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--ink-soft)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            cursor: "pointer",
+            marginBottom: "20px"
+          }}
+        >
+          <ArrowLeft size={16} /> Back to home
+        </button>
 
-        <div className="auth-tabs">
-          <button
-            className={`auth-tab ${!isSignup ? "active" : ""}`}
-            onClick={() => setMode("signin")}
-          >
-            Sign in
-          </button>
-          <button
-            className={`auth-tab ${isSignup ? "active" : ""}`}
-            onClick={() => setMode("signup")}
-          >
-            Create account
-          </button>
-        </div>
-
-        <form className="auth-form" onSubmit={submit}>
-          {isSignup && (
-            <label className="auth-field" htmlFor="signup-name">
-              <span>Name</span>
-              <input
-                id="signup-name"
-                name="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ada Lovelace"
-                autoComplete="name"
-              />
-            </label>
-          )}
-
-          <label className="auth-field" htmlFor="auth-email">
-            <span>Email</span>
-            <input
-              id="auth-email"
-              name="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
+        <div className="glass-panel" style={{ padding: "36px" }}>
+          <div style={{ textAlign: "center", marginBottom: "28px" }}>
+            <img
+              src="/brand/android_adaptive_icon.png"
+              alt="Codempress"
+              style={{ width: "64px", height: "64px", borderRadius: "16px", marginBottom: "12px" }}
             />
-            {email && !emailValid && (
-              <span className="field-error">Enter a valid email address.</span>
-            )}
-          </label>
+            <h2 style={{ fontSize: "24px", color: "#fff", marginBottom: "6px" }}>
+              {isSignup ? "Create Your Account" : "Welcome Back"}
+            </h2>
+            <p style={{ color: "var(--ink-soft)", fontSize: "14px" }}>
+              Access your personalized CS curriculum & progress
+            </p>
+          </div>
 
-          <label className="auth-field" htmlFor="auth-password">
-            <span>Password</span>
-            <div className="pwd-wrap">
-              <input
-                id="auth-password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete={isSignup ? "new-password" : "current-password"}
-              />
-              <button
-                type="button"
-                className="pwd-toggle"
-                onClick={() => setShowPassword((s) => !s)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
-            </div>
-          </label>
-
-          {isSignup && <PasswordChecklist password={password} />}
-
-          <button type="submit" className="btn btn-primary auth-submit" disabled={!formValid}>
-            {submitting
-              ? "Please wait…"
-              : isSignup
-              ? "Create account"
-              : "Sign in"}
-          </button>
-        </form>
-
-        <div className="auth-divider">
-          <span>or</span>
-        </div>
-
-        <div className="auth-google" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-          {window.Capacitor ? (
+          <div
+            style={{
+              display: "flex",
+              background: "rgba(255, 255, 255, 0.05)",
+              borderRadius: "12px",
+              padding: "4px",
+              marginBottom: "24px"
+            }}
+          >
             <button
-              type="button"
-              className="btn btn-google-native"
-              onClick={handleNativeGoogleSignIn}
+              onClick={() => setMode("signin")}
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                width: "280px",
-                height: "40px",
-                backgroundColor: "#ffffff",
-                color: "#1f1f1f",
-                border: "1px solid #dadce0",
-                borderRadius: "4px",
-                fontFamily: "Roboto, arial, sans-serif",
-                fontSize: "14px",
-                fontWeight: "500",
+                flex: 1,
+                padding: "8px",
+                border: "none",
+                borderRadius: "8px",
+                background: !isSignup ? "var(--primary)" : "transparent",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: "13px",
                 cursor: "pointer",
-                margin: "0 auto",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                transition: "all 0.2s ease"
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.5 24c0-1.63-.15-3.2-.43-4.75H24v9h12.75c-.55 2.91-2.2 5.39-4.67 7.04l7.25 5.62C43.58 36.5 46.5 30.73 46.5 24z"/>
-                <path fill="#FBBC05" d="M10.54 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.98-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.25-5.62c-2.01 1.35-4.58 2.15-7.64 2.15-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
-              <span>Continue with Google</span>
+              Sign In
             </button>
-          ) : (
-            <>
-              {!googleReady && GOOGLE_CLIENT_ID && (
-                <span className="gbtn-fallback">Loading Google…</span>
-              )}
-              {!GOOGLE_CLIENT_ID && (
-                <span className="gbtn-fallback">Google not configured</span>
-              )}
-              <div ref={gbtnRef} className="gbtn" aria-label="Sign in with Google" style={{ margin: "0 auto" }} />
-            </>
-          )}
+            <button
+              onClick={() => setMode("signup")}
+              style={{
+                flex: 1,
+                padding: "8px",
+                border: "none",
+                borderRadius: "8px",
+                background: isSignup ? "var(--primary)" : "transparent",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer",
+                transition: "all 0.2s ease"
+              }}
+            >
+              Create Account
+            </button>
+          </div>
+
+          <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {isSignup && (
+              <div>
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--ink-soft)", display: "block", marginBottom: "6px" }}>
+                  Name
+                </label>
+                <div style={{ position: "relative" }}>
+                  <User size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--ink-faint)" }} />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Ada Lovelace"
+                    className="search-input"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--ink-soft)", display: "block", marginBottom: "6px" }}>
+                Email Address
+              </label>
+              <div style={{ position: "relative" }}>
+                <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--ink-faint)" }} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="search-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--ink-soft)", display: "block", marginBottom: "6px" }}>
+                Password
+              </label>
+              <div style={{ position: "relative" }}>
+                <Lock size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--ink-faint)" }} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="search-input"
+                  style={{ paddingRight: "40px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    color: "var(--ink-faint)",
+                    cursor: "pointer"
+                  }}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {isSignup && <PasswordChecklist password={password} />}
+
+            <Button variant="primary" fullWidth size="lg" loading={submitting} disabled={!formValid}>
+              {isSignup ? "Create Account" : "Sign In"}
+            </Button>
+          </form>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}>
+            <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+            <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>OR</span>
+            <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            {window.Capacitor ? (
+              <Button variant="secondary" fullWidth onClick={handleNativeGoogleSignIn}>
+                Continue with Google
+              </Button>
+            ) : (
+              <div ref={gbtnRef} style={{ width: "100%", display: "flex", justifyContent: "center" }} />
+            )}
+          </div>
         </div>
       </div>
     </div>

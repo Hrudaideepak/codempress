@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { useToast } from "../ToastContext";
-import RewardBanner from "../RewardBanner";
-import { CheckCircle2, XCircle, Award, ArrowLeft, ArrowRight, HelpCircle, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, Award, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { QuizSkeleton } from "../components/ui/SkeletonLoader";
+import EmptyState from "../components/ui/EmptyState";
 import { soundService } from "../services/soundService";
 import { fireCelebrationConfetti } from "../utils/confetti";
 
@@ -29,7 +32,8 @@ export default function Quiz() {
     if (!currentId || currentId === "undefined") return;
 
     setStatus("loading");
-    api.getTopic(currentId)
+    api
+      .getTopic(currentId)
       .then(async (topicData) => {
         let qList = topicData?.questions || [];
         if (!qList || qList.length === 0) {
@@ -52,8 +56,7 @@ export default function Quiz() {
   const handleSelect = (optIdx) => {
     if (selected !== null) return;
     setSelected(optIdx);
-    
-    // In our backend schema, questions carry correct_answer index
+
     const isCorrect = optIdx === current.correct_answer;
     if (isCorrect) {
       soundService.playCorrect();
@@ -70,7 +73,6 @@ export default function Quiz() {
       setIndex((i) => i + 1);
       setSelected(null);
     } else {
-      // Quiz finished - submit to backend
       const submissionAnswers = questions.map((q, i) => ({
         question_id: q._id,
         selected_option: selected !== null ? selected : 0
@@ -93,247 +95,155 @@ export default function Quiz() {
     }
   };
 
-  if (status === "loading")
+  if (status === "loading") {
     return (
-      <div className="container">
-        <div className="quiz">
-          <div className="skeleton skeleton-pill" style={{ width: "120px", height: "20px", marginBottom: "24px" }} />
-          
-          <div style={{ marginBottom: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-              <div className="skeleton skeleton-text" style={{ width: "100px", height: "16px" }} />
-              <div className="skeleton skeleton-text" style={{ width: "80px", height: "16px" }} />
-            </div>
-            <div className="skeleton" style={{ height: "8px", borderRadius: "999px" }} />
-          </div>
-
-          <div className="question">
-            <div className="skeleton skeleton-title" style={{ width: "85%", height: "28px", marginBottom: "20px" }} />
-            <div className="options" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="skeleton" style={{ height: "58px", borderRadius: "16px" }} />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="quiz-arena">
+        <QuizSkeleton />
       </div>
     );
+  }
 
-  if (status === "empty" || status === "error")
+  if (status === "empty" || status === "error") {
     return (
-      <div className="container">
-        <div className="state">
-          <h2>{errorMsg || "No quiz questions found"}</h2>
-          <p>Generate theory and questions first for this topic.</p>
-          <Link className="back-link" to={`/topic/${id}`}>
-            ← Back to Topic
-          </Link>
-        </div>
+      <div className="quiz-arena">
+        <EmptyState
+          title="No Quiz Questions Available"
+          description={errorMsg || "Theory and questions have not been forged for this topic yet."}
+          actionLabel="Back to Lesson"
+          onAction={() => navigate(`/topic/${id}`)}
+        />
       </div>
     );
+  }
 
-  if (finished && masteryResult)
+  if (finished && masteryResult) {
     return (
-      <div className="container">
-        <div style={{
-          maxWidth: "540px",
-          margin: "0 auto",
-          background: "#ffffff",
-          border: "1.5px solid #ddd6fe",
-          borderRadius: "28px",
-          padding: "40px",
-          textAlign: "center",
-          boxShadow: "0 10px 40px rgba(124,58,237,0.08)"
-        }}>
-          <div style={{
-            width: "72px",
-            height: "72px",
-            borderRadius: "50%",
-            background: passed ? "#e6f6ec" : "#fde7ec",
-            color: passed ? "#16a34a" : "#be123c",
-            display: "grid",
-            placeItems: "center",
-            margin: "0 auto 20px"
-          }}>
+      <div className="quiz-arena">
+        <Card glass padding="40px" style={{ textAlign: "center" }}>
+          <div
+            style={{
+              width: "72px",
+              height: "72px",
+              borderRadius: "50%",
+              background: passed ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
+              color: passed ? "#34D399" : "#EF4444",
+              display: "grid",
+              placeItems: "center",
+              margin: "0 auto 20px"
+            }}
+          >
             {passed ? <Award size={36} /> : <XCircle size={36} />}
           </div>
 
-          <h2 style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}>
+          <h2 style={{ fontSize: "28px", color: "#fff", marginBottom: "8px" }}>
             {passed ? "Assessment Passed! 🎉" : "Keep Practicing"}
           </h2>
 
-          <p style={{ color: "#6b7280", fontSize: "15px", marginBottom: "24px" }}>
+          <p style={{ color: "var(--ink-soft)", fontSize: "15px", marginBottom: "24px" }}>
             You scored <strong>{masteryResult.score_percent}%</strong> and earned <strong>+{masteryResult.xp_earned} XP</strong>!
           </p>
 
-          <div style={{ background: "#f4f1ff", padding: "16px 20px", borderRadius: "16px", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: 600, color: "#1f2937" }}>Topic Mastery Score</span>
-            <span style={{ fontWeight: 800, color: "#7c3aed", fontSize: "18px" }}>{masteryResult.topic_mastery_percent}%</span>
-          </div>
-
-          <button
-            onClick={() => navigate("/library")}
+          <div
             style={{
-              background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "18px",
-              padding: "16px 32px",
-              fontWeight: 800,
-              fontSize: "16px",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              width: "100%",
-              justifyContent: "center"
+              background: "rgba(255, 255, 255, 0.04)",
+              padding: "16px 20px",
+              borderRadius: "14px",
+              border: "1px solid var(--border)",
+              marginBottom: "28px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
             }}
           >
-            <span>Continue to Command Center</span>
-            <ArrowRight size={20} />
-          </button>
-        </div>
+            <span style={{ fontWeight: 600, color: "var(--ink-soft)" }}>Topic Mastery Level</span>
+            <span style={{ fontWeight: 800, color: "#C084FC", fontSize: "18px" }}>
+              {masteryResult.topic_mastery_percent}%
+            </span>
+          </div>
+
+          <Button variant="glowing" fullWidth size="lg" onClick={() => navigate("/library")} rightIcon={<ArrowRight size={20} />}>
+            Continue Learning
+          </Button>
+        </Card>
       </div>
     );
+  }
 
   return (
-    <div className="container">
-      <div className="quiz">
-        <Link className="back-link" to={`/topic/${id}`} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-          <ArrowLeft size={16} />
-          <span>Back to Lesson</span>
-        </Link>
+    <div className="quiz-arena">
+      <button
+        onClick={() => navigate(`/topic/${id}`)}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--ink-soft)",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          fontSize: "14px",
+          fontWeight: 600,
+          cursor: "pointer",
+          marginBottom: "20px"
+        }}
+      >
+        <ArrowLeft size={16} /> Back to Lesson
+      </button>
 
-        {/* Header Progress Bar */}
-        <div style={{ marginBottom: "24px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", fontWeight: 700, color: "#6b7280", marginBottom: "8px" }}>
-            <span>Question {index + 1} of {questions.length}</span>
-            <span>{Math.round(((index + 1) / questions.length) * 100)}% Complete</span>
-          </div>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${((index + 1) / questions.length) * 100}%` }} />
-          </div>
-        </div>
-
-        {/* Question Card */}
-        <div className="question">
-          <div className="q-text" style={{ fontSize: "20px", fontWeight: 700, marginBottom: "20px" }}>
-            {current.question_text}
-          </div>
-
-          {current.code_snippet && (
-            <div className="code-block" style={{ marginBottom: "20px" }}>
-              {current.code_snippet}
-            </div>
-          )}
-
-          {/* Options */}
-          <div className="options" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {current.options.map((opt, i) => {
-              const isSelected = selected === i;
-              const isCorrect = i === current.correct_answer;
-              const hasAnswered = selected !== null;
-
-              let cardBg = "#ffffff";
-              let cardBorder = "1.5px solid #e5e7eb";
-              let cardGlow = "none";
-              let textColor = "#1f2937";
-
-              if (hasAnswered) {
-                if (isCorrect) {
-                  cardBg = "rgba(16, 185, 129, 0.08)";
-                  cardBorder = "2px solid #10b981";
-                  cardGlow = "0 0 20px rgba(16, 185, 129, 0.4)";
-                  textColor = "#065f46";
-                } else if (isSelected) {
-                  cardBg = "rgba(239, 68, 68, 0.08)";
-                  cardBorder = "2px solid #ef4444";
-                  cardGlow = "0 0 20px rgba(239, 68, 68, 0.4)";
-                  textColor = "#991b1b";
-                }
-              }
-
-              return (
-                <button
-                  key={i}
-                  className="option"
-                  disabled={hasAnswered}
-                  onClick={() => handleSelect(i)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "18px 24px",
-                    borderRadius: "16px",
-                    background: cardBg,
-                    border: cardBorder,
-                    boxShadow: cardGlow,
-                    color: textColor,
-                    fontWeight: isSelected || (hasAnswered && isCorrect) ? 700 : 500,
-                    fontSize: "15px",
-                    cursor: hasAnswered ? "default" : "pointer",
-                    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                  }}
-                >
-                  <span style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "50%",
-                      background: isCorrect && hasAnswered ? "#10b981" : isSelected && !isCorrect ? "#ef4444" : "#f3f4f6",
-                      color: (isCorrect && hasAnswered) || (isSelected && !isCorrect) ? "#ffffff" : "#4b5563",
-                      display: "grid",
-                      placeItems: "center",
-                      fontSize: "13px",
-                      fontWeight: 700
-                    }}>
-                      {String.fromCharCode(65 + i)}
-                    </span>
-                    <span>{opt}</span>
-                  </span>
-
-                  {hasAnswered && (
-                    isCorrect ? (
-                      <div style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        color: "#10b981",
-                        fontWeight: 700,
-                        fontSize: "14px"
-                      }}>
-                        <span>Correct</span>
-                        <CheckCircle2 size={22} color="#10b981" />
-                      </div>
-                    ) : isSelected ? (
-                      <div style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        color: "#ef4444",
-                        fontWeight: 700,
-                        fontSize: "14px"
-                      }}>
-                        <span>Wrong</span>
-                        <XCircle size={22} color="#ef4444" />
-                      </div>
-                    ) : null
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Bottom Action Controls */}
-          {selected !== null && (
-            <div className="cta-row" style={{ marginTop: "24px" }}>
-              <button className="btn btn-primary" onClick={handleNext} style={{ width: "100%" }}>
-                {index + 1 >= questions.length ? "Finish Assessment →" : "Next Question →"}
-              </button>
-            </div>
-          )}
-        </div>
+      <div className="quiz-progress-header">
+        <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink-soft)" }}>
+          Question {index + 1} of {questions.length}
+        </span>
+        <span className="pill xp">{Math.round(((index + 1) / questions.length) * 100)}% Complete</span>
       </div>
+
+      <div className="progress-bar-bg" style={{ marginBottom: "28px" }}>
+        <div className="progress-bar-fill" style={{ width: `${((index + 1) / questions.length) * 100}%` }} />
+      </div>
+
+      <Card glass padding="32px">
+        <h3 style={{ fontSize: "20px", color: "#fff", marginBottom: "20px", lineHeight: 1.5 }}>
+          {current.question_text}
+        </h3>
+
+        {current.code_snippet && (
+          <div className="code-block-container" style={{ marginBottom: "20px" }}>
+            <pre><code>{current.code_snippet}</code></pre>
+          </div>
+        )}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {current.options.map((opt, i) => {
+            const isSelected = selected === i;
+            const isCorrect = i === current.correct_answer;
+            const hasAnswered = selected !== null;
+
+            let cardClass = "option-card";
+            if (hasAnswered) {
+              if (isCorrect) cardClass += " correct";
+              else if (isSelected) cardClass += " incorrect";
+            } else if (isSelected) {
+              cardClass += " selected";
+            }
+
+            return (
+              <div key={i} className={cardClass} onClick={() => handleSelect(i)}>
+                <span className="option-idx">{String.fromCharCode(65 + i)}</span>
+                <span style={{ flex: 1, color: "#fff", fontSize: "15px" }}>{opt}</span>
+                {hasAnswered && isCorrect && <CheckCircle2 size={20} color="#34D399" />}
+                {hasAnswered && isSelected && !isCorrect && <XCircle size={20} color="#EF4444" />}
+              </div>
+            );
+          })}
+        </div>
+
+        {selected !== null && (
+          <div style={{ marginTop: "28px" }}>
+            <Button variant="primary" fullWidth size="lg" onClick={handleNext} rightIcon={<ArrowRight size={18} />}>
+              {index + 1 >= questions.length ? "Complete Quiz Assessment" : "Next Question"}
+            </Button>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

@@ -1,24 +1,27 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useToast } from "../ToastContext";
-import { 
-  Flame, BookOpen, ArrowRight, Brain, Zap, Target 
-} from "lucide-react";
-
+import { Flame, BookOpen, ArrowRight, Brain, Zap, Target, Search, CheckCircle } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { CardSkeleton } from "../components/ui/SkeletonLoader";
+import EmptyState from "../components/ui/EmptyState";
 
 export default function Library() {
   const [subjects, setSubjects] = useState([]);
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const toast = useToast();
 
   useEffect(() => {
-    // Use api.getLibrary() — sends the JWT token, returns categories with topic counts
-    api.getLibrary()
+    api
+      .getLibrary()
       .then((data) => {
-        // Map categories → subjects shape expected by the grid
         const subs = (data.categories || []).map((cat) => ({
           name: cat.name,
           total_topics: cat.topic_count,
@@ -26,9 +29,10 @@ export default function Library() {
             ? Math.round(
                 (cat.topics.filter((t) => t.cleared).length / cat.topic_count) * 100
               )
-            : 0,
+            : 0
         }));
         setSubjects(subs);
+        setFilteredSubjects(subs);
         setStatus(subs.length ? "ready" : "empty");
       })
       .catch((e) => {
@@ -37,179 +41,173 @@ export default function Library() {
       });
   }, []);
 
+  useEffect(() => {
+    let result = subjects;
+    if (searchQuery.trim()) {
+      result = result.filter((s) =>
+        s.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setFilteredSubjects(result);
+  }, [searchQuery, subjects]);
+
   return (
-    <div className="container">
-      {/* 🎯 TODAY'S ACTION PLAN HERO CARD (The Signature Feature) */}
-      <div style={{        background: "linear-gradient(135deg, #ffffff 0%, #f4f1ff 100%)",
-        border: "1.5px solid #ddd6fe",
-        borderRadius: "24px",
-        padding: "32px",
-        marginBottom: "36px",
-        boxShadow: "0 10px 40px rgba(124,58,237,0.08)"
-      }}>
+    <div style={{ paddingBottom: "64px" }}>
+      {/* Today's Action Plan Hero Card */}
+      <div className="glass-panel" style={{ marginBottom: "36px", border: "1px solid rgba(139, 92, 246, 0.3)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#7c3aed", fontWeight: "700", fontSize: "14px", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--primary)", fontWeight: "700", fontSize: "13px", marginBottom: "6px" }}>
               <Target size={18} />
-              <span>TODAY'S MISSION</span>
+              <span>DAILY ENGINEERING MISSION</span>
             </div>
-            <h1 style={{ fontSize: "28px", color: "#1f2937", margin: 0, fontWeight: 800 }}>
+            <h1 style={{ fontSize: "28px", color: "#fff", margin: 0, fontWeight: 800 }}>
               Your Daily Action Plan
             </h1>
           </div>
-          <div style={{
-            background: "#fde7ec",
-            color: "#be123c",
-            padding: "8px 16px",
-            borderRadius: "999px",
-            fontWeight: 800,
-            fontSize: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px"
-          }}>
-            <Flame size={16} fill="#be123c" />
-            <span>5 Day Streak</span>
+          <div className="pill streak">
+            <Flame size={16} fill="#FBBF24" />
+            <span>Active Learning Streak</span>
           </div>
         </div>
 
-        <p style={{ color: "#6b7280", fontSize: "15px", marginBottom: "24px" }}>
-          Zero decisions required. Complete these 3 micro-tasks today to advance your software engineering readiness:
+        <p style={{ color: "var(--ink-soft)", fontSize: "15px", marginBottom: "24px" }}>
+          Zero friction. Complete these 3 micro-modules today to systematically level up your software engineering skills:
         </p>
 
-        {/* 3 Micro-Tasks */}
+        {/* 3 Action Tasks */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px", marginBottom: "28px" }}>
-          <div 
-            onClick={() => navigate("/topic/1")}
-            style={{ background: "#ffffff", padding: "18px", borderRadius: "16px", border: "1px solid #e6e2f0", display: "flex", alignItems: "center", gap: "14px", cursor: "pointer", transition: "transform 0.15s ease" }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "none"}
-          >
-            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#ede7fb", color: "#7c3aed", display: "grid", placeItems: "center", flexShrink: 0 }}>
-              <BookOpen size={20} />
+          <Card hoverLift clickable onClick={() => navigate("/topic/1")}>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(99, 102, 241, 0.2)", color: "#818CF8", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                <BookOpen size={20} />
+              </div>
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#818CF8", textTransform: "uppercase" }}>1. Learn (15m)</span>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#fff" }}>Arrays & Prefix Sums</div>
+              </div>
             </div>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#7c3aed", textTransform: "uppercase" }}>1. Learn (15m)</span>
-              <div style={{ fontWeight: 700, fontSize: "14px", color: "#1f2937" }}>Arrays & Prefix Sums</div>
-            </div>
-          </div>
+          </Card>
 
-          <div 
-            onClick={() => navigate("/quiz/1")}
-            style={{ background: "#ffffff", padding: "18px", borderRadius: "16px", border: "1px solid #e6e2f0", display: "flex", alignItems: "center", gap: "14px", cursor: "pointer", transition: "transform 0.15s ease" }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "none"}
-          >
-            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#fde7ec", color: "#be123c", display: "grid", placeItems: "center", flexShrink: 0 }}>
-              <Brain size={20} />
+          <Card hoverLift clickable onClick={() => navigate("/quiz/1")}>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.2)", color: "#FBBF24", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                <Brain size={20} />
+              </div>
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#FBBF24", textTransform: "uppercase" }}>2. MCQ Challenge</span>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#fff" }}>8 Question Assessment</div>
+              </div>
             </div>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#be123c", textTransform: "uppercase" }}>2. Practice Quiz</span>
-              <div style={{ fontWeight: 700, fontSize: "14px", color: "#1f2937" }}>8 MCQ Assessment</div>
-            </div>
-          </div>
+          </Card>
 
-          <div 
-            onClick={() => navigate("/topic/36")}
-            style={{ background: "#ffffff", padding: "18px", borderRadius: "16px", border: "1px solid #e6e2f0", display: "flex", alignItems: "center", gap: "14px", cursor: "pointer", transition: "transform 0.15s ease" }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "none"}
-          >
-            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#e6f6ec", color: "#16a34a", display: "grid", placeItems: "center", flexShrink: 0 }}>
-              <Zap size={20} />
+          <Card hoverLift clickable onClick={() => navigate("/forge")}>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(16, 185, 129, 0.2)", color: "#34D399", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                <Zap size={20} />
+              </div>
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#34D399", textTransform: "uppercase" }}>3. Code Playground</span>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#fff" }}>Interactive Execution</div>
+              </div>
             </div>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#16a34a", textTransform: "uppercase" }}>3. Spaced Review</span>
-              <div style={{ fontWeight: 700, fontSize: "14px", color: "#1f2937" }}>Recursion Base Cases</div>
-            </div>
+          </Card>
+        </div>
+
+        <Button variant="glowing" size="lg" onClick={() => navigate("/topic/1")} rightIcon={<ArrowRight size={20} />}>
+          Start Today's Mission
+        </Button>
+      </div>
+
+      {/* Subject Search and Filter */}
+      <div className="library-header">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+          <div>
+            <h2 style={{ fontSize: "24px", color: "#fff" }}>Curriculum & Subjects</h2>
+            <p style={{ color: "var(--ink-soft)", fontSize: "14px" }}>
+              {subjects.length} subjects covering full Computer Science fundamentals
+            </p>
           </div>
         </div>
 
-        {/* Primary CTA */}
-        <button
-          onClick={() => navigate("/topic/1")}
-          style={{
-            background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "18px",
-            padding: "16px 32px",
-            fontWeight: 800,
-            fontSize: "16px",
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "10px",
-            boxShadow: "0 4px 14px rgba(124, 58, 237, 0.25)",
-            transition: "transform 0.15s ease"
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-          onMouseOut={(e) => (e.currentTarget.style.transform = "none")}
-        >
-          <span>Start Today's Plan</span>
-          <ArrowRight size={20} />
-        </button>
-      </div>
-
-      {/* SUBJECT EXPLORER */}
-      <div className="section-head">
-        <h2>Curriculum & Learning Paths</h2>
-        <span className="count">{subjects.length} Subjects Available</span>
+        <div className="search-filter-bar">
+          <div className="search-input-wrapper">
+            <Search size={16} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search subjects (e.g. Data Structures, Python, OS)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+          </div>
+        </div>
       </div>
 
       {status === "loading" && (
-        <div className="grid">
+        <div className="topics-grid">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="skeleton-card" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div className="skeleton skeleton-pill" style={{ width: "90px", height: "20px" }} />
-                <div className="skeleton skeleton-text" style={{ width: "60px", height: "18px" }} />
-              </div>
-              <div className="skeleton skeleton-title" style={{ width: "75%", height: "24px" }} />
-              <div className="skeleton skeleton-text" style={{ width: "100%" }} />
-              <div className="skeleton skeleton-text short" style={{ width: "50%" }} />
-            </div>
+            <CardSkeleton key={i} />
           ))}
         </div>
       )}
 
       {status === "error" && (
-        <div className="state">
-          <h2>Unable to load curriculum</h2>
-          <p>{error}</p>
-        </div>
+        <EmptyState
+          title="Failed to Load Curriculum"
+          description={error || "Could not retrieve subject data from backend server."}
+          actionLabel="Retry"
+          onAction={() => window.location.reload()}
+        />
       )}
 
-      {status === "ready" && (
-        <div className="grid">
-          {subjects.map((sub) => (
-            <div
+      {status === "ready" && filteredSubjects.length === 0 && (
+        <EmptyState
+          title="No Subjects Found"
+          description={`No subjects matched your query "${searchQuery}".`}
+          actionLabel="Clear Search"
+          onAction={() => setSearchQuery("")}
+        />
+      )}
+
+      {status === "ready" && filteredSubjects.length > 0 && (
+        <div className="topics-grid">
+          {filteredSubjects.map((sub) => (
+            <Card
               key={sub.name}
-              className="card"
+              hoverLift
+              clickable
               onClick={() => navigate(`/subject/${encodeURIComponent(sub.name)}`)}
+              className="topic-card"
             >
-              <div className="card-top">
-                <span className="level-tag">{sub.name}</span>
-                <span className="xp-tag">{sub.total_topics} Topics</span>
+              <div className="topic-card-header">
+                <span className="pill xp">{sub.total_topics} Topics</span>
+                {sub.mastery_percent > 0 && (
+                  <span style={{ fontSize: "12px", color: "#34D399", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <CheckCircle size={14} /> {sub.mastery_percent}% Mastered
+                  </span>
+                )}
               </div>
 
-              <h3>{sub.name}</h3>
-              <p>Master foundational to pro concepts through bite-sized theory & MCQs.</p>
+              <h3 className="topic-title" style={{ marginTop: "12px", marginBottom: "8px" }}>
+                {sub.name}
+              </h3>
+              <p className="topic-desc">
+                Interactive curriculum path covering theoretical concepts, code snippets, and assessment quizzes.
+              </p>
 
-              <div style={{ marginTop: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#6b7280", marginBottom: "4px", fontWeight: 600 }}>
-                  <span>Progress</span>
-                  <span>{sub.mastery_percent}%</span>
+              <div style={{ marginTop: "auto", paddingTop: "16px" }}>
+                <div className="progress-bar-bg">
+                  <div className="progress-bar-fill" style={{ width: `${sub.mastery_percent}%` }} />
                 </div>
-                <div className="mastery-mini">
-                  <div style={{ width: `${sub.mastery_percent}%` }} />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 600 }}>
+                    {sub.mastery_percent > 0 ? "Continue Path" : "Start Path"}
+                  </span>
+                  <ArrowRight size={16} color="var(--primary)" />
                 </div>
               </div>
-
-              <div className="card-foot">
-                <span className="badge-ready">Explore Path →</span>
-              </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

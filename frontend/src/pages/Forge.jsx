@@ -1,12 +1,15 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { soundService } from "../services/soundService";
 import { fireCelebrationConfetti } from "../utils/confetti";
+import { ArrowLeft, Play, Terminal, Code2, Trash2, Copy, Check } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
 
 const JS_TEMPLATES = [
   {
     name: "Hello World",
-    code: `// Welcome to the Code Forge!
+    code: `// Welcome to the Codempress Code Forge!
 console.log("Hello, Codempress!");
 return "Playground ready.";`
   },
@@ -78,6 +81,9 @@ export default function Forge() {
   const [output, setOutput] = useState("Run your script to inspect console outputs and return values.");
   const [pyodideInstance, setPyodideInstance] = useState(null);
   const [loadingPyodide, setLoadingPyodide] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const navigate = useNavigate();
 
   const changeLanguage = (newLang) => {
     setLang(newLang);
@@ -93,17 +99,20 @@ export default function Forge() {
       script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js";
       script.async = true;
       script.onload = () => {
-        window.loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/"
-        }).then((py) => {
-          window.pyodideInstance = py;
-          setPyodideInstance(py);
-          setLoadingPyodide(false);
-          resolve(py);
-        }).catch((err) => {
-          setLoadingPyodide(false);
-          reject(err);
-        });
+        window
+          .loadPyodide({
+            indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/"
+          })
+          .then((py) => {
+            window.pyodideInstance = py;
+            setPyodideInstance(py);
+            setLoadingPyodide(false);
+            resolve(py);
+          })
+          .catch((err) => {
+            setLoadingPyodide(false);
+            reject(err);
+          });
       };
       script.onerror = () => {
         setLoadingPyodide(false);
@@ -137,11 +146,11 @@ export default function Forge() {
             }
           };
         `;
-        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const blob = new Blob([workerCode], { type: "application/javascript" });
         const worker = new Worker(URL.createObjectURL(blob));
 
         worker.onmessage = (e) => {
-          if (e.data.status === 'success') {
+          if (e.data.status === "success") {
             setOutput(e.data.output);
             soundService.playCorrect();
             fireCelebrationConfetti();
@@ -160,28 +169,10 @@ export default function Forge() {
 
         worker.postMessage(code);
       } catch (err) {
-        const logs = [];
-        const oldLog = console.log;
-        console.log = (...args) => {
-          logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-        };
-        try {
-          const result = new Function(code)();
-          if (result !== undefined) {
-            logs.push(`→ Return: ${typeof result === 'object' ? JSON.stringify(result) : String(result)}`);
-          }
-          setOutput(logs.join("\n") || "Script ran successfully with no log outputs.");
-          soundService.playCorrect();
-          fireCelebrationConfetti();
-        } catch (e) {
-          soundService.playIncorrect();
-          setOutput(`⚠️ JS Evaluation Error: ${e.message}`);
-        } finally {
-          console.log = oldLog;
-        }
+        soundService.playIncorrect();
+        setOutput(`⚠️ JS Evaluation Error: ${err.message}`);
       }
     } else {
-      // Python (Pyodide WebAssembly)
       try {
         let py = pyodideInstance || window.pyodideInstance;
         if (!py) {
@@ -190,7 +181,9 @@ export default function Forge() {
         }
         const logs = [];
         py.setStdout({
-          batched: (str) => { logs.push(str); }
+          batched: (str) => {
+            logs.push(str);
+          }
         });
         const result = await py.runPythonAsync(code);
         let outText = logs.join("\n");
@@ -210,102 +203,119 @@ export default function Forge() {
   const currentTemplates = lang === "javascript" ? JS_TEMPLATES : PY_TEMPLATES;
 
   return (
-    <div className="container">
-      <Link to="/library" className="back-link">
-        ← Back to Library
-      </Link>
+    <div style={{ paddingBottom: "64px" }}>
+      <button
+        onClick={() => navigate("/library")}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--ink-soft)",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          fontSize: "14px",
+          fontWeight: 600,
+          cursor: "pointer",
+          marginBottom: "20px"
+        }}
+      >
+        <ArrowLeft size={16} /> Back to Library
+      </button>
 
-      <div className="section-head">
-        <h2>Code Forge 🛠️</h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+        <div>
+          <h2 style={{ fontSize: "28px", color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
+            <Terminal color="#C084FC" /> Code Forge Playground
+          </h2>
+          <p style={{ color: "var(--ink-soft)", fontSize: "14px" }}>
+            In-browser code execution & experimentation sandbox
+          </p>
+        </div>
+
         <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            className={`btn ${lang === "javascript" ? "btn-primary" : "btn-ghost"}`}
+          <Button
+            variant={lang === "javascript" ? "primary" : "secondary"}
+            size="sm"
             onClick={() => changeLanguage("javascript")}
-            style={{ padding: "6px 16px", fontSize: "13px" }}
           >
             JavaScript
-          </button>
-          <button
-            className={`btn ${lang === "python" ? "btn-primary" : "btn-ghost"}`}
+          </Button>
+          <Button
+            variant={lang === "python" ? "primary" : "secondary"}
+            size="sm"
             onClick={() => changeLanguage("python")}
-            style={{ padding: "6px 16px", fontSize: "13px" }}
           >
             Python (WASM)
-          </button>
+          </Button>
         </div>
       </div>
 
-      {loadingPyodide && (
-        <div style={{ padding: "10px 15px", marginBottom: "15px", borderRadius: "6px", backgroundColor: "rgba(124, 58, 237, 0.15)", border: "1px solid var(--primary)", fontSize: "14px", color: "var(--primary)" }}>
-          ⏳ Fetching Pyodide Python runtime over WebAssembly from CDN...
-        </div>
-      )}
-
-      <div className="forge-grid">
-        {/* Editor column */}
-        <div className="forge-editor-panel" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            {currentTemplates.map((t, idx) => (
-              <button
-                key={idx}
-                className="btn btn-ghost"
-                onClick={() => setCode(t.code)}
-                style={{ fontSize: "12px", padding: "6px 12px" }}
-              >
-                {t.name}
-              </button>
-            ))}
+      <div className="forge-container">
+        {/* Editor Box */}
+        <div className="code-editor-box">
+          <div className="code-header">
+            <div style={{ display: "flex", gap: "8px" }}>
+              {currentTemplates.map((t, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCode(t.code)}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.05)",
+                    border: "1px solid var(--border)",
+                    color: "#CBD5E1",
+                    borderRadius: "6px",
+                    padding: "4px 10px",
+                    fontSize: "12px",
+                    cursor: "pointer"
+                  }}
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+            <Button
+              variant="glowing"
+              size="sm"
+              onClick={runCode}
+              loading={loadingPyodide}
+              leftIcon={<Play size={14} />}
+            >
+              Run Script
+            </Button>
           </div>
 
           <textarea
-            id="code-editor-textarea"
-            name="code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
-            style={{
-              width: "100%",
-              height: "400px",
-              backgroundColor: "rgba(25, 25, 30, 0.95)",
-              color: lang === "javascript" ? "#A7F3D0" : "#FBBF24",
-              fontFamily: "Space Mono, monospace",
-              fontSize: "14px",
-              padding: "15px",
-              borderRadius: "8px",
-              border: "1px solid var(--border)",
-              resize: "vertical",
-              outline: "none",
-              lineHeight: "1.5"
-            }}
+            className="editor-textarea"
           />
-
-          <button className="btn btn-primary" onClick={runCode} disabled={loadingPyodide} style={{ alignSelf: "flex-start" }}>
-            {loadingPyodide ? "Loading Engine..." : "Run Script ⚡"}
-          </button>
         </div>
 
-        {/* Output column */}
-        <div className="forge-output-panel" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <div style={{ padding: "4px 8px", backgroundColor: "rgba(255,255,255,0.05)", borderRadius: "4px", fontSize: "12px", color: "var(--muted)" }}>
-            Console & Output Logs
+        {/* Output Terminal */}
+        <div className="code-editor-box">
+          <div className="code-header">
+            <span>CONSOLE LOGS</span>
+            <button
+              onClick={() => setOutput("Console cleared.")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--ink-soft)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "12px"
+              }}
+            >
+              <Trash2 size={14} /> Clear
+            </button>
           </div>
-          <pre
-            style={{
-              backgroundColor: "rgba(10, 10, 15, 0.95)",
-              color: "#E2E8F0",
-              fontFamily: "Space Mono, monospace",
-              fontSize: "14px",
-              padding: "20px",
-              borderRadius: "8px",
-              border: "1px solid var(--border)",
-              height: "435px",
-              overflow: "auto",
-              whiteSpace: "pre-wrap",
-              margin: 0
-            }}
-          >
-            {output}
-          </pre>
+
+          <div className="console-output">
+            <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{output}</pre>
+          </div>
         </div>
       </div>
     </div>

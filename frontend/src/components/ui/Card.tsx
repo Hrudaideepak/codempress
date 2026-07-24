@@ -5,6 +5,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   clickable?: boolean;
   bordered?: boolean;
   glowOnHover?: boolean;
+  glass?: boolean;
   padding?: string | number;
   background?: string;
   borderRadius?: string | number;
@@ -15,8 +16,9 @@ export default function Card({
   clickable = false,
   bordered = true,
   glowOnHover = true,
+  glass = true,
   padding = "24px",
-  background = "#ffffff",
+  background,
   borderRadius = "20px",
   children,
   style,
@@ -30,21 +32,31 @@ export default function Card({
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
+  const defaultBg = glass
+    ? "rgba(17, 24, 39, 0.7)"
+    : "var(--bg-panel, #1F2937)";
+
   const baseStyle: React.CSSProperties = {
-    background,
+    background: background || defaultBg,
     padding,
     borderRadius,
-    border: bordered ? "1.5px solid var(--border)" : "none",
+    border: bordered ? "1px solid rgba(255, 255, 255, 0.08)" : "none",
+    backdropFilter: glass ? "blur(16px)" : "none",
+    WebkitBackdropFilter: glass ? "blur(16px)" : "none",
     boxShadow: isFocused
-      ? "0 0 0 3px rgba(124, 58, 237, 0.3)"
+      ? "0 0 0 3px rgba(99, 102, 241, 0.4)"
       : isHovered && hoverLift && clickable
-      ? "0 12px 30px rgba(124, 58, 237, 0.08)"
-      : (style?.boxShadow || "0 4px 20px rgba(124, 58, 237, 0.02)"),
+      ? "0 12px 32px -4px rgba(99, 102, 241, 0.25)"
+      : (style?.boxShadow || "0 4px 20px rgba(0, 0, 0, 0.2)"),
     cursor: clickable ? "pointer" : "default",
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    transform: isHovered && hoverLift && clickable ? "translateY(-3px)" : "none",
+    transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+    transform: isHovered && hoverLift && clickable ? "translateY(-4px)" : "none",
     outline: "none",
-    borderColor: isFocused ? "var(--primary)" : (isHovered && glowOnHover && clickable ? "#ddd6fe" : "var(--border)"),
+    borderColor: isFocused
+      ? "var(--primary, #8B5CF6)"
+      : isHovered && glowOnHover && clickable
+      ? "rgba(139, 92, 246, 0.4)"
+      : "rgba(255, 255, 255, 0.08)",
   };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {

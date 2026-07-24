@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import HeroScene from "../HeroScene";
 import { useToast } from "../ToastContext";
-import { Card, Button } from "../components/ui";
-
-function stars(n) {
-  return "★".repeat(n) + "☆".repeat(Math.max(0, 5 - n));
-}
+import { ArrowLeft, MapPin, Grid, Lock, CheckCircle2, Star, Sparkles } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import MindMap from "../components/ui/MindMap";
+import EmptyState from "../components/ui/EmptyState";
+import { CardSkeleton } from "../components/ui/SkeletonLoader";
 
 export default function Subject() {
   const params = useParams();
@@ -20,16 +20,12 @@ export default function Subject() {
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState("map");
-  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 640 : false);
 
   useEffect(() => {
     if (!decoded) {
       navigate("/library", { replace: true });
       return;
     }
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, [decoded, navigate]);
 
   useEffect(() => {
@@ -65,266 +61,132 @@ export default function Subject() {
     : [];
 
   return (
-    <div className="container">
-      <Link to="/library" className="back-link">
-        ← All subjects
-      </Link>
+    <div style={{ paddingBottom: "64px" }}>
+      <button
+        onClick={() => navigate("/library")}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--ink-soft)",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          fontSize: "14px",
+          fontWeight: 600,
+          cursor: "pointer",
+          marginBottom: "20px"
+        }}
+      >
+        <ArrowLeft size={16} /> All Subjects
+      </button>
 
-      <div className="hero">
-        <HeroScene />
-        <div className="hero-content">
-          <h1>
-            <span>{decoded || "Subject"}</span>
-          </h1>
-          <p>
-            {cat
-              ? `${cat.topic_count} topic${cat.topic_count === 1 ? "" : "s"} — read the theory, prove your understanding, and forge your path from Explorer to Legend.`
-              : "Loading this subject's curriculum…"}
-          </p>
+      {/* Header Banner */}
+      <div className="glass-panel" style={{ marginBottom: "32px", border: "1px solid rgba(139, 92, 246, 0.3)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+          <div>
+            <div className="hero-badge" style={{ marginBottom: "12px" }}>
+              <Sparkles size={14} />
+              <span>{decoded} Path</span>
+            </div>
+            <h1 style={{ fontSize: "32px", color: "#fff", marginBottom: "8px" }}>{decoded}</h1>
+            <p style={{ color: "var(--ink-soft)", fontSize: "15px", maxWidth: "600px" }}>
+              {cat
+                ? `${cat.topic_count} topics structured in progressive order.`
+                : "Loading curriculum details..."}
+            </p>
+          </div>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button
+              variant={viewMode === "map" ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setViewMode("map")}
+              leftIcon={<MapPin size={16} />}
+            >
+              Mind Map
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              leftIcon={<Grid size={16} />}
+            >
+              List View
+            </Button>
+          </div>
         </div>
       </div>
 
       {status === "loading" && (
-        <div className="state">
-          <h2>Summoning the shelf…</h2>
-        </div>
-      )}
-
-      {status === "error" && (
-        <div className="state">
-          <h2>The library is sealed</h2>
-          <p>{error}</p>
-        </div>
-      )}
-
-      {status === "ready" && !cat && (
-        <div className="state">
-          <h2>Subject not found</h2>
-          <p>No curriculum exists for "{decoded}".</p>
-        </div>
-      )}
-
-      {status === "ready" && cat && (
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px", gap: "10px" }}>
-          <Button
-            variant={viewMode === "map" ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => setViewMode("map")}
-          >
-            🗺️ Visual Path
-          </Button>
-          <Button
-            variant={viewMode === "grid" ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => setViewMode("grid")}
-          >
-            ☰ Grid List
-          </Button>
-        </div>
-      )}
-
-      {status === "ready" && cat && viewMode === "grid" && (
-        <div className="grid">
-          {topics.map((topic) => (
-            <div
-              key={topic.id}
-              className={`card ${topic.locked ? "locked" : ""} ${
-                topic.cleared ? "cleared" : ""
-              }`}
-              onClick={() => openTopic(topic)}
-              title={
-                topic.locked ? "Complete the previous topic to unlock" : ""
-              }
-            >
-              <div className="card-top">
-                <span className="level-tag">{topic.level_name}</span>
-                {topic.locked ? (
-                  <span className="lock-badge" title="Locked">
-                    🔒
-                  </span>
-                ) : topic.cleared ? (
-                  <span className="check-badge" title="Cleared">
-                    ✓
-                  </span>
-                ) : (
-                  <span className="difficulty">{stars(topic.difficulty)}</span>
-                )}
-              </div>
-              <h3>{topic.title}</h3>
-              <p>{topic.description}</p>
-              <div className="card-foot">
-                <span className="xp-tag">+{topic.xp} XP</span>
-                {topic.locked ? (
-                  <span className="badge-locked">🔒 Locked</span>
-                ) : topic.cleared ? (
-                  <span className="badge-cleared">
-                    ✓ Cleared
-                    {typeof topic.mastery === "number" && (
-                      <span className="mastery-pct"> {topic.mastery}%</span>
-                    )}
-                  </span>
-                ) : (
-                  <span className="badge-ready">● Ready</span>
-                )}
-              </div>
-              {typeof topic.mastery === "number" && !topic.locked && (
-                <div className="mastery-mini">
-                  <div style={{ width: `${topic.mastery}%` }} />
-                </div>
-              )}
-            </div>
+        <div className="topics-grid">
+          {[1, 2, 3, 4].map((i) => (
+            <CardSkeleton key={i} />
           ))}
         </div>
       )}
 
+      {status === "error" && (
+        <EmptyState
+          title="Subject Sealed"
+          description={error || "Could not retrieve topics for this subject."}
+          actionLabel="Return to Library"
+          onAction={() => navigate("/library")}
+        />
+      )}
+
+      {status === "ready" && !cat && (
+        <EmptyState
+          title="Subject Not Found"
+          description={`No curriculum exists for "${decoded}".`}
+          actionLabel="Return to Library"
+          onAction={() => navigate("/library")}
+        />
+      )}
+
       {status === "ready" && cat && viewMode === "map" && (
-        <div className="skill-tree" style={{
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "40px",
-          padding: isMobile ? "20px 10px 20px 30px" : "40px 10px",
-          margin: "0 auto",
-          maxWidth: "800px"
-        }}>
-          {/* Central Connecting Road */}
-          <div style={{
-            position: "absolute",
-            top: "40px",
-            bottom: "40px",
-            left: isMobile ? "20px" : "50%",
-            transform: "translateX(-50%)",
-            width: "6px",
-            background: "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
-            opacity: 0.2,
-            zIndex: 0,
-            borderRadius: "3px"
-          }} />
+        <MindMap topics={topics} onSelectTopic={openTopic} />
+      )}
 
-          {topics.map((topic, idx) => {
-            const isLeft = isMobile ? false : idx % 2 === 0;
-            const isLocked = topic.locked;
-            const isCleared = topic.cleared;
-
-            // Border color configuration
-            const borderColor = isLocked
-              ? "var(--border)"
-              : isCleared
-                ? "var(--success)"
-                : "var(--primary)";
-
-            const glowColor = isLocked
-              ? "none"
-              : isCleared
-                ? "rgba(22, 163, 74, 0.15)"
-                : "rgba(124, 58, 237, 0.15)";
-
-            return (
-              <div
-                key={topic.id}
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  justifyContent: isLeft ? "flex-start" : "flex-end",
-                  position: "relative",
-                  zIndex: 1
-                }}
-              >
-                {/* Node Center Milestone Circle */}
-                <div style={{
-                  position: "absolute",
-                  left: isMobile ? "20px" : "50%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "50%",
-                  background: isLocked ? "var(--bg-subtle)" : isCleared ? "var(--success)" : "var(--primary)",
-                  border: `4px solid var(--bg-panel)`,
-                  boxShadow: isLocked ? "none" : `0 0 12px ${isCleared ? "var(--success)" : "var(--primary)"}`,
-                  zIndex: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontSize: "10px",
-                  fontWeight: "bold"
-                }}>
-                  {isCleared ? "✓" : idx + 1}
-                </div>
-
-                {/* Snake Path Card element */}
-                <Card
-                  clickable
-                  hoverLift={!isLocked}
-                  onClick={() => openTopic(topic)}
-                  style={{
-                    width: isMobile ? "calc(100% - 40px)" : "42%",
-                    padding: "24px",
-                    borderRadius: "20px",
-                    background: "var(--bg-panel)",
-                    border: `1.5px solid ${borderColor}`,
-                    boxShadow: glowColor,
-                    opacity: isLocked ? 0.6 : 1,
-                    textAlign: "left"
-                  }}
-                >
-                  <div className="card-top" style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", alignItems: "center" }}>
-                    <span className="level-tag" style={{
-                      fontSize: "11px",
-                      padding: "4px 8px",
-                      borderRadius: "6px",
-                      background: "var(--bg-subtle)",
-                      color: "var(--ink-soft)"
-                    }}>{topic.level_name}</span>
-
-                    {isLocked ? (
-                      <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>🔒 Locked</span>
-                    ) : isCleared ? (
-                      <span style={{ fontSize: "12px", color: "var(--success)", fontWeight: 700 }}>✓ Mastered</span>
-                    ) : (
-                      <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: 700 }}>● Active</span>
-                    )}
-                  </div>
-
-                  <h3 style={{ fontSize: "17px", fontWeight: 700, color: "var(--ink)", marginBottom: "8px" }}>
-                    {topic.title}
-                  </h3>
-                  
-                  <p style={{ fontSize: "13px", color: "var(--ink-soft)", lineHeight: 1.5, marginBottom: "16px" }}>
-                    {topic.description}
-                  </p>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--accent)" }}>+{topic.xp} XP</span>
-                    {!isLocked && typeof topic.mastery === "number" && (
-                      <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 500 }}>
-                        Mastery: {topic.mastery}%
-                      </span>
-                    )}
-                  </div>
-
-                  {!isLocked && typeof topic.mastery === "number" && (
-                    <div style={{
-                      height: "6px",
-                      background: "var(--bg-subtle)",
-                      borderRadius: "3px",
-                      overflow: "hidden",
-                      marginTop: "12px"
-                    }}>
-                      <div style={{
-                        height: "100%",
-                        width: `${topic.mastery}%`,
-                        background: isCleared ? "var(--success)" : "var(--primary)",
-                        transition: "width 0.3s ease"
-                      }} />
-                    </div>
-                  )}
-                </Card>
+      {status === "ready" && cat && viewMode === "grid" && (
+        <div className="topics-grid">
+          {topics.map((topic) => (
+            <Card
+              key={topic.id}
+              hoverLift={!topic.locked}
+              clickable={!topic.locked}
+              onClick={() => openTopic(topic)}
+              style={{ opacity: topic.locked ? 0.5 : 1 }}
+            >
+              <div className="topic-card-header">
+                <span className="pill xp">{topic.level_name || "Level"}</span>
+                {topic.locked ? (
+                  <span style={{ fontSize: "12px", color: "var(--ink-faint)", display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Lock size={14} /> Locked
+                  </span>
+                ) : topic.cleared ? (
+                  <span style={{ fontSize: "12px", color: "#34D399", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <CheckCircle2 size={14} /> Cleared
+                  </span>
+                ) : (
+                  <span style={{ fontSize: "12px", color: "#FBBF24", fontWeight: 700 }}>● Active</span>
+                )}
               </div>
-            );
-          })}
+
+              <h3 className="topic-title" style={{ marginTop: "12px", marginBottom: "8px" }}>
+                {topic.title}
+              </h3>
+              <p className="topic-desc">{topic.description}</p>
+
+              <div style={{ marginTop: "auto", paddingTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "12px", color: "#C084FC", fontWeight: 700 }}>+{topic.xp} XP</span>
+                {typeof topic.mastery === "number" && !topic.locked && (
+                  <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 600 }}>
+                    Mastery: {topic.mastery}%
+                  </span>
+                )}
+              </div>
+            </Card>
+          ))}
         </div>
       )}
     </div>
