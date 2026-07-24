@@ -1,5 +1,5 @@
 // Web Audio Sound Feedback System for Codempress
-// Provides clean synth audio feedback for correct, incorrect, level up, and confetti burst events
+// Provides clean synth audio feedback for correct, incorrect, level up, pop, and confetti burst events
 // Persists mute preference in localStorage ('codempress_sound_muted')
 
 const STORAGE_KEY = "codempress_sound_muted";
@@ -43,9 +43,35 @@ class SoundService {
     const newState = !this.muted;
     this.setMuted(newState);
     if (!newState) {
-      this.playCorrect(); // Soft preview sound when unmuting
+      this.playCorrect();
     }
     return newState;
+  }
+
+  playPop() {
+    if (this.muted) return;
+    try {
+      const ctx = this.getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } catch (err) {
+      console.warn("Sound play error:", err);
+    }
   }
 
   playCorrect() {
@@ -87,7 +113,7 @@ class SoundService {
       const gain = ctx.createGain();
       osc.type = "triangle";
       osc.frequency.setValueAtTime(220, now); // A3
-      osc.frequency.linearRampToValueAtTime(140, now + 0.25); // Lower buzz pitch
+      osc.frequency.linearRampToValueAtTime(140, now + 0.25);
 
       gain.gain.setValueAtTime(0.2, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
@@ -109,7 +135,7 @@ class SoundService {
       if (!ctx) return;
 
       const now = ctx.currentTime;
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Victorious Level Up)
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
       notes.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -137,7 +163,7 @@ class SoundService {
       if (!ctx) return;
 
       const now = ctx.currentTime;
-      const freqs = [880, 1174.66, 1396.91, 1760]; // A5, D6, F6, A6 (Celebratory sparkles)
+      const freqs = [880, 1174.66, 1396.91, 1760]; // A5, D6, F6, A6
       freqs.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
