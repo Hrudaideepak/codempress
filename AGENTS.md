@@ -19,26 +19,48 @@ app/
 └── requirements.txt     # Python deps (fastapi, uvicorn, httpx, pydantic)
 ```
 
-## Subagent architecture (Antigravity)
+## Subagent architecture (Antigravity Enterprise Matrix)
 
-12 subagents spawned dynamically by the Orchestrator, run in parallel with workspace isolation:
+The system supports specialized subagent roles spawned dynamically to handle end-to-end production software engineering across 18 enterprise disciplines:
 
-| Subagent | Purpose | Key Deliverable |
-|----------|---------|-----------------|
-| **Orchestrator** | Breaks down goals, delegates, tracks progress | Coordination |
-| **UI-UX-Designer** | Screen designs (Galaxy Map, Battle, Code Forge, Library, Profile) | Figma + HTML/CSS |
-| **Frontend-Engineer** | Jetpack Compose screens, animations, navigation | Kotlin UI |
-| **Backend-Engineer** | FastAPI endpoints, KeylessAI `/generate`, caching | Python API |
-| **Database-Architect** | SQLite schema, 10K+ questions seeded, Room integration | DB + seed scripts |
-| **AI-Integration-Specialist** | MCQ generation, code explanations, prompt engineering | AI prompts |
-| **Content-Curator** | Full curriculum from official docs, difficulty scaling | Knowledge graph |
-| **Game-Designer** | XP, streaks, badges, health bars, reward logic | Gamification engine |
-| **QA-Tester** | Unit + UI + offline + performance tests | JUnit/Espresso |
-| **DevOps-Engineer** | Gradle, GitHub Actions, APK signing, Crashlytics | CI/CD pipeline |
-| **Documentation-Writer** | API docs, user guide, developer guide, README | Markdown |
-| **Project-Manager** | Sprint plans, task tracking, progress reports | Markdown/JSON |
+| Subagent Name | Role | Core Responsibility |
+|---------------|------|---------------------|
+| `cto` | **CTO** | Technical strategy, Build vs Buy, trade-offs, cost, scalability, tech debt |
+| `principal_software_architect` | **Principal Software Architect** | High-level architecture, module boundaries, system design, data & event flows |
+| `staff_backend_engineer` | **Staff Backend Engineer** | FastAPI, Clean Architecture, DDD, Repository Pattern, DI, API reliability |
+| `staff_frontend_engineer` | **Staff Frontend Engineer** | React, Vite, state management, accessibility, component design, optimistic updates |
+| `senior_mobile_engineer` | **Senior Mobile Engineer** | Offline-first sync, mobile components (Compose/RN), touch interactions |
+| `ai_ml_engineer` | **AI/ML Engineer** | GitHub Models pipeline, prompt architecture, fallback chains, token optimization |
+| `devops_engineer` | **DevOps Engineer** | Docker, CI/CD pipelines (GitHub Actions), environment & deployment configs |
+| `platform_engineer` | **Platform Engineer** | Internal tooling, developer experience, build automation, local dev scripts |
+| `database_architect` | **Database Architect** | SQLite/Postgres schema, indexing, migrations, query optimization, N+1 fixes |
+| `security_engineer` | **Security Engineer** | OWASP Top 10, JWT security, OAuth, SQLi/XSS/CSRF prevention, security audits |
+| `performance_engineer` | **Performance Engineer** | Big-O optimization, bundle size, memory profiling, rendering & query latency |
+| `qa_automation_engineer` | **QA Automation Engineer** | Pytest, unit/integration/E2E test suites, edge case verification |
+| `site_reliability_engineer` | **Site Reliability Engineer (SRE)** | Health checks, monitoring, alerting, circuit breakers, disaster recovery |
+| `product_manager` | **Product Manager** | Business requirements, user stories, edge cases, feature prioritization |
+| `ux_engineer` | **UX Engineer** | Design systems, visual aesthetics, micro-animations, theme management |
+| `technical_writer` | **Technical Writer** | System docs, API specifications, READMEs, architecture guides |
+| `code_reviewer` | **Code Reviewer** | Code quality audits, refactoring, pattern enforcement, anti-pattern detection |
+| `tech_lead` | **Tech Lead** | Execution coordination, task breakdown, multi-subagent orchestration |
+| `senior_debugging_engineer` | **Senior Debugging Engineer** | Live production outages, step-by-step trace, empirical root cause analysis, zero-regression fixes |
+| `clean_architecture_refactoring_specialist` | **Clean Architecture Specialist** | Refactoring messy monoliths, separating concerns, DIP/SOLID, modular coupling reduction |
+| `systems_infrastructure_architect` | **Systems Infrastructure Architect** | High-growth startup infrastructure, component topology, caching strategy, DB scaling |
+| `four_agent_panel` | **Four-Agent Panel** | Synchronized Architect -> Engineer -> Reviewer -> Optimizer team execution pipeline |
+| `ui_systems_engineer` | **UI Systems Engineer** | Reusable UI component systems, loading/empty/error states, responsive layout, WCAG a11y |
 
-Workflow: user `/goal` → Orchestrator spawns subagents in parallel → each works independently → Orchestrator merges outputs.
+### Registered Skills (`.agents/skills/`)
+
+- `architecture-audit`: Reverse-engineer architecture, technical debt analysis, performance & scalability risks.
+- `production-debugging`: Outage investigation, un-truncated log tracing, root cause & edge-case analysis.
+- `performance-optimization`: High-traffic profiling, Big-O complexity, query optimization, render latency reduction.
+- `clean-architecture-refactoring`: Separation of concerns, SOLID/DIP, modular layer boundaries.
+- `infrastructure-design`: High-growth system design, caching topologies, API flows, database schemas.
+- `ui-systems`: Reusable UI component architecture, loading/empty/error states, responsive layouts, a11y.
+- `security-audit`: OWASP Top 10, JWT/OAuth security, prompt injection, vulnerability remediation.
+- `devops-production`: Docker/K8s, GitHub Actions CI/CD, health check monitoring, zero-downtime deployment.
+
+Workflow: Orchestrator / Lead invokes subagents via `invoke_subagent` → each executes autonomously in parallel → results are merged into production-grade code.
 
 Run:
 ```bash

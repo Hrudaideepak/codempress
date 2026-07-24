@@ -44,3 +44,6 @@ opencode.jsonc
 
 # Downloaded installers
 *.exe
+
+# Temporary test artifacts
+.playwright-mcp/

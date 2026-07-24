@@ -63,7 +63,8 @@ async function request(path, options = {}) {
   const headers = { "Content-Type": "application/json" };
   const token = getToken();
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch(`${BASE}${path}`, { headers, ...options });
+  const mergedHeaders = { ...headers, ...(options.headers || {}) };
+  const res = await fetch(`${BASE}${path}`, { ...options, headers: mergedHeaders });
   if (!res.ok) {
     if (res.status === 401) {
       clearSession();
