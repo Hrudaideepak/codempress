@@ -213,7 +213,7 @@ async def ensure_user_in_db(user_id: int, current_user: Optional[dict] = None) -
     return user_id
 
 @router.post("/topics/{topic_id}/theory-read")
-async def mark_theory_read(topic_id: int, current_user: dict = Depends(get_current_user)):
+async def mark_theory_read(topic_id: int, current_user: Optional[dict] = Depends(get_current_user_optional)):
     """Marks a topic's theory as read and recalculates mastery."""
     try:
         sub_str = str(current_user.get("sub", "1"))

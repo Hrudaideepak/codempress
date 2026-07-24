@@ -43,13 +43,52 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing Codempress API Engine services...")
     try:
         from backend.infrastructure.database.db_connection import ensure_database_seeded
-        ensure_database_seeded()
         from backend.database import execute_write
+        await execute_write("""
+        CREATE TABLE IF NOT EXISTS users (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            google_sub TEXT UNIQUE NOT NULL,
+            email TEXT NOT NULL,
+            name TEXT NOT NULL,
+            picture TEXT,
+            xp INTEGER DEFAULT 0,
+            streak_count INTEGER DEFAULT 0,
+            last_active_date TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+        await execute_write("""
+        CREATE TABLE IF NOT EXISTS user_progress (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            topic_id INTEGER NOT NULL,
+            theory_read BOOLEAN DEFAULT 0,
+            quizzes_taken INTEGER DEFAULT 0,
+            quizzes_passed INTEGER DEFAULT 0,
+            mastery_percent INTEGER DEFAULT 0,
+            last_studied TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(_id) ON DELETE CASCADE,
+            FOREIGN KEY(topic_id) REFERENCES topics(_id) ON DELETE CASCADE,
+            UNIQUE(user_id, topic_id)
+        );
+        """)
+        await execute_write("""
+        CREATE TABLE IF NOT EXISTS quiz_attempts (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            topic_id INTEGER NOT NULL,
+            score_percent INTEGER NOT NULL,
+            xp_earned INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(_id) ON DELETE CASCADE,
+            FOREIGN KEY(topic_id) REFERENCES topics(_id) ON DELETE CASCADE
+        );
+        """)
         await execute_write("CREATE INDEX IF NOT EXISTS idx_questions_topic_id ON questions(topic_id);")
         await execute_write("CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_topic ON quiz_attempts(user_id, topic_id);")
         await execute_write("CREATE INDEX IF NOT EXISTS idx_user_progress_user_topic ON user_progress(user_id, topic_id);")
         await execute_write("CREATE INDEX IF NOT EXISTS idx_topics_subject_id ON topics(subject_name, _id);")
-        logger.info("Database performance indexing verified.")
+        logger.info("Database performance indexing & table schema verified.")
     except Exception as e:
         logger.warning(f"Failed to create performance indexes: {e}")
     yield
