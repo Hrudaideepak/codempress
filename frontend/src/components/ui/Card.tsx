@@ -32,31 +32,27 @@ export default function Card({
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  const defaultBg = glass
-    ? "rgba(17, 24, 39, 0.7)"
-    : "var(--bg-panel, #1F2937)";
+  const defaultBg = "#FFFFFF";
 
   const baseStyle: React.CSSProperties = {
     background: background || defaultBg,
     padding,
     borderRadius,
-    border: bordered ? "1px solid rgba(255, 255, 255, 0.08)" : "none",
-    backdropFilter: glass ? "blur(16px)" : "none",
-    WebkitBackdropFilter: glass ? "blur(16px)" : "none",
+    border: bordered ? "1px solid #E2E8F0" : "none",
     boxShadow: isFocused
-      ? "0 0 0 3px rgba(99, 102, 241, 0.4)"
+      ? "0 0 0 3px rgba(124, 58, 237, 0.2)"
       : isHovered && hoverLift && clickable
-      ? "0 12px 32px -4px rgba(99, 102, 241, 0.25)"
-      : (style?.boxShadow || "0 4px 20px rgba(0, 0, 0, 0.2)"),
+      ? "0 16px 36px -4px rgba(15, 23, 42, 0.08)"
+      : (style?.boxShadow || "0 4px 20px -2px rgba(15, 23, 42, 0.05)"),
     cursor: clickable ? "pointer" : "default",
     transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
     transform: isHovered && hoverLift && clickable ? "translateY(-4px)" : "none",
     outline: "none",
     borderColor: isFocused
-      ? "var(--primary, #8B5CF6)"
+      ? "var(--primary, #7C3AED)"
       : isHovered && glowOnHover && clickable
-      ? "rgba(139, 92, 246, 0.4)"
-      : "rgba(255, 255, 255, 0.08)",
+      ? "#DDD6FE"
+      : "#E2E8F0",
   };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {

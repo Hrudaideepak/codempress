@@ -58,6 +58,10 @@ async def lifespan(app: FastAPI):
         );
         """)
         await execute_write("""
+        INSERT OR IGNORE INTO users (_id, google_sub, email, name)
+        VALUES (1, 'guest_explorer_1', 'explorer@codempress.app', 'Explorer');
+        """)
+        await execute_write("""
         CREATE TABLE IF NOT EXISTS user_progress (
             _id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,

@@ -191,12 +191,14 @@ async def get_library(current_user: Optional[dict] = Depends(get_current_user_op
 
 async def ensure_user_in_db(user_id: int, current_user: Optional[dict] = None) -> int:
     """Ensures user record exists in database table to prevent foreign key constraint failures."""
+    if not user_id or user_id <= 0:
+        user_id = 1
     try:
         user_rows = await execute_query("SELECT _id FROM users WHERE _id = ?", (user_id,))
         if not user_rows:
-            email = (current_user and current_user.get("email")) or f"user_{user_id}@codempress.app"
-            name = (current_user and current_user.get("name")) or "Explorer"
-            sub_val = (current_user and str(current_user.get("sub"))) or f"sub_{user_id}"
+            email = (current_user and isinstance(current_user, dict) and current_user.get("email")) or f"user_{user_id}@codempress.app"
+            name = (current_user and isinstance(current_user, dict) and current_user.get("name")) or "Explorer"
+            sub_val = (current_user and isinstance(current_user, dict) and str(current_user.get("sub"))) or f"sub_{user_id}"
             try:
                 await execute_write(
                     "INSERT INTO users (_id, google_sub, email, name) VALUES (?, ?, ?, ?)",
@@ -215,11 +217,11 @@ async def ensure_user_in_db(user_id: int, current_user: Optional[dict] = None) -
 @router.post("/topics/{topic_id}/theory-read")
 async def mark_theory_read(topic_id: int, current_user: Optional[dict] = Depends(get_current_user_optional)):
     """Marks a topic's theory as read and recalculates mastery."""
-    try:
+    user_id = 1
+    if current_user and isinstance(current_user, dict):
         sub_str = str(current_user.get("sub", "1"))
-        user_id = int(sub_str) if sub_str.isdigit() else 1
-    except Exception:
-        user_id = 1
+        if sub_str.isdigit():
+            user_id = int(sub_str)
     
     user_id = await ensure_user_in_db(user_id, current_user)
 
@@ -243,7 +245,7 @@ async def mark_theory_read(topic_id: int, current_user: Optional[dict] = Depends
             )
         else:
             await execute_write(
-                "INSERT INTO user_progress (user_id, topic_id, theory_read) VALUES (?, ?, 1)",
+                "INSERT INTO user_progress (user_id, topic_id, theory_read, mastery_percent) VALUES (?, ?, 1, 30)",
                 (user_id, topic_id)
             )
             
