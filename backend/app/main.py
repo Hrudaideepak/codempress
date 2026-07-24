@@ -188,6 +188,7 @@ app.include_router(ai_router)
 app.include_router(progress_router)
 
 @app.get("/health")
+@app.get("/api/health")
 def health_check():
     return {"status": "ok", "app": "Codempress API", "version": "1.0.0"}
 
