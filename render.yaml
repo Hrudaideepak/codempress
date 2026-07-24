@@ -2,16 +2,28 @@ services:
   - type: web
     name: codempress-backend
     env: python
-    buildCommand: pip install -r requirements.txt && (python content/seed_topics.py || true)
+    region: oregon
+    plan: starter
+    healthCheckPath: /api/health
+    buildCommand: pip install -r requirements.txt && python content/seed_topics.py
     startCommand: python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    disk:
+      name: sqlite-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
-      - key: GITHUB_TOKEN
-        sync: false
-      - key: GROQ_API_KEY
-        sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: OPENROUTER_API_KEY
-        sync: false
+      - key: ENV
+        value: production
+      - key: DB_PATH
+        value: /var/data/skillforge.db
       - key: JWT_SECRET
         generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://codempress.vercel.app,http://localhost:5173
+      - key: GITHUB_MODELS_ENDPOINT
+        value: https://models.github.ai/inference/chat/completions
+
