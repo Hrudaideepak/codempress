@@ -78,4 +78,9 @@ def init_and_seed_db():
     print("="*60)
 
 if __name__ == "__main__":
-    init_and_seed_db()
+    try:
+        init_and_seed_db()
+    except Exception as err:
+        print(f"[WARN] Database seeding skipped: {err}")
+        sys.exit(0)
+
