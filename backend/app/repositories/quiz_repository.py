@@ -1,7 +1,7 @@
 import json
 import logging
 from typing import List, Dict, Tuple, Any
-from backend.database import execute_query, execute_batch_write
+from backend.database import execute_query, execute_batch_write, execute_write
 
 logger = logging.getLogger("codempress.quiz_repository")
 
@@ -59,7 +59,7 @@ class QuizRepository:
             (new_total_xp, new_streak, user_id)
         ))
 
-        # 3. Update or insert progress
+        # 3. Update or insert progress (INSERT OR IGNORE prevents unique constraint errors)
         if has_progress_record:
             queries_and_params.append((
                 "UPDATE user_progress SET mastery_percent = ?, last_studied = CURRENT_TIMESTAMP WHERE user_id = ? AND topic_id = ?",
@@ -67,10 +67,22 @@ class QuizRepository:
             ))
         else:
             queries_and_params.append((
-                "INSERT INTO user_progress (user_id, topic_id, mastery_percent) VALUES (?, ?, ?)",
+                "INSERT OR IGNORE INTO user_progress (user_id, topic_id, theory_read, mastery_percent) VALUES (?, ?, 0, ?)",
                 (user_id, topic_id, total_mastery)
             ))
 
-        return await execute_batch_write(queries_and_params)
+        try:
+            return await execute_batch_write(queries_and_params)
+        except Exception as exc:
+            logger.warning(f"Batch write partial fallback for user {user_id}, topic {topic_id}: {exc}. Attempting individual writes.")
+            # Fallback: execute each write independently so partial data is saved
+            results = []
+            for q, p in queries_and_params:
+                try:
+                    result = await execute_write(q, p)
+                    results.append(result)
+                except Exception as e:
+                    logger.error(f"Individual write fallback failed: {q[:60]}... Error: {e}")
+            return results
 
 quiz_repository = QuizRepository()

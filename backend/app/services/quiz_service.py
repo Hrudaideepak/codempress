@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 from backend.app.domain.models import QuizSubmission, QuizResultDTO
 from backend.app.repositories.quiz_repository import quiz_repository
 
@@ -9,10 +9,12 @@ class QuizService:
     def __init__(self, repo=quiz_repository):
         self.repo = repo
 
-    async def process_quiz_submission(self, user_id: int, submission: QuizSubmission) -> QuizResultDTO:
+    async def process_quiz_submission(self, user_id: int, submission: QuizSubmission, current_user: Optional[dict] = None) -> QuizResultDTO:
         """Evaluates submitted answers, calculates score/XP/mastery, and commits database transaction."""
         from backend.database import ensure_user_exists
-        user_id = await ensure_user_exists(user_id)
+        email = current_user.get("email") if current_user else None
+        name = current_user.get("name") if current_user else None
+        user_id = await ensure_user_exists(user_id, email=email, name=name)
         topic_id = submission.topic_id
         answers = submission.answers
         
@@ -70,14 +72,14 @@ class QuizService:
 
     async def recalculate_topic_mastery(self, user_id: int, topic_id: int) -> int:
         """Calculates mastery: 30% for reading theory + up to 70% based on quiz accuracy."""
-        from backend.database import ensure_user_exists
+        from backend.database import ensure_user_exists, execute_query, execute_write
         user_id = await ensure_user_exists(user_id)
+        
         prog = await self.repo.get_user_topic_progress(user_id, topic_id)
         has_progress = bool(prog)
         theory_score = 30 if (has_progress and prog.get("theory_read")) else 0
 
-        attempts = await self.repo.get_questions_by_ids([]) # reuse query
-        from backend.database import execute_query, execute_write
+        # Get latest quiz score for this topic
         attempts_rows = await execute_query(
             "SELECT score_percent FROM quiz_attempts WHERE user_id = ? AND topic_id = ? ORDER BY _id DESC LIMIT 1",
             (user_id, topic_id)
@@ -85,16 +87,20 @@ class QuizService:
         quiz_score = int((attempts_rows[0]["score_percent"] / 100.0) * 70) if attempts_rows else 0
         total_mastery = min(100, theory_score + quiz_score)
 
-        if has_progress:
-            await execute_write(
-                "UPDATE user_progress SET mastery_percent = ?, last_studied = CURRENT_TIMESTAMP WHERE user_id = ? AND topic_id = ?",
-                (total_mastery, user_id, topic_id)
-            )
-        else:
-            await execute_write(
-                "INSERT INTO user_progress (user_id, topic_id, mastery_percent) VALUES (?, ?, ?)",
-                (user_id, topic_id, total_mastery)
-            )
+        try:
+            if has_progress:
+                await execute_write(
+                    "UPDATE user_progress SET mastery_percent = ?, last_studied = CURRENT_TIMESTAMP WHERE user_id = ? AND topic_id = ?",
+                    (total_mastery, user_id, topic_id)
+                )
+            else:
+                await execute_write(
+                    "INSERT OR IGNORE INTO user_progress (user_id, topic_id, theory_read, mastery_percent) VALUES (?, ?, 0, ?)",
+                    (user_id, topic_id, total_mastery)
+                )
+        except Exception as exc:
+            logger.warning(f"recalculate_topic_mastery write error for user {user_id} topic {topic_id}: {exc}")
+
         return total_mastery
 
 quiz_service = QuizService()

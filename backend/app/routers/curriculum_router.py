@@ -222,8 +222,20 @@ async def mark_theory_read(topic_id: int, current_user: Optional[dict] = Depends
         sub_str = str(current_user.get("sub", "1"))
         if sub_str.isdigit():
             user_id = int(sub_str)
-    
-    user_id = await ensure_user_in_db(user_id, current_user)
+
+    # Guarantee user record exists — create from JWT claims if missing (critical on fresh DB)
+    try:
+        user_rows = await execute_query("SELECT _id FROM users WHERE _id = ?", (user_id,))
+        if not user_rows:
+            email = (current_user and current_user.get("email")) or f"user_{user_id}@codempress.app"
+            name = (current_user and current_user.get("name")) or "Explorer"
+            google_sub = f"jwt_sub_{user_id}"
+            await execute_write(
+                "INSERT OR IGNORE INTO users (_id, google_sub, email, name) VALUES (?, ?, ?, ?)",
+                (user_id, google_sub, email, name)
+            )
+    except Exception as e:
+        logger.warning(f"Could not ensure user {user_id} in db: {e}")
 
     # Verify topic exists
     topic_rows = await execute_query("SELECT _id FROM topics WHERE _id = ?", (topic_id,))
@@ -232,22 +244,16 @@ async def mark_theory_read(topic_id: int, current_user: Optional[dict] = Depends
         
     mastery_percent = 30
     try:
-        # Check if user has an existing progress record
-        prog_rows = await execute_query(
-            "SELECT * FROM user_progress WHERE user_id = ? AND topic_id = ?", 
+        # Upsert progress row — INSERT OR REPLACE handles both first-visit and repeat visits
+        await execute_write(
+            """INSERT INTO user_progress (user_id, topic_id, theory_read, mastery_percent)
+               VALUES (?, ?, 1, 30)
+               ON CONFLICT(user_id, topic_id) DO UPDATE SET
+                   theory_read = 1,
+                   mastery_percent = MAX(mastery_percent, 30),
+                   last_studied = CURRENT_TIMESTAMP""",
             (user_id, topic_id)
         )
-        
-        if prog_rows:
-            await execute_write(
-                "UPDATE user_progress SET theory_read = 1, last_studied = CURRENT_TIMESTAMP WHERE user_id = ? AND topic_id = ?",
-                (user_id, topic_id)
-            )
-        else:
-            await execute_write(
-                "INSERT INTO user_progress (user_id, topic_id, theory_read, mastery_percent) VALUES (?, ?, 1, 30)",
-                (user_id, topic_id)
-            )
             
         # Recalculate topic mastery
         from backend.app.routers.quiz_router import recalculate_topic_mastery

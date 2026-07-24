@@ -21,7 +21,7 @@ async def submit_quiz(submission: QuizSubmission, current_user: Optional[dict] =
             user_id = int(sub_val)
 
     try:
-        result = await quiz_service.process_quiz_submission(user_id, submission)
+        result = await quiz_service.process_quiz_submission(user_id, submission, current_user=current_user)
         return result
     except ValueError as val_err:
         raise HTTPException(status_code=400, detail=str(val_err))
