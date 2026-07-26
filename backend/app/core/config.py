@@ -7,6 +7,10 @@ raw_db_path = os.environ.get("DB_PATH") or os.environ.get("DATABASE_PATH")
 DB_PATH = Path(raw_db_path) if raw_db_path else BASE_DIR / "database" / "skillforge.db"
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class Settings(BaseModel):
     ENV: str = os.environ.get("ENV", "development")
     PROD: bool = (
@@ -27,4 +31,7 @@ class Settings(BaseModel):
     USE_SUPABASE: bool = os.environ.get("USE_SUPABASE", "false").lower() in ("true", "1", "yes")
 
 settings = Settings()
+
+if settings.PROD and settings.JWT_SECRET == "codempress_super_secret_jwt_key_2026":
+    logger.warning("CRITICAL SECURITY WARNING: Production mode detected but default fallback JWT_SECRET is active! Set JWT_SECRET env var.")
 

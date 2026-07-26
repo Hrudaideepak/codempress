@@ -12,17 +12,18 @@ import { soundService } from "./services/soundService";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Library from "./pages/Library";
-import Subject from "./pages/Subject";
-import TopicReader from "./pages/TopicReader";
-import Quiz from "./pages/Quiz";
-import Profile from "./pages/Profile";
-import Forge from "./pages/Forge";
-import Roadmaps from "./pages/Roadmaps";
-import RoadmapDetail from "./pages/RoadmapDetail";
-import RoadmapStageReader from "./pages/RoadmapStageReader";
-import RoadmapTailored from "./pages/RoadmapTailored";
-import Mentor from "./pages/Mentor";
 import NotFound from "./pages/NotFound";
+
+const Subject = lazy(() => import("./pages/Subject"));
+const TopicReader = lazy(() => import("./pages/TopicReader"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Forge = lazy(() => import("./pages/Forge"));
+const Roadmaps = lazy(() => import("./pages/Roadmaps"));
+const RoadmapDetail = lazy(() => import("./pages/RoadmapDetail"));
+const RoadmapStageReader = lazy(() => import("./pages/RoadmapStageReader"));
+const RoadmapTailored = lazy(() => import("./pages/RoadmapTailored"));
+const Mentor = lazy(() => import("./pages/Mentor"));
 
 function TopBar() {
   const { user, logout } = useAuth();
@@ -30,10 +31,12 @@ function TopBar() {
   const [muted, setMuted] = useState(soundService.isMuted());
   const location = useLocation();
 
+  const lastFetchedRef = useRef(0);
+
   const scheduleStreakReminder = () => {
     if (!window.Capacitor) return;
     import("@capacitor/local-notifications").then(({ LocalNotifications }) => {
-      LocalNotifications.requestPermissions().then((perm) => {
+      LocalNotifications.checkPermissions().then((perm) => {
         if (perm.display !== "granted") return;
         LocalNotifications.cancel({ notifications: [{ id: 42 }] }).then(() => {
           LocalNotifications.schedule({
@@ -51,6 +54,19 @@ function TopBar() {
     });
   };
 
+  const loadProgress = useCallback((force = false) => {
+    const now = Date.now();
+    if (!force && now - lastFetchedRef.current < 30000) return;
+    lastFetchedRef.current = now;
+    api
+      .getProgress()
+      .then((p) => {
+        setStats(p);
+        scheduleStreakReminder();
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const handleSoundToggle = (e) => {
       setMuted(e.detail.muted);
@@ -61,25 +77,20 @@ function TopBar() {
 
   useEffect(() => {
     if (!user) return;
-    const load = () =>
-      api
-        .getProgress()
-        .then((p) => {
-          setStats(p);
-          scheduleStreakReminder();
-        })
-        .catch(() => {});
-    load();
+    loadProgress(true);
+
     const onFocus = () => {
-      if (document.visibilityState === "visible") load();
+      if (document.visibilityState === "visible") loadProgress(false);
     };
+    const onProgressSync = () => loadProgress(true);
+
     document.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("codempress:progress", load);
+    window.addEventListener("codempress:progress", onProgressSync);
     return () => {
       document.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("codempress:progress", load);
+      window.removeEventListener("codempress:progress", onProgressSync);
     };
-  }, [user]);
+  }, [user, loadProgress]);
 
   return (
     <header className="topbar">
@@ -193,7 +204,7 @@ function AppShell() {
           setUpdateInfo(status);
         }
       })
-      .catch((err) => console.log("Failed to check app status:", err));
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

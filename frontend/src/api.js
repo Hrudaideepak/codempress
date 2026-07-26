@@ -400,7 +400,9 @@ export async function syncOfflineData() {
   const q = getQueue();
   if (q.length === 0) return;
 
-  console.log(`[OfflineSync] Syncing ${q.length} pending actions...`);
+  if (import.meta.env.DEV) {
+    console.log(`[OfflineSync] Syncing ${q.length} pending actions...`);
+  }
   const remaining = [];
 
   for (const item of q) {
