@@ -62,138 +62,148 @@ class SoundService {
 
   playPop() {
     if (this.muted) return;
-    try {
-      const ctx = this.getAudioContext();
-      if (!ctx) return;
+    setTimeout(() => {
+      try {
+        const ctx = this.getAudioContext();
+        if (!ctx) return;
 
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(600, now);
-      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
 
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(now);
-      osc.stop(now + 0.05);
-    } catch (err) {
-      console.warn("Sound play error:", err);
-    }
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } catch (err) {
+        console.warn("Sound play error:", err);
+      }
+    }, 0);
   }
 
   playCorrect() {
     if (this.muted) return;
-    try {
-      const ctx = this.getAudioContext();
-      if (!ctx) return;
+    setTimeout(() => {
+      try {
+        const ctx = this.getAudioContext();
+        if (!ctx) return;
 
-      const now = ctx.currentTime;
-      const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 (Major Arpeggio)
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        const now = ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 (Major Arpeggio)
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
 
-        gain.gain.setValueAtTime(0.15, now + idx * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+          gain.gain.setValueAtTime(0.15, now + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
 
-        osc.start(now + idx * 0.08);
-        osc.stop(now + idx * 0.08 + 0.25);
-      });
-    } catch (err) {
-      console.warn("Sound play error:", err);
-    }
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 0.25);
+        });
+      } catch (err) {
+        console.warn("Sound play error:", err);
+      }
+    }, 0);
   }
 
   playIncorrect() {
     if (this.muted) return;
-    try {
-      const ctx = this.getAudioContext();
-      if (!ctx) return;
+    setTimeout(() => {
+      try {
+        const ctx = this.getAudioContext();
+        if (!ctx) return;
 
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(220, now); // A3
-      osc.frequency.linearRampToValueAtTime(140, now + 0.25);
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(220, now); // A3
+        osc.frequency.linearRampToValueAtTime(140, now + 0.25);
 
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(now);
-      osc.stop(now + 0.25);
-    } catch (err) {
-      console.warn("Sound play error:", err);
-    }
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } catch (err) {
+        console.warn("Sound play error:", err);
+      }
+    }, 0);
   }
 
   playLevelUp() {
     if (this.muted) return;
-    try {
-      const ctx = this.getAudioContext();
-      if (!ctx) return;
+    setTimeout(() => {
+      try {
+        const ctx = this.getAudioContext();
+        if (!ctx) return;
 
-      const now = ctx.currentTime;
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+        const now = ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.1);
 
-        gain.gain.setValueAtTime(0.2, now + idx * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.35);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.35);
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
 
-        osc.start(now + idx * 0.1);
-        osc.stop(now + idx * 0.1 + 0.35);
-      });
-    } catch (err) {
-      console.warn("Sound play error:", err);
-    }
+          osc.start(now + idx * 0.1);
+          osc.stop(now + idx * 0.1 + 0.35);
+        });
+      } catch (err) {
+        console.warn("Sound play error:", err);
+      }
+    }, 0);
   }
 
   playConfetti() {
     if (this.muted) return;
-    try {
-      const ctx = this.getAudioContext();
-      if (!ctx) return;
+    setTimeout(() => {
+      try {
+        const ctx = this.getAudioContext();
+        if (!ctx) return;
 
-      const now = ctx.currentTime;
-      const freqs = [880, 1174.66, 1396.91, 1760]; // A5, D6, F6, A6
-      freqs.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+        const now = ctx.currentTime;
+        const freqs = [880, 1174.66, 1396.91, 1760]; // A5, D6, F6, A6
+        freqs.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
 
-        gain.gain.setValueAtTime(0.12, now + idx * 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.15);
+          gain.gain.setValueAtTime(0.12, now + idx * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.15);
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
 
-        osc.start(now + idx * 0.05);
-        osc.stop(now + idx * 0.05 + 0.15);
-      });
-    } catch (err) {
-      console.warn("Sound play error:", err);
-    }
+          osc.start(now + idx * 0.05);
+          osc.stop(now + idx * 0.05 + 0.15);
+        });
+      } catch (err) {
+        console.warn("Sound play error:", err);
+      }
+    }, 0);
   }
 }
 
