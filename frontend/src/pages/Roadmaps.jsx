@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import Spinner from "../components/ui/Spinner";
@@ -73,15 +73,17 @@ export default function Roadmaps() {
     { id: "all", label: "🌐 All Roadmaps", count: 26, desc: "Complete library of career systems" }
   ];
 
-  const filteredRoadmaps = roadmaps.filter((r) => {
-    const matchesCategory = activeCategory === "all" || r.category === activeCategory;
-    const matchesSearch =
-      !searchQuery.trim() ||
-      r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.target_role.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredRoadmaps = useMemo(() => {
+    return roadmaps.filter((r) => {
+      const matchesCategory = activeCategory === "all" || r.category === activeCategory;
+      const matchesSearch =
+        !searchQuery.trim() ||
+        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.target_role.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [roadmaps, activeCategory, searchQuery]);
 
   const openRoadmapModal = (rm) => {
     soundService.play("click");

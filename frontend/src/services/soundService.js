@@ -24,6 +24,18 @@ class SoundService {
     return this.ctx;
   }
 
+  play(name = "pop") {
+    if (this.muted) return;
+    // Execute audio synthesis asynchronously off the main input click thread
+    setTimeout(() => {
+      if (name === "correct") return this.playCorrect();
+      if (name === "incorrect") return this.playIncorrect();
+      if (name === "levelup" || name === "levelUp") return this.playLevelUp();
+      if (name === "confetti") return this.playConfetti();
+      return this.playPop();
+    }, 0);
+  }
+
   isMuted() {
     return this.muted;
   }
