@@ -704,8 +704,54 @@ export default function Mentor() {
               <div ref={chatBottomRef} />
             </div>
 
+            {/* Quick Suggested Prompts */}
+            <div style={{ display: "flex", gap: "8px", overflowX: "auto", padding: "8px 0", marginTop: "12px", scrollbarWidth: "none" }}>
+              {[
+                { icon: "📄", label: "Analyze My Resume", text: "Please review my technical profile and tell me my strongest skills and areas to improve." },
+                { icon: "🎯", label: "Mock Interview Prep", text: "Can you ask me a technical system design interview question?" },
+                { icon: "🗺️", label: "AI Career Roadmap", text: "What key skills do I need to master to become a Senior AI Systems Engineer?" },
+                { icon: "💼", label: "Cover Letter Tips", text: "How should I structure a high-impact cover letter for lead engineering roles?" }
+              ].map((chip, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setChatInput(chip.text);
+                  }}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.05)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "20px",
+                    padding: "6px 14px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#94A3B8",
+                    whiteSpace: "nowrap",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(139, 92, 246, 0.15)";
+                    e.currentTarget.style.color = "#F8FAFC";
+                    e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                    e.currentTarget.style.color = "#94A3B8";
+                    e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                  }}
+                >
+                  <span>{chip.icon}</span>
+                  <span>{chip.label}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Input Form */}
-            <form onSubmit={handleSendChat} style={{ display: "flex", gap: "12px", marginTop: "20px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+            <form onSubmit={handleSendChat} style={{ display: "flex", gap: "12px", marginTop: "8px", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
               <input
                 type="text"
                 placeholder="Ask about interview strategies, resume feedback, or career transitions..."
