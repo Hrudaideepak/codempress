@@ -447,7 +447,7 @@ export default function Roadmaps() {
                 }}
               >
                 {calculatingGap ? <Spinner size="sm" color="#FFF" /> : <TrendingUp size={16} />}
-                Run Personal Skill-Gap Analysis & 7-Day Plan
+                Run Personal Skill-Gap Analysis
               </button>
             </div>
 
@@ -457,24 +457,9 @@ export default function Roadmaps() {
                 <h4 style={{ color: "#F472B6", fontWeight: 800, fontSize: "16px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
                   <Zap size={16} /> Skill-Gap Analysis Results ({skillGapResult.completion_percentage}% Ready)
                 </h4>
-                <p style={{ color: "#94A3B8", fontSize: "13px", marginBottom: "14px" }}>
+                <p style={{ color: "#94A3B8", fontSize: "13px", margin: 0 }}>
                   Estimated {skillGapResult.estimated_hours_remaining} hours remaining to master key prerequisites.
                 </p>
-
-                <h5 style={{ color: "#F8FAFC", fontSize: "14px", fontWeight: 700, marginBottom: "8px" }}>
-                  7-Day Personalized Learning Plan:
-                </h5>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {skillGapResult.daily_learning_plan.map((item, idx) => (
-                    <div key={idx} style={{ background: "rgba(30, 41, 59, 0.6)", padding: "10px 14px", borderRadius: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px" }}>
-                      <div>
-                        <span style={{ color: "#C084FC", fontWeight: 800, marginRight: "8px" }}>{item.day}:</span>
-                        <span style={{ color: "#F8FAFC", fontWeight: 700 }}>{item.focus}</span> — <span style={{ color: "#94A3B8" }}>{item.action}</span>
-                      </div>
-                      <span style={{ color: "#F59E0B", fontWeight: 700, fontSize: "12px" }}>+{item.target_xp} XP</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
