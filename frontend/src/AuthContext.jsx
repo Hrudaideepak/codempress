@@ -6,8 +6,31 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
   const [loading, setLoading] = useState(false);
+  const [userProgress, setUserProgress] = useState({
+    roadmaps_progress: {},
+    enrolled_items: [],
+    completed_topics: [],
+    xp: 0,
+    streak: 0
+  });
 
-  // Validate stored token on first load without destroying offline session on network glitch
+  const syncUserProgress = async () => {
+    try {
+      const data = await api.getAllUserProgress();
+      if (data) {
+        setUserProgress(data);
+        localStorage.setItem("sf_user_progress_cache", JSON.stringify(data));
+      }
+    } catch (err) {
+      console.warn("[AuthContext] Cross-device progress sync warning:", err);
+      try {
+        const cached = localStorage.getItem("sf_user_progress_cache");
+        if (cached) setUserProgress(JSON.parse(cached));
+      } catch {}
+    }
+  };
+
+  // Validate stored token on first load & hydrate user progress
   useEffect(() => {
     const token = localStorage.getItem("sf_token");
     if (token) {
@@ -17,10 +40,10 @@ export function AuthProvider({ children }) {
           if (freshUser) {
             setUser(freshUser);
             localStorage.setItem("sf_user", JSON.stringify(freshUser));
+            syncUserProgress();
           }
         })
         .catch((err) => {
-          // Only clear session if token is explicitly rejected (401 Unauthorized)
           if (err && (err.status === 401 || (err.message && err.message.includes("401")))) {
             clearSession();
             setUser(null);
@@ -35,6 +58,7 @@ export function AuthProvider({ children }) {
       const res = await api.loginWithGoogle(idToken);
       setSession(res.token, res.user);
       setUser(res.user);
+      await syncUserProgress();
       return res.user;
     } finally {
       setLoading(false);
@@ -84,6 +108,8 @@ export function AuthProvider({ children }) {
       value={{
         user,
         loading,
+        userProgress,
+        syncUserProgress,
         loginWithGoogle,
         loginWithEmail,
         signup,

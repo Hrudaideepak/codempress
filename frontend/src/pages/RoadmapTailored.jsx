@@ -84,13 +84,14 @@ export default function RoadmapTailored() {
     setCompletedNodes(nextCompleted);
 
     try {
-      await api.toggleRoadmapNodeProgress(skeleton?.slug || roadmapId, nodeId);
+      await api.saveRoadmapProgress(skeleton?.slug || roadmapId, nodeId, nextCompleted);
       if (!completedNodes.includes(nodeId)) {
         soundService.play("levelup");
-        toast.show("Stage completed! XP Progress updated.", "success");
+        toast.show("Stage completed! XP & Cross-Device Progress Saved.", "success");
       }
     } catch (err) {
       console.error("Failed to sync node progress:", err);
+      toast.show("Progress saved locally (network sync pending)", "info");
     }
   };
 

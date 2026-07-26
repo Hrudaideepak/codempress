@@ -348,6 +348,16 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ roadmap_slug: slug, node_id: nodeId }),
     }),
+  getAllUserProgress: () => request("/progress/all"),
+  saveRoadmapProgress: (roadmapSlug, nodeId = null, completedNodes = null) =>
+    request("/progress/roadmap/save", {
+      method: "POST",
+      body: JSON.stringify({
+        roadmap_slug: roadmapSlug,
+        node_id: nodeId,
+        completed_nodes: completedNodes
+      }),
+    }),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

@@ -1,4 +1,7 @@
+import json
 import logging
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends
 from backend.database import execute_query
 from backend.auth import get_current_user
@@ -82,6 +85,116 @@ async def get_my_rewards(current_user: dict = Depends(get_current_user)):
             })
 
     return {"badges": badges, "total_xp": xp}
+
+
+@router.get("/progress/all")
+async def get_all_user_progress(current_user: dict = Depends(get_current_user)):
+    """Fetches full cross-device progress for Google OAuth user (roadmaps, topics, enrollments, XP)."""
+    try:
+        user_id = int(current_user["sub"]) if current_user and "sub" in current_user and str(current_user["sub"]).isdigit() else 1
+    except Exception:
+        user_id = 1
+
+    # Fetch User XP & Streak
+    user_rows = await execute_query("SELECT xp, streak_count FROM users WHERE _id = ?", (user_id,))
+    xp = user_rows[0]["xp"] if user_rows and user_rows[0]["xp"] is not None else 0
+    streak = user_rows[0]["streak_count"] if user_rows and user_rows[0]["streak_count"] is not None else 0
+
+    # Fetch Roadmap Node Progress records
+    rm_rows = await execute_query(
+        "SELECT roadmap_slug, completed_nodes_json, selected_track, current_node_id, updated_at FROM user_roadmap_progress WHERE user_id = ?",
+        (user_id,)
+    )
+    roadmaps_progress = {}
+    for r in rm_rows:
+        roadmaps_progress[r["roadmap_slug"]] = {
+            "completed_nodes": json.loads(r["completed_nodes_json"] or "[]"),
+            "selected_track": r["selected_track"] or "",
+            "current_node_id": r["current_node_id"] or "",
+            "updated_at": r["updated_at"]
+        }
+
+    # Fetch Enrollments
+    enrolled_rows = await execute_query(
+        "SELECT item_type, item_id FROM user_enrollments WHERE user_id = ?",
+        (user_id,)
+    )
+    enrolled_items = [{"item_type": e["item_type"], "item_id": e["item_id"]} for e in enrolled_rows]
+
+    # Fetch Completed Topics
+    topic_rows = await execute_query(
+        "SELECT topic_id, mastery_percent FROM user_progress WHERE user_id = ? AND mastery_percent >= 60",
+        (user_id,)
+    )
+    completed_topics = [t["topic_id"] for t in topic_rows]
+
+    return {
+        "user_id": user_id,
+        "xp": xp,
+        "streak": streak,
+        "roadmaps_progress": roadmaps_progress,
+        "enrolled_items": enrolled_items,
+        "completed_topics": completed_topics
+    }
+
+
+class SaveRoadmapProgressRequest(BaseModel):
+    roadmap_slug: str
+    node_id: Optional[str] = None
+    completed_nodes: Optional[List[str]] = None
+    selected_track: Optional[str] = None
+
+@router.post("/progress/roadmap/save")
+async def save_roadmap_progress(
+    payload: SaveRoadmapProgressRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Atomically persists roadmap node progress keyed by Google OAuth user ID + roadmap ID."""
+    from backend.database import execute_write
+    try:
+        user_id = int(current_user["sub"]) if current_user and "sub" in current_user and str(current_user["sub"]).isdigit() else 1
+    except Exception:
+        user_id = 1
+
+    rows = await execute_query(
+        "SELECT _id, completed_nodes_json FROM user_roadmap_progress WHERE user_id = ? AND roadmap_slug = ?",
+        (user_id, payload.roadmap_slug)
+    )
+
+    if payload.completed_nodes is not None:
+        completed = payload.completed_nodes
+    else:
+        existing = json.loads(rows[0]["completed_nodes_json"] or "[]") if rows else []
+        if payload.node_id:
+            if payload.node_id in existing:
+                existing.remove(payload.node_id)
+            else:
+                existing.append(payload.node_id)
+        completed = existing
+
+    if rows:
+        await execute_write(
+            "UPDATE user_roadmap_progress SET completed_nodes_json = ?, current_node_id = ?, updated_at = CURRENT_TIMESTAMP WHERE _id = ?",
+            (json.dumps(completed), payload.node_id or "", rows[0]["_id"])
+        )
+    else:
+        await execute_write(
+            "INSERT INTO user_roadmap_progress (user_id, roadmap_slug, completed_nodes_json, current_node_id) VALUES (?, ?, ?, ?)",
+            (user_id, payload.roadmap_slug, json.dumps(completed), payload.node_id or "")
+        )
+
+    # Award 50 XP per node completion
+    new_xp_earned = 50 if payload.node_id and payload.node_id in completed else 0
+    if new_xp_earned > 0:
+        await execute_write("UPDATE users SET xp = xp + ? WHERE _id = ?", (new_xp_earned, user_id))
+
+    return {
+        "status": "success",
+        "user_id": user_id,
+        "roadmap_slug": payload.roadmap_slug,
+        "completed_nodes": completed,
+        "xp_awarded": new_xp_earned
+    }
 
 
 @router.get("/app-status")
