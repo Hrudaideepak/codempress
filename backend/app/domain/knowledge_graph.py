@@ -113,7 +113,7 @@ class SkillGapResponse(BaseModel):
     mastered_skills: List[str]
     missing_skills: List[str]
     recommended_next_topics: List[Dict[str, Any]]
-    daily_learning_plan: List[Dict[str, Any]]
+    daily_learning_plan: List[Dict[str, Any]] = []
     estimated_hours_remaining: int
 
 
@@ -121,7 +121,7 @@ def analyze_roadmap_skill_gap(
     roadmap: Dict[str, Any], 
     completed_topic_ids: List[int]
 ) -> SkillGapResponse:
-    """Calculates user skill-gap, missing prerequisites, and a 7-day personalized action plan."""
+    """Calculates user skill-gap, missing prerequisites, and completion estimation."""
     milestones = roadmap.get("milestones", [])
     total_milestones = len(milestones)
     
@@ -139,17 +139,6 @@ def analyze_roadmap_skill_gap(
     mastered_cutoff = int(len(all_skills) * (completion_pct / 100.0))
     mastered_skills = all_skills[:mastered_cutoff]
     missing_skills = all_skills[mastered_cutoff:]
-
-    # Generate 7-Day Action Plan
-    daily_plan = [
-        {"day": "Day 1", "focus": f"Milestone 1: {milestones[0]['title'] if milestones else 'Foundations'}", "action": "Read core theory & complete diagnostic quiz", "target_xp": 100},
-        {"day": "Day 2", "focus": "Prerequisite Concept Mastery", "action": "Implement interactive code challenge", "target_xp": 150},
-        {"day": "Day 3", "focus": f"Skill Integration ({missing_skills[0] if missing_skills else 'Core Tools'})", "action": "Build mini-project module", "target_xp": 120},
-        {"day": "Day 4", "focus": "Deep Dive & AI Mentor Querying", "action": "Consult Socratic AI Mentor on edge cases", "target_xp": 80},
-        {"day": "Day 5", "focus": f"Advanced Skill ({missing_skills[1] if len(missing_skills)>1 else 'Architecture'})", "action": "Refactor codebase to Clean Architecture", "target_xp": 140},
-        {"day": "Day 6", "focus": "Capstone Project Preparation", "action": "Scaffolding capstone repository & dependencies", "target_xp": 200},
-        {"day": "Day 7", "focus": "Portfolio Evaluation & Benchmark", "action": "Submit capstone for automated evaluation", "target_xp": 250}
-    ]
 
     # RecommendedNextTopics
     next_topics = [
@@ -169,7 +158,7 @@ def analyze_roadmap_skill_gap(
         mastered_skills=mastered_skills,
         missing_skills=missing_skills,
         recommended_next_topics=next_topics,
-        daily_learning_plan=daily_plan,
+        daily_learning_plan=[],
         estimated_hours_remaining=remaining_hours
     )
 
