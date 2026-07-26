@@ -242,6 +242,17 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ topic_id: topicId, wrong_answer_index: wrongAnswerIndex }),
     }),
+  generateCustomRoadmapFromText: (goal, targetRole = "AI Agent Architect") =>
+    request("/custom-roadmap/text", {
+      method: "POST",
+      body: JSON.stringify({ goal, target_role: targetRole }),
+    }),
+  generateCustomRoadmapFromResume: (resumeText, certifications = [], targetRole = "AI Agent Architect") =>
+    request("/custom-roadmap/resume", {
+      method: "POST",
+      body: JSON.stringify({ resume_text: resumeText, certifications, target_role: targetRole }),
+    }),
+  getCustomRoadmapById: (id) => request(`/custom-roadmap/${id}`),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

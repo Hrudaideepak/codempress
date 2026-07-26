@@ -44,6 +44,15 @@ export default function Roadmaps() {
   const [skillGapResult, setSkillGapResult] = useState(null);
   const [calculatingGap, setCalculatingGap] = useState(false);
 
+  // Custom AI Roadmap & Resume Analyzer State
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customInputMode, setCustomInputMode] = useState("text"); // 'text' or 'resume'
+  const [customGoalText, setCustomGoalText] = useState("");
+  const [customResumeText, setCustomResumeText] = useState("");
+  const [customTargetRole, setCustomTargetRole] = useState("AI Agent Architect");
+  const [customLoading, setCustomLoading] = useState(false);
+  const [customRoadmapResult, setCustomRoadmapResult] = useState(null);
+
   useEffect(() => {
     setLoading(true);
     Promise.all([
@@ -108,6 +117,26 @@ export default function Roadmaps() {
       .finally(() => setCalculatingGap(false));
   };
 
+  const handleGenerateCustomRoadmap = async () => {
+    soundService.play("click");
+    setCustomLoading(true);
+    setCustomRoadmapResult(null);
+    try {
+      let res;
+      if (customInputMode === "text") {
+        res = await api.generateCustomRoadmapFromText(customGoalText, customTargetRole);
+      } else {
+        res = await api.generateCustomRoadmapFromResume(customResumeText, [], customTargetRole);
+      }
+      setCustomRoadmapResult(res);
+      soundService.play("levelup");
+    } catch (err) {
+      console.error("Failed to generate custom roadmap:", err);
+    } finally {
+      setCustomLoading(false);
+    }
+  };
+
   return (
     <div className="roadmaps-page" style={{ padding: "32px 24px 80px", maxWidth: "1280px", margin: "0 auto" }}>
       {/* Hero Banner */}
@@ -167,6 +196,29 @@ export default function Roadmaps() {
             <button
               onClick={() => {
                 soundService.play("click");
+                setShowCustomModal(true);
+              }}
+              style={{
+                padding: "14px 22px",
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                border: "none",
+                color: "#FFFFFF",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                boxShadow: "0 8px 24px -4px rgba(236, 72, 153, 0.4)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px"
+              }}
+            >
+              <Sparkles size={16} /> Create Custom AI Roadmap
+            </button>
+
+            <button
+              onClick={() => {
+                soundService.play("click");
                 setShowTaxonomyModal(true);
               }}
               style={{
@@ -183,7 +235,7 @@ export default function Roadmaps() {
                 gap: "8px"
               }}
             >
-              <BrainCircuit size={16} /> Explore Ontology & Taxonomy (53 Skills)
+              <BrainCircuit size={16} /> Inspect 10-Level Ontology
             </button>
           </div>
         </div>
@@ -617,6 +669,170 @@ export default function Roadmaps() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Custom AI Roadmap Modal */}
+      {showCustomModal && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(12px)", zIndex: 1000, display: "flex", justifyContent: "center", alignItems: "center", padding: "24px" }}>
+          <div style={{ background: "#0F172A", border: "1.5px solid rgba(168, 85, 247, 0.4)", borderRadius: "24px", width: "100%", maxWidth: "780px", maxHeight: "90vh", overflowY: "auto", padding: "32px", position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
+            <button
+              onClick={() => {
+                soundService.play("click");
+                setShowCustomModal(false);
+              }}
+              style={{ position: "absolute", top: "24px", right: "24px", background: "rgba(255, 255, 255, 0.1)", border: "none", borderRadius: "50%", width: "36px", height: "36px", color: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            >
+              <X size={20} />
+            </button>
+
+            <h2 style={{ fontSize: "26px", fontWeight: 800, color: "#F8FAFC", marginBottom: "8px", display: "flex", alignItems: "center", gap: "10px" }}>
+              <Sparkles color="#EC4899" /> AI Custom Roadmap & Resume Analyzer
+            </h2>
+            <p style={{ color: "#94A3B8", fontSize: "14px", marginBottom: "24px" }}>
+              Describe your goal or paste your resume/certifications. Our AI engine extracts skills, computes job match scores, and compiles a 5-phase customized roadmap.
+            </p>
+
+            <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+              <button
+                onClick={() => setCustomInputMode("text")}
+                style={{ flex: 1, padding: "12px", borderRadius: "12px", border: "1px solid rgba(168, 85, 247, 0.3)", background: customInputMode === "text" ? "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)" : "rgba(30, 41, 59, 0.5)", color: "#FFFFFF", fontWeight: 700, cursor: "pointer" }}
+              >
+                ✏️ Type Goal Text
+              </button>
+              <button
+                onClick={() => setCustomInputMode("resume")}
+                style={{ flex: 1, padding: "12px", borderRadius: "12px", border: "1px solid rgba(168, 85, 247, 0.3)", background: customInputMode === "resume" ? "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)" : "rgba(30, 41, 59, 0.5)", color: "#FFFFFF", fontWeight: 700, cursor: "pointer" }}
+              >
+                📄 Resume & Certifications
+              </button>
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", color: "#C084FC", fontSize: "13px", fontWeight: 700, marginBottom: "8px" }}>
+                Target Role:
+              </label>
+              <select
+                value={customTargetRole}
+                onChange={(e) => setCustomTargetRole(e.target.value)}
+                style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.15)", color: "#F8FAFC", fontSize: "14px" }}
+              >
+                <option value="AI Agent Architect">AI Agent Architect</option>
+                <option value="RAG & Vector DB Specialist">RAG & Vector DB Specialist</option>
+                <option value="MCP Protocol Engineer">MCP Protocol Engineer</option>
+                <option value="GenAI Full-Stack Developer">GenAI Full-Stack Developer</option>
+                <option value="LLMOps Infrastructure Engineer">LLMOps Infrastructure Engineer</option>
+                <option value="AI Automation Engineer">AI Automation Engineer</option>
+                <option value="Software Engineer">Software Engineer</option>
+                <option value="DevOps Engineer">DevOps Engineer</option>
+                <option value="Data Engineer">Data Engineer</option>
+                <option value="Security Engineer">Security Engineer</option>
+              </select>
+            </div>
+
+            {customInputMode === "text" ? (
+              <div style={{ marginBottom: "24px" }}>
+                <label style={{ display: "block", color: "#C084FC", fontSize: "13px", fontWeight: 700, marginBottom: "8px" }}>
+                  Your Learning Goal & Current Background:
+                </label>
+                <textarea
+                  rows={5}
+                  value={customGoalText}
+                  onChange={(e) => setCustomGoalText(e.target.value)}
+                  placeholder="e.g. I know Python and basic REST APIs. I want to learn AI agents, RAG, and vector databases to build business automation tools..."
+                  style={{ width: "100%", padding: "14px 18px", borderRadius: "14px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.15)", color: "#F8FAFC", fontSize: "14px", outline: "none" }}
+                />
+              </div>
+            ) : (
+              <div style={{ marginBottom: "24px" }}>
+                <label style={{ display: "block", color: "#C084FC", fontSize: "13px", fontWeight: 700, marginBottom: "8px" }}>
+                  Paste Resume Content & Certifications:
+                </label>
+                <textarea
+                  rows={6}
+                  value={customResumeText}
+                  onChange={(e) => setCustomResumeText(e.target.value)}
+                  placeholder="Paste text from your resume (skills, experience, AWS/Azure certifications)..."
+                  style={{ width: "100%", padding: "14px 18px", borderRadius: "14px", background: "rgba(30, 41, 59, 0.8)", border: "1px solid rgba(255, 255, 255, 0.15)", color: "#F8FAFC", fontSize: "14px", outline: "none" }}
+                />
+              </div>
+            )}
+
+            <button
+              onClick={handleGenerateCustomRoadmap}
+              disabled={customLoading}
+              style={{ width: "100%", padding: "16px", borderRadius: "14px", background: "linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)", border: "none", color: "#FFFFFF", fontWeight: 800, fontSize: "16px", cursor: customLoading ? "wait" : "pointer", marginBottom: "24px" }}
+            >
+              {customLoading ? "Analyzing Skills & Compiling Custom Roadmap..." : "🚀 Generate My Custom Roadmap"}
+            </button>
+
+            {/* Custom Roadmap Output */}
+            {customRoadmapResult && (
+              <div style={{ background: "rgba(30, 41, 59, 0.6)", borderRadius: "20px", padding: "24px", border: "1.5px solid rgba(236, 72, 153, 0.4)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <div>
+                    <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#F8FAFC", margin: 0 }}>
+                      {customRoadmapResult.title}
+                    </h3>
+                    <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0 0" }}>
+                      Role Match Score: <strong style={{ color: "#EC4899" }}>{customRoadmapResult.match_score}%</strong>
+                    </p>
+                  </div>
+                  <div style={{ background: "rgba(236, 72, 153, 0.2)", border: "1px solid #EC4899", padding: "6px 14px", borderRadius: "20px", color: "#F472B6", fontWeight: 800, fontSize: "14px" }}>
+                    {customRoadmapResult.match_score}% Match
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                  <h4 style={{ fontSize: "14px", fontWeight: 800, color: "#C084FC", marginBottom: "8px" }}>
+                    Extracted Skills:
+                  </h4>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {customRoadmapResult.extracted_skills?.map((sk, idx) => (
+                      <span key={idx} style={{ background: "rgba(16, 185, 129, 0.2)", border: "1px solid #10B981", color: "#34D399", padding: "4px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700 }}>
+                        ✓ {sk}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "24px" }}>
+                  <h4 style={{ fontSize: "14px", fontWeight: 800, color: "#EC4899", marginBottom: "8px" }}>
+                    Missing Skill Gaps to Fill:
+                  </h4>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {customRoadmapResult.skill_gaps?.map((gap, idx) => (
+                      <span key={idx} style={{ background: "rgba(239, 68, 68, 0.2)", border: "1px solid #EF4444", color: "#FCA5A5", padding: "4px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700 }}>
+                        ⚡ {gap}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <h4 style={{ fontSize: "16px", fontWeight: 800, color: "#F8FAFC", marginBottom: "12px" }}>
+                  5-Phase Custom Learning Path:
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {customRoadmapResult.phases?.map((ph) => (
+                    <div key={ph.phase} style={{ background: "rgba(15, 23, 42, 0.8)", padding: "14px", borderRadius: "12px", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", color: "#C084FC", fontWeight: 800, fontSize: "14px" }}>
+                        <span>{ph.name}</span>
+                        <span>{ph.duration}</span>
+                      </div>
+                      <p style={{ color: "#94A3B8", fontSize: "13px", margin: "6px 0" }}>{ph.description}</p>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px" }}>
+                        {ph.topics?.map((tp, i) => (
+                          <span key={i} style={{ background: "rgba(168, 85, 247, 0.2)", color: "#E9D5FF", padding: "3px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 600 }}>
+                            {tp}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
