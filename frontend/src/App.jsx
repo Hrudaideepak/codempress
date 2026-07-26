@@ -9,17 +9,15 @@ import ErrorBoundary from "./ErrorBoundary";
 import Spinner from "./components/ui/Spinner";
 import { soundService } from "./services/soundService";
 
+import Landing from "./pages/Landing";
+import Auth from "./pages/Auth";
+import Library from "./pages/Library";
+import Subject from "./pages/Subject";
+import TopicReader from "./pages/TopicReader";
+import Quiz from "./pages/Quiz";
+import Profile from "./pages/Profile";
+import Forge from "./pages/Forge";
 import Roadmaps from "./pages/Roadmaps";
-
-// Route-based code-splitting via dynamic imports
-const Landing = lazy(() => import("./pages/Landing"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Library = lazy(() => import("./pages/Library"));
-const Subject = lazy(() => import("./pages/Subject"));
-const TopicReader = lazy(() => import("./pages/TopicReader"));
-const Quiz = lazy(() => import("./pages/Quiz"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Forge = lazy(() => import("./pages/Forge"));
 
 function TopBar() {
   const { user, logout } = useAuth();
