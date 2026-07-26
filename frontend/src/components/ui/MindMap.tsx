@@ -10,6 +10,7 @@ interface Topic {
   cleared?: boolean;
   xp?: number;
   mastery?: number;
+  skills?: string[];
 }
 
 interface MindMapProps {
@@ -146,6 +147,26 @@ export default function MindMap({ topics, onSelectTopic }: MindMapProps) {
                 <p style={{ fontSize: "13px", color: "var(--ink-soft)", lineHeight: 1.5, marginBottom: "12px" }}>
                   {topic.description}
                 </p>
+
+                {topic.skills && topic.skills.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "12px" }}>
+                    {topic.skills.map((sk: string, sIdx: number) => (
+                      <span
+                        key={sIdx}
+                        style={{
+                          fontSize: "11px",
+                          padding: "2px 8px",
+                          borderRadius: "6px",
+                          background: "var(--primary-soft)",
+                          color: "var(--primary)",
+                          fontWeight: 600
+                        }}
+                      >
+                        ✓ {sk}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: 700 }}>+{topic.xp || 25} XP</span>

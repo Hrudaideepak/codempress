@@ -16,10 +16,13 @@ import {
   Layers,
   Compass,
   Plus,
-  Check
+  Check,
+  MapPin,
+  Grid
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
+import MindMap from "../components/ui/MindMap";
 
 export default function RoadmapDetail() {
   const { slug } = useParams();
@@ -27,6 +30,7 @@ export default function RoadmapDetail() {
   const toast = useToast();
   const [roadmap, setRoadmap] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [viewMode, setViewMode] = useState("map");
 
   useEffect(() => {
     const found = STATIC_ROADMAPS.find((r) => r.slug === slug);
@@ -158,92 +162,136 @@ export default function RoadmapDetail() {
 
       {/* Role-Scoped Staged Pipeline Nodes */}
       <div style={{ marginBottom: "40px" }}>
-        <h2 style={{ fontSize: "22px", color: "#0F172A", margin: "0 0 8px 0", fontWeight: 800 }}>
-          🧭 Scoped Learning Pipeline ({roadmap.milestones?.length || 0} Stages)
-        </h2>
-        <p style={{ color: "var(--ink-soft)", fontSize: "14px", marginBottom: "24px" }}>
-          Each stage is strictly scoped for the <strong>{roadmap.title}</strong> role. Clicking a stage opens only the content relevant to this role without cross-content bleeding.
-        </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "20px" }}>
+          <div>
+            <h2 style={{ fontSize: "22px", color: "#0F172A", margin: "0 0 4px 0", fontWeight: 800 }}>
+              🧭 Scoped Learning Pipeline ({roadmap.milestones?.length || 0} Stages)
+            </h2>
+            <p style={{ color: "var(--ink-soft)", fontSize: "14px", margin: 0 }}>
+              Each stage is strictly scoped for the <strong>{roadmap.title}</strong> role. Clicking a stage opens only the content relevant to this role.
+            </p>
+          </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {(roadmap.milestones || []).map((stage, idx) => (
-            <Card
-              key={stage.id || idx}
-              padding="24px"
-              hoverLift
-              style={{
-                borderLeft: "4px solid var(--primary)",
-                background: "#FFFFFF",
-                boxShadow: "var(--shadow)"
-              }}
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button
+              variant={viewMode === "map" ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setViewMode("map")}
+              leftIcon={<MapPin size={16} />}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px" }}>
-                <div style={{ flex: 1, minWidth: "280px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                    <span
-                      style={{
-                        width: "28px",
-                        height: "28px",
-                        borderRadius: "50%",
-                        background: "var(--primary-soft)",
-                        color: "var(--primary)",
-                        fontWeight: 800,
-                        fontSize: "14px",
-                        display: "grid",
-                        placeItems: "center"
-                      }}
-                    >
-                      {idx + 1}
-                    </span>
-                    <h3 style={{ margin: 0, fontSize: "18px", color: "#0F172A", fontWeight: 800 }}>
-                      {stage.title}
-                    </h3>
-                    <span className="pill xp" style={{ fontSize: "11px" }}>
-                      {stage.role_scope || `${roadmap.title} Depth`}
-                    </span>
-                  </div>
+              Mind Map
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              leftIcon={<Grid size={16} />}
+            >
+              List View
+            </Button>
+          </div>
+        </div>
 
-                  <p style={{ color: "var(--ink-soft)", fontSize: "14px", margin: "0 0 16px 38px", lineHeight: 1.5 }}>
-                    {stage.description}
-                  </p>
-
-                  {/* Scoped Skills Pills */}
-                  <div style={{ marginLeft: "38px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                    {(stage.skills || []).map((sk, sIdx) => (
+        {viewMode === "map" ? (
+          <MindMap
+            topics={(roadmap.milestones || []).map((m, idx) => ({
+              id: m.stage_id || m.id || idx + 1,
+              title: m.title,
+              description: m.description,
+              level_name: m.role_scope || `Stage ${idx + 1}`,
+              locked: false,
+              cleared: false,
+              xp: 100,
+              skills: m.skills || [],
+              stage_id: m.stage_id || m.id
+            }))}
+            onSelectTopic={(selected) => {
+              soundService.play("click");
+              const sId = selected.stage_id || selected.id;
+              navigate(`/roadmaps/${roadmap.slug}/stage/${sId}`);
+            }}
+          />
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            {(roadmap.milestones || []).map((stage, idx) => (
+              <Card
+                key={stage.id || idx}
+                padding="24px"
+                hoverLift
+                style={{
+                  borderLeft: "4px solid var(--primary)",
+                  background: "#FFFFFF",
+                  boxShadow: "var(--shadow)"
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px" }}>
+                  <div style={{ flex: 1, minWidth: "280px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
                       <span
-                        key={sIdx}
                         style={{
-                          fontSize: "12px",
-                          padding: "4px 10px",
-                          borderRadius: "8px",
-                          background: "var(--bg-subtle)",
-                          color: "#0F172A",
-                          fontWeight: 600
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "50%",
+                          background: "var(--primary-soft)",
+                          color: "var(--primary)",
+                          fontWeight: 800,
+                          fontSize: "14px",
+                          display: "grid",
+                          placeItems: "center"
                         }}
                       >
-                        ✓ {sk}
+                        {idx + 1}
                       </span>
-                    ))}
+                      <h3 style={{ margin: 0, fontSize: "18px", color: "#0F172A", fontWeight: 800 }}>
+                        {stage.title}
+                      </h3>
+                      <span className="pill xp" style={{ fontSize: "11px" }}>
+                        {stage.role_scope || `${roadmap.title} Depth`}
+                      </span>
+                    </div>
+
+                    <p style={{ color: "var(--ink-soft)", fontSize: "14px", margin: "0 0 16px 38px", lineHeight: 1.5 }}>
+                      {stage.description}
+                    </p>
+
+                    {/* Scoped Skills Pills */}
+                    <div style={{ marginLeft: "38px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                      {(stage.skills || []).map((sk, sIdx) => (
+                        <span
+                          key={sIdx}
+                          style={{
+                            fontSize: "12px",
+                            padding: "4px 10px",
+                            borderRadius: "8px",
+                            background: "var(--bg-subtle)",
+                            color: "#0F172A",
+                            fontWeight: 600
+                          }}
+                        >
+                          ✓ {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ paddingTop: "8px" }}>
+                    <Button
+                      variant="glowing"
+                      size="md"
+                      onClick={() => {
+                        soundService.play("click");
+                        navigate(`/roadmaps/${roadmap.slug}/stage/${stage.stage_id || stage.id}`);
+                      }}
+                      rightIcon={<ArrowRight size={16} />}
+                    >
+                      Open {stage.title.split(":")[0]} Scoped Course
+                    </Button>
                   </div>
                 </div>
-
-                <div style={{ paddingTop: "8px" }}>
-                  <Button
-                    variant="glowing"
-                    size="md"
-                    onClick={() => {
-                      soundService.play("click");
-                      navigate(`/roadmaps/${roadmap.slug}/stage/${stage.stage_id || stage.id}`);
-                    }}
-                    rightIcon={<ArrowRight size={16} />}
-                  >
-                    Open {stage.title.split(":")[0]} Scoped Course
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Capstone Project Section */}
