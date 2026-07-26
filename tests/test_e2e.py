@@ -144,3 +144,25 @@ async def test_scoped_roadmap_stage_endpoint():
     assert data["roadmap_slug"] == "frontend-engineer"
     assert "stage" in data
 
+@pytest.mark.anyio
+async def test_resume_analysis_endpoint():
+    """Verify POST /api/mentor/resume dynamically parses skills, experience, and proficiency."""
+    token = create_jwt_token(1, "arjun@example.com", "Arjun Kumar (Dev)")
+    headers = {"Authorization": f"Bearer {token}"}
+    sample_resume = """
+    Arjun Kumar
+    Senior Software Engineer with 5+ years of experience building Python, React, FastAPI, SQL, and Docker applications.
+    Education: B.Tech in Computer Science and Engineering from National Institute of Technology.
+    Skills: Python, JavaScript, React, FastAPI, PostgreSQL, Docker, Git.
+    """
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        resp = await ac.post("/api/mentor/resume", headers=headers, json={"resume_text": sample_resume})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "success"
+        assert "Python" in data["skills"]
+        assert "React" in data["skills"]
+        assert data["experience_level"] == "Senior"
+        assert "proficiency" in data
+
+
