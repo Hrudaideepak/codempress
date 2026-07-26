@@ -57,12 +57,22 @@ def ensure_database_seeded():
             roadmap_slug TEXT NOT NULL,
             completed_nodes_json TEXT NOT NULL DEFAULT '[]',
             selected_track TEXT,
+            current_node_id TEXT,
             last_node_id TEXT,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(_id) ON DELETE CASCADE,
             UNIQUE(user_id, roadmap_slug)
         );
     """)
+    # Auto-migrate missing columns if table existed prior to schema update
+    try:
+        conn.execute("ALTER TABLE user_roadmap_progress ADD COLUMN last_node_id TEXT;")
+    except Exception:
+        pass
+    try:
+        conn.execute("ALTER TABLE user_roadmap_progress ADD COLUMN current_node_id TEXT;")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 

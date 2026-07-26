@@ -189,6 +189,7 @@ CREATE TABLE IF NOT EXISTS user_roadmap_progress (
     selected_track TEXT,
     completed_nodes_json TEXT DEFAULT '[]', -- JSON array of completed stage_ids
     current_node_id TEXT,
+    last_node_id TEXT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, roadmap_slug)
 );
