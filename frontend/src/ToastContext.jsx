@@ -103,6 +103,8 @@ export function ToastProvider({ children }) {
       `}</style>
     </ToastContext.Provider>
   );
+}
+
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {
