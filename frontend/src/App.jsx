@@ -22,6 +22,7 @@ import RoadmapDetail from "./pages/RoadmapDetail";
 import RoadmapStageReader from "./pages/RoadmapStageReader";
 import RoadmapTailored from "./pages/RoadmapTailored";
 import Mentor from "./pages/Mentor";
+import NotFound from "./pages/NotFound";
 
 function TopBar() {
   const { user, logout } = useAuth();
@@ -392,6 +393,17 @@ function AppShell() {
                   <TopBar />
                   <Forge />
                 </RequireAuth>
+              }
+            />
+            <Route path="/subjects" element={<Navigate to="/library" replace />} />
+            <Route path="/analyze" element={<Navigate to="/mentor" replace />} />
+            <Route
+              path="*"
+              element={
+                <>
+                  {user && <TopBar />}
+                  <NotFound />
+                </>
               }
             />
           </Routes>
