@@ -181,4 +181,17 @@ CREATE TABLE IF NOT EXISTS user_mentor_roadmaps (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 15. User Lightweight Roadmap Node Progress Table
+CREATE TABLE IF NOT EXISTS user_roadmap_progress (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    roadmap_slug TEXT NOT NULL,
+    selected_track TEXT,
+    completed_nodes_json TEXT DEFAULT '[]', -- JSON array of completed stage_ids
+    current_node_id TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, roadmap_slug)
+);
+CREATE INDEX IF NOT EXISTS idx_user_roadmap_prog ON user_roadmap_progress(user_id, roadmap_slug);
+
 

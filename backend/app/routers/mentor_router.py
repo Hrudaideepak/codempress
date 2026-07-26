@@ -393,3 +393,103 @@ async def toggle_roadmap_step(
     )
 
     return {"status": "success", "steps": steps}
+
+
+class SkeletonRequest(BaseModel):
+    target_role: str
+    user_goals: Optional[str] = ""
+    resume_skills: Optional[List[str]] = []
+    experience_level: Optional[str] = "Mid"
+
+class ModuleRequest(BaseModel):
+    roadmap_title: str
+    stage_title: str
+    stage_description: Optional[str] = ""
+    role_depth: Optional[str] = "Production Engineering"
+
+class NodeProgressRequest(BaseModel):
+    roadmap_slug: str
+    node_id: str
+
+@router.post("/roadmap/generate-skeleton")
+async def generate_skeleton_endpoint(
+    payload: SkeletonRequest,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
+    """Generates an on-the-fly roadmap skeleton via AI with validation and fallbacks."""
+    from backend.app.domain.dynamic_roadmap_generator import generate_roadmap_skeleton
+    skeleton = await generate_roadmap_skeleton(
+        target_role=payload.target_role,
+        user_goals=payload.user_goals,
+        resume_skills=payload.resume_skills,
+        experience_level=payload.experience_level
+    )
+    return skeleton
+
+@router.post("/roadmap/generate-module")
+async def generate_module_endpoint(
+    payload: ModuleRequest,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
+    """Lazy loads detailed module content (theory markdown, code exercise, mini-project, interview prep) on click."""
+    from backend.app.domain.dynamic_roadmap_generator import generate_stage_module
+    module_data = await generate_stage_module(
+        roadmap_title=payload.roadmap_title,
+        stage_title=payload.stage_title,
+        stage_description=payload.stage_description,
+        role_depth=payload.role_depth
+    )
+    return module_data
+
+@router.get("/roadmap/progress/{roadmap_slug}")
+async def get_node_progress(
+    roadmap_slug: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Retrieves lightweight user node completion progress from SQLite."""
+    user_id = int(current_user["sub"])
+    rows = await execute_query(
+        "SELECT completed_nodes_json, selected_track FROM user_roadmap_progress WHERE user_id = ? AND roadmap_slug = ?",
+        (user_id, roadmap_slug)
+    )
+    if not rows:
+        return {"completed_nodes": [], "selected_track": ""}
+    
+    r = rows[0]
+    return {
+        "completed_nodes": json.loads(r["completed_nodes_json"] or "[]"),
+        "selected_track": r["selected_track"] or ""
+    }
+
+@router.post("/roadmap/progress/toggle")
+async def toggle_node_progress(
+    payload: NodeProgressRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Toggles stage node completion status in SQLite lightweight user progress table."""
+    user_id = int(current_user["sub"])
+    rows = await execute_query(
+        "SELECT _id, completed_nodes_json FROM user_roadmap_progress WHERE user_id = ? AND roadmap_slug = ?",
+        (user_id, payload.roadmap_slug)
+    )
+    completed = []
+    if rows:
+        r = rows[0]
+        completed = json.loads(r["completed_nodes_json"] or "[]")
+        if payload.node_id in completed:
+            completed.remove(payload.node_id)
+        else:
+            completed.append(payload.node_id)
+            
+        await execute_write(
+            "UPDATE user_roadmap_progress SET completed_nodes_json = ?, updated_at = CURRENT_TIMESTAMP WHERE _id = ?",
+            (json.dumps(completed), r["_id"])
+        )
+    else:
+        completed = [payload.node_id]
+        await execute_write(
+            "INSERT INTO user_roadmap_progress (user_id, roadmap_slug, completed_nodes_json) VALUES (?, ?, ?)",
+            (user_id, payload.roadmap_slug, json.dumps(completed))
+        )
+        
+    return {"status": "success", "completed_nodes": completed}

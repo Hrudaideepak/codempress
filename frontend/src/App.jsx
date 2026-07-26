@@ -20,6 +20,7 @@ import Forge from "./pages/Forge";
 import Roadmaps from "./pages/Roadmaps";
 import RoadmapDetail from "./pages/RoadmapDetail";
 import RoadmapStageReader from "./pages/RoadmapStageReader";
+import RoadmapTailored from "./pages/RoadmapTailored";
 import Mentor from "./pages/Mentor";
 
 function TopBar() {
@@ -363,6 +364,15 @@ function AppShell() {
                 <>
                   <TopBar />
                   <RoadmapStageReader />
+                </>
+              }
+            />
+            <Route
+              path="/roadmaps/tailored/:roadmapId"
+              element={
+                <>
+                  <TopBar />
+                  <RoadmapTailored />
                 </>
               }
             />

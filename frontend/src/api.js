@@ -322,6 +322,32 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ step_id: stepId }),
     }),
+  generateRoadmapSkeleton: (targetRole, userGoals = "", resumeSkills = [], experienceLevel = "Mid") =>
+    request("/mentor/roadmap/generate-skeleton", {
+      method: "POST",
+      body: JSON.stringify({
+        target_role: targetRole,
+        user_goals: userGoals,
+        resume_skills: resumeSkills,
+        experience_level: experienceLevel
+      }),
+    }),
+  generateRoadmapModule: (roadmapTitle, stageTitle, stageDescription = "", roleDepth = "Production Engineering") =>
+    request("/mentor/roadmap/generate-module", {
+      method: "POST",
+      body: JSON.stringify({
+        roadmap_title: roadmapTitle,
+        stage_title: stageTitle,
+        stage_description: stageDescription,
+        role_depth: roleDepth
+      }),
+    }),
+  getRoadmapNodeProgress: (slug) => request(`/mentor/roadmap/progress/${slug}`),
+  toggleRoadmapNodeProgress: (slug, nodeId) =>
+    request("/mentor/roadmap/progress/toggle", {
+      method: "POST",
+      body: JSON.stringify({ roadmap_slug: slug, node_id: nodeId }),
+    }),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

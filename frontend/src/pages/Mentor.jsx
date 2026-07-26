@@ -178,6 +178,8 @@ export default function Mentor() {
       setRoadmap(res);
       toast.show(`Personalized ${targetRoleInput} Roadmap Generated!`, "success");
       soundService.play("levelup");
+      const slug = `tailored-${targetRoleInput.toLowerCase().replace(/\s+/g, "-")}`;
+      window.location.href = `/roadmaps/tailored/${slug}`;
     } catch (err) {
       toast.show(err.message || "Failed to generate career roadmap", "error");
     } finally {
