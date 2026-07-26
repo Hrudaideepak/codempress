@@ -14,9 +14,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </React.StrictMode>
 );
 
-// Register service worker for PWA / installable APK (PWABuilder).
+// Service Worker unregistration / registration safeguard to prevent stale PWA cache lock
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        // Unregister stale service workers if offline caching causes chunk failure
+        registration.update().catch(() => registration.unregister());
+      }
+    }).catch(() => {});
   });
 }

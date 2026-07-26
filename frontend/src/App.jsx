@@ -9,6 +9,8 @@ import ErrorBoundary from "./ErrorBoundary";
 import Spinner from "./components/ui/Spinner";
 import { soundService } from "./services/soundService";
 
+import Roadmaps from "./pages/Roadmaps";
+
 // Route-based code-splitting via dynamic imports
 const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -18,7 +20,6 @@ const TopicReader = lazy(() => import("./pages/TopicReader"));
 const Quiz = lazy(() => import("./pages/Quiz"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Forge = lazy(() => import("./pages/Forge"));
-const Roadmaps = lazy(() => import("./pages/Roadmaps"));
 
 function TopBar() {
   const { user, logout } = useAuth();
