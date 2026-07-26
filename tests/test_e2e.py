@@ -165,4 +165,20 @@ async def test_resume_analysis_endpoint():
         assert data["experience_level"] == "Senior"
         assert "proficiency" in data
 
+@pytest.mark.anyio
+async def test_file_upload_resume():
+    """Verify POST /api/mentor/upload-file accepts file uploads and returns analyzed profile."""
+    token = create_jwt_token(1, "arjun@example.com", "Arjun Kumar (Dev)")
+    headers = {"Authorization": f"Bearer {token}"}
+    file_content = b"Arjun Kumar\nSenior Developer with Python, React, SQL, and Docker experience.\nEducation: B.Tech Computer Science."
+    files = {"file": ("resume.txt", file_content, "text/plain")}
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        resp = await ac.post("/api/mentor/upload-file", headers=headers, files=files)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "success"
+        assert "Python" in data["skills"]
+        assert data["experience_level"] == "Senior"
+
+
 
