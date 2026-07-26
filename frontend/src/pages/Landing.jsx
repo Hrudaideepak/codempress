@@ -1,9 +1,11 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { Sparkles, ArrowRight, Terminal, Layers, Code2, Cpu, Zap, Award, Compass } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
+
+const HeroScene = lazy(() => import("../HeroScene"));
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -46,6 +48,10 @@ export default function Landing() {
         <div style={{ marginTop: "24px", color: "var(--ink-faint)", fontSize: "13px", fontFamily: "var(--mono)" }}>
           ✦ SQLite Offline-First • 26 Career Roadmaps • 34 CS Subjects • GitHub Models AI Engine
         </div>
+
+        <Suspense fallback={null}>
+          <HeroScene />
+        </Suspense>
       </div>
 
       {/* Feature Cards Grid */}
