@@ -6,3 +6,4 @@ export { default as Skeleton, CardSkeleton, QuizSkeleton } from "./SkeletonLoade
 export { default as GuardianGateModal } from "./GuardianGateModal";
 export { default as MindMap } from "./MindMap";
 export { default as RecapModule } from "./RecapModule";
+export { default as ErrorState } from "./ErrorState";
