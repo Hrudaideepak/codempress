@@ -23,7 +23,10 @@ import {
   Cpu,
   BrainCircuit,
   FileCode,
-  Network
+  Network,
+  Calendar,
+  Zap,
+  TrendingUp
 } from "lucide-react";
 
 export default function Roadmaps() {
@@ -34,23 +37,32 @@ export default function Roadmaps() {
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [taxonomyData, setTaxonomyData] = useState(null);
+  const [ontologyLevels, setOntologyLevels] = useState([]);
   const [showTaxonomyModal, setShowTaxonomyModal] = useState(false);
+  
+  // Skill Gap State
+  const [skillGapResult, setSkillGapResult] = useState(null);
+  const [calculatingGap, setCalculatingGap] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     Promise.all([
       api.getRoadmaps(),
-      api.getCurriculumTaxonomy().catch(() => null)
+      api.getCurriculumTaxonomy().catch(() => null),
+      api.getKnowledgeGraph().catch(() => null)
     ])
-      .then(([resRoadmaps, resTaxonomy]) => {
+      .then(([resRoadmaps, resTaxonomy, resKG]) => {
         if (resRoadmaps && resRoadmaps.roadmaps) {
           setRoadmaps(resRoadmaps.roadmaps);
         }
         if (resTaxonomy && resTaxonomy.taxonomy) {
           setTaxonomyData(resTaxonomy.taxonomy);
         }
+        if (resKG && resKG.ontology_levels) {
+          setOntologyLevels(resKG.ontology_levels);
+        }
       })
-      .catch((err) => console.error("Failed to load roadmaps & taxonomy:", err))
+      .catch((err) => console.error("Failed to load roadmaps & knowledge graph:", err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -74,11 +86,24 @@ export default function Roadmaps() {
   const openRoadmapModal = (rm) => {
     soundService.play("click");
     setSelectedRoadmap(rm);
+    setSkillGapResult(null);
   };
 
   const closeRoadmapModal = () => {
     soundService.play("click");
     setSelectedRoadmap(null);
+    setSkillGapResult(null);
+  };
+
+  const runSkillGapAnalysis = (slug) => {
+    soundService.play("click");
+    setCalculatingGap(true);
+    api.calculateSkillGap(slug, [1741])
+      .then((res) => {
+        setSkillGapResult(res);
+      })
+      .catch((err) => console.error("Skill gap failed:", err))
+      .finally(() => setCalculatingGap(false));
   };
 
   return (
@@ -103,7 +128,7 @@ export default function Roadmaps() {
               <Compass size={15} /> Codempress AI Career Operating System
             </div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(236, 72, 153, 0.15)", border: "1px solid rgba(236, 72, 153, 0.3)", padding: "6px 14px", borderRadius: "30px", color: "#F472B6", fontSize: "13px", fontWeight: 700 }}>
-              <Sparkles size={15} /> Curriculum SDK v1.0 Universal
+              <Network size={15} /> Phase 2 Global Knowledge Graph & 10-Level Ontology
             </div>
           </div>
 
@@ -156,7 +181,7 @@ export default function Roadmaps() {
                 gap: "8px"
               }}
             >
-              <BrainCircuit size={16} /> Explore Skill Taxonomy (53 Skills)
+              <BrainCircuit size={16} /> Explore Ontology & Taxonomy (53 Skills)
             </button>
           </div>
         </div>
@@ -343,9 +368,61 @@ export default function Roadmaps() {
               </div>
             </div>
 
-            <p style={{ color: "#94A3B8", fontSize: "15px", lineHeight: 1.6, marginBottom: "28px" }}>
+            <p style={{ color: "#94A3B8", fontSize: "15px", lineHeight: 1.6, marginBottom: "20px" }}>
               {selectedRoadmap.overview}
             </p>
+
+            {/* Action Bar for Skill Gap Analysis */}
+            <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
+              <button
+                onClick={() => runSkillGapAnalysis(selectedRoadmap.slug)}
+                disabled={calculatingGap}
+                style={{
+                  padding: "12px 20px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)",
+                  border: "none",
+                  color: "#FFFFFF",
+                  fontWeight: 800,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  boxShadow: "0 8px 20px rgba(236, 72, 153, 0.3)"
+                }}
+              >
+                {calculatingGap ? <Spinner size="sm" color="#FFF" /> : <TrendingUp size={16} />}
+                Run Personal Skill-Gap Analysis & 7-Day Plan
+              </button>
+            </div>
+
+            {/* Skill Gap Results Panel */}
+            {skillGapResult && (
+              <div style={{ background: "rgba(15, 23, 42, 0.9)", border: "1px solid rgba(236, 72, 153, 0.4)", borderRadius: "16px", padding: "20px", marginBottom: "28px" }}>
+                <h4 style={{ color: "#F472B6", fontWeight: 800, fontSize: "16px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Zap size={16} /> Skill-Gap Analysis Results ({skillGapResult.completion_percentage}% Ready)
+                </h4>
+                <p style={{ color: "#94A3B8", fontSize: "13px", marginBottom: "14px" }}>
+                  Estimated {skillGapResult.estimated_hours_remaining} hours remaining to master key prerequisites.
+                </p>
+
+                <h5 style={{ color: "#F8FAFC", fontSize: "14px", fontWeight: 700, marginBottom: "8px" }}>
+                  7-Day Personalized Learning Plan:
+                </h5>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {skillGapResult.daily_learning_plan.map((item, idx) => (
+                    <div key={idx} style={{ background: "rgba(30, 41, 59, 0.6)", padding: "10px 14px", borderRadius: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px" }}>
+                      <div>
+                        <span style={{ color: "#C084FC", fontWeight: 800, marginRight: "8px" }}>{item.day}:</span>
+                        <span style={{ color: "#F8FAFC", fontWeight: 700 }}>{item.focus}</span> — <span style={{ color: "#94A3B8" }}>{item.action}</span>
+                      </div>
+                      <span style={{ color: "#F59E0B", fontWeight: 700, fontSize: "12px" }}>+{item.target_xp} XP</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Capstone Banner */}
             <div style={{ background: "linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.15) 100%)", border: "1px solid rgba(168, 85, 247, 0.4)", borderRadius: "16px", padding: "20px", marginBottom: "32px" }}>
@@ -444,7 +521,7 @@ export default function Roadmaps() {
         </div>
       )}
 
-      {/* Master Skill Taxonomy Modal */}
+      {/* Master Skill Taxonomy & 10-Level Ontology Modal */}
       {showTaxonomyModal && (
         <div
           style={{
@@ -500,14 +577,30 @@ export default function Roadmaps() {
             </button>
 
             <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#F8FAFC", marginBottom: "8px", display: "flex", alignItems: "center", gap: "10px" }}>
-              <BrainCircuit color="#A855F7" /> Master Skill Taxonomy Engine
+              <BrainCircuit color="#A855F7" /> Master Engineering Ontology & Knowledge Graph
             </h2>
-            <p style={{ color: "#94A3B8", fontSize: "14px", marginBottom: "24px" }}>
-              Codempress Curriculum SDK indexes 53 core skill taxonomies across AI, Web, Mobile, DevOps, and Exclusive Builder disciplines.
+            <p style={{ color: "#94A3B8", fontSize: "14px", marginBottom: "20px" }}>
+              Codempress Phase 2 establishes a 10-level hierarchical ontology connecting 3,404 topics to 53 core skill taxonomies.
             </p>
 
+            {/* 10-Level Ontology Hierarchy Inspector */}
+            {ontologyLevels && ontologyLevels.length > 0 && (
+              <div style={{ background: "rgba(30, 41, 59, 0.6)", borderRadius: "16px", padding: "18px", marginBottom: "24px", border: "1px solid rgba(168, 85, 247, 0.3)" }}>
+                <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#EC4899", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Layers size={16} /> 10-Level Curriculum Ontology Stack:
+                </h3>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {ontologyLevels.map((lvl, idx) => (
+                    <span key={idx} style={{ background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(236, 72, 153, 0.3)", color: "#F8FAFC", padding: "4px 10px", borderRadius: "14px", fontSize: "12px", fontWeight: 700 }}>
+                      Level {idx + 1}: {lvl}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {taxonomyData && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 {Object.entries(taxonomyData).map(([catKey, skills]) => (
                   <div key={catKey} style={{ background: "rgba(30, 41, 59, 0.5)", borderRadius: "16px", padding: "20px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
                     <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#C084FC", marginBottom: "12px", textTransform: "capitalize" }}>

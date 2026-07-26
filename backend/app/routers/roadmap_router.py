@@ -1061,3 +1061,33 @@ async def get_curriculum_taxonomy():
     from backend.app.domain.curriculum_sdk import MASTER_SKILL_TAXONOMY
     return {"taxonomy": MASTER_SKILL_TAXONOMY}
 
+@router.get("/knowledge-graph")
+async def get_knowledge_graph():
+    """Returns Phase 2 Master Knowledge Graph structure, 10-level ontology, and core domains."""
+    from backend.app.domain.knowledge_graph import ONTOLOGY_HIERARCHY_LEVELS, CORE_KNOWLEDGE_DOMAINS
+    return {
+        "ontology_levels": ONTOLOGY_HIERARCHY_LEVELS,
+        "domains": CORE_KNOWLEDGE_DOMAINS,
+        "total_domains": len(CORE_KNOWLEDGE_DOMAINS)
+    }
+
+@router.post("/knowledge-graph/skill-gap")
+async def calculate_skill_gap(req: dict):
+    """Analyzes user progress against a specific roadmap to generate a personalized skill-gap analysis & 7-day action plan."""
+    from backend.app.domain.knowledge_graph import analyze_roadmap_skill_gap
+    slug = req.get("roadmap_slug", "")
+    completed = req.get("completed_topic_ids", [])
+    
+    target_rm = None
+    for r in ROADMAPS_DATA:
+        if r["slug"] == slug:
+            target_rm = r
+            break
+            
+    if not target_rm:
+        raise HTTPException(status_code=404, detail="Roadmap not found for skill-gap analysis")
+        
+    res = analyze_roadmap_skill_gap(target_rm, completed)
+    return res.dict()
+
+

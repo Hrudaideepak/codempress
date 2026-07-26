@@ -226,6 +226,12 @@ export const api = {
   getRoadmap: (slug) => request(`/roadmaps/${slug}`),
   getCurriculumSchema: () => request("/curriculum/schema"),
   getCurriculumTaxonomy: () => request("/curriculum/taxonomy"),
+  getKnowledgeGraph: () => request("/knowledge-graph"),
+  calculateSkillGap: (roadmapSlug, completedTopicIds = []) =>
+    request("/knowledge-graph/skill-gap", {
+      method: "POST",
+      body: JSON.stringify({ roadmap_slug: roadmapSlug, completed_topic_ids: completedTopicIds }),
+    }),
 };
 
 const QUEUE_KEY = "sf_offline_queue";
