@@ -15,7 +15,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https: http: wss: ws:; connect-src 'self' https: http: wss: ws:;"
+          "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https: http: wss: ws:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https: http:; connect-src 'self' https: http: wss: ws:; worker-src 'self' blob:;"
         }
       ]
     },
