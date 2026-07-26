@@ -232,6 +232,16 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ roadmap_slug: roadmapSlug, completed_topic_ids: completedTopicIds }),
     }),
+  getAIProgressiveHints: (topicId, exerciseTitle = "Exercise", codeSnippet = "") =>
+    request("/ai/hints", {
+      method: "POST",
+      body: JSON.stringify({ topic_id: topicId, exercise_title: exerciseTitle, code_snippet: codeSnippet }),
+    }),
+  getAIMisconception: (topicId, wrongAnswerIndex) =>
+    request("/ai/misconception", {
+      method: "POST",
+      body: JSON.stringify({ topic_id: topicId, wrong_answer_index: wrongAnswerIndex }),
+    }),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

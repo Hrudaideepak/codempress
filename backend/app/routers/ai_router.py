@@ -50,3 +50,29 @@ async def get_ai_status():
         "status": "online",
         "active_cooldowns": {k: int(v - time.time()) for k, v in ai_engine.cooldowns.items() if v > time.time()}
     }
+
+class HintRequest(BaseModel):
+    topic_id: int
+    exercise_title: Optional[str] = "Interactive Exercise"
+    code_snippet: Optional[str] = ""
+
+@router.post("/hints")
+async def get_progressive_hints(req: HintRequest):
+    """Returns 4 progressive hints (Level 1 nudge to Level 4 complete solution) according to Content Production Guide v2.0."""
+    from backend.app.domain.content_pipeline import generate_progressive_hints
+    topic_rows = await execute_query("SELECT title FROM topics WHERE _id = ?", (req.topic_id,))
+    title = topic_rows[0]['title'] if topic_rows else "Topic"
+    hints = generate_progressive_hints(title, req.exercise_title, req.code_snippet)
+    return {"topic_id": req.topic_id, "hints": hints}
+
+class MisconceptionRequest(BaseModel):
+    topic_id: int
+    wrong_answer_index: int
+
+@router.post("/misconception")
+async def analyze_misconception(req: MisconceptionRequest):
+    """Provides targeted misconception detection and grounding analogy for wrong quiz answers."""
+    from backend.app.domain.content_pipeline import detect_misconceptions
+    result = detect_misconceptions(req.topic_id, req.wrong_answer_index)
+    return {"topic_id": req.topic_id, "analysis": result}
+

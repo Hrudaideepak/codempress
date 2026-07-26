@@ -70,3 +70,54 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
 -- 6. Performance Indexes
 CREATE INDEX IF NOT EXISTS idx_questions_topic_id ON questions(topic_id);
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_topic ON quiz_attempts(user_id, topic_id);
+
+-- =====================================================================
+-- MASTER TOPIC DATABASE (MTD) & CONTENT PRODUCTION SCHEMA
+-- =====================================================================
+
+-- 7. Topic Prerequisites Graph
+CREATE TABLE IF NOT EXISTS topic_prerequisites (
+    topic_id INTEGER NOT NULL,
+    prerequisite_topic_id INTEGER NOT NULL,
+    dependency_type TEXT CHECK(dependency_type IN ('required', 'recommended', 'related')),
+    PRIMARY KEY (topic_id, prerequisite_topic_id),
+    FOREIGN KEY(topic_id) REFERENCES topics(_id) ON DELETE CASCADE,
+    FOREIGN KEY(prerequisite_topic_id) REFERENCES topics(_id) ON DELETE CASCADE
+);
+
+-- 8. Project Library (Micro, Module, Capstone Projects)
+CREATE TABLE IF NOT EXISTS projects (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id_code TEXT UNIQUE NOT NULL, -- P-0001
+    title TEXT NOT NULL,
+    project_type TEXT CHECK(project_type IN ('micro_project', 'module_project', 'career_capstone', 'path_capstone')),
+    difficulty TEXT CHECK(difficulty IN ('beginner', 'intermediate', 'advanced', 'expert')),
+    estimated_hours INTEGER DEFAULT 4,
+    spec_markdown TEXT NOT NULL,
+    rubric_json TEXT,
+    starter_code TEXT,
+    solution_code TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. Assessment Library
+CREATE TABLE IF NOT EXISTS assessments (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessment_id_code TEXT UNIQUE NOT NULL, -- A-0001
+    topic_id INTEGER NOT NULL,
+    assessment_type TEXT CHECK(assessment_type IN ('knowledge_check', 'concept_check', 'skill_check', 'debugging_task', 'design_exercise')),
+    questions_json TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(topic_id) REFERENCES topics(_id) ON DELETE CASCADE
+);
+
+-- 10. AI Mentor Misconception Database
+CREATE TABLE IF NOT EXISTS misconceptions (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    topic_id INTEGER NOT NULL,
+    misconception_text TEXT NOT NULL,
+    reality_text TEXT NOT NULL,
+    analogy TEXT,
+    FOREIGN KEY(topic_id) REFERENCES topics(_id) ON DELETE CASCADE
+);
+

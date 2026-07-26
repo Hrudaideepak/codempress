@@ -314,16 +314,26 @@ export default function TopicReader() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "14px" }}>
               <button
-                onClick={() => handleAskAI(`Explain ${topic.title} using a real-world analogy`)}
+                onClick={() => handleAskAI(`Explain ${topic.title} using a simple real-world analogy.`)}
                 style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--primary)", fontSize: "12px", fontWeight: 600, textAlign: "left", cursor: "pointer" }}
               >
                 💡 Real-world analogy
               </button>
               <button
-                onClick={() => handleAskAI(`What are common edge cases in ${topic.title}?`)}
-                style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--primary)", fontSize: "12px", fontWeight: 600, textAlign: "left", cursor: "pointer" }}
+                onClick={() => {
+                  setAiLoading(true);
+                  api.getAIProgressiveHints(topic._id, topic.title)
+                    .then((res) => {
+                      const hList = res.hints || [];
+                      const formatted = hList.map(h => `${h.title}:\n${h.hint}${h.code_snippet ? '\n```\n' + h.code_snippet + '\n```' : ''}`).join('\n\n');
+                      setAiResponse(formatted);
+                    })
+                    .catch(() => setAiResponse("Failed to fetch progressive hints."))
+                    .finally(() => setAiLoading(false));
+                }}
+                style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid rgba(168, 85, 247, 0.3)", background: "rgba(168, 85, 247, 0.1)", color: "#A855F7", fontSize: "12px", fontWeight: 700, textAlign: "left", cursor: "pointer" }}
               >
-                ⚠️ Edge cases to watch for
+                ⚡ Get 4-Level Progressive Hints (Nudge ➔ Solution)
               </button>
             </div>
 
@@ -334,7 +344,7 @@ export default function TopicReader() {
             )}
 
             {aiResponse && (
-              <div style={{ fontSize: "13px", color: "var(--ink)", lineHeight: 1.5, padding: "12px", background: "var(--bg-subtle)", borderRadius: "8px", marginBottom: "14px", maxHeight: "180px", overflowY: "auto" }}>
+              <div style={{ fontSize: "13px", color: "var(--ink)", lineHeight: 1.5, padding: "12px", background: "var(--bg-subtle)", borderRadius: "8px", marginBottom: "14px", maxHeight: "200px", overflowY: "auto", whitespace: "pre-wrap" }}>
                 {aiResponse}
               </div>
             )}
