@@ -28,11 +28,12 @@ import {
   Zap,
   TrendingUp
 } from "lucide-react";
+import { STATIC_ROADMAPS } from "../data/staticRoadmaps";
 
 export default function Roadmaps() {
   const navigate = useNavigate();
-  const [roadmaps, setRoadmaps] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [roadmaps, setRoadmaps] = useState(STATIC_ROADMAPS);
+  const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState("ai_native"); // 'ai_native', 'exclusive', 'legacy', 'all'
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,14 +55,13 @@ export default function Roadmaps() {
   const [customRoadmapResult, setCustomRoadmapResult] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
     Promise.all([
-      api.getRoadmaps(),
+      api.getRoadmaps().catch(() => null),
       api.getCurriculumTaxonomy().catch(() => null),
       api.getKnowledgeGraph().catch(() => null)
     ])
       .then(([resRoadmaps, resTaxonomy, resKG]) => {
-        if (resRoadmaps && resRoadmaps.roadmaps) {
+        if (resRoadmaps && resRoadmaps.roadmaps && resRoadmaps.roadmaps.length > 0) {
           setRoadmaps(resRoadmaps.roadmaps);
         }
         if (resTaxonomy && resTaxonomy.taxonomy) {
