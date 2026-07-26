@@ -165,7 +165,6 @@ async def observability_and_cors_middleware(request: Request, call_next):
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         _telemetry_metrics["error_5xx"] += 1
         _telemetry_metrics["total_latency_ms"] += duration_ms
-        
         logger.error(
             f"req_id={req_id} UNHANDLED EXCEPTION method={request.method} path={request.url.path} duration_ms={duration_ms:.2f} error={exc}\n{traceback.format_exc()}"
         )
@@ -184,6 +183,41 @@ async def observability_and_cors_middleware(request: Request, call_next):
         res.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
         return res
 
+# Sliding-Window IP Rate Limiter for API & AI protection
+_rate_limit_store: Dict[str, list] = {}
+
+@app.middleware("http")
+async def rate_limiting_middleware(request: Request, call_next):
+    # Allow health checks and telemetry without rate limiting
+    path = request.url.path
+    if path in ("/health", "/api/health", "/api/telemetry", "/ready", "/api/ready") or request.method == "OPTIONS":
+        return await call_next(request)
+
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    now = time.time()
+    window = 60.0  # 60 seconds
+    
+    is_ai = "/api/ai" in path or "/api/mentor" in path
+    max_reqs = 30 if is_ai else 180
+
+    timestamps = _rate_limit_store.get(client_ip, [])
+    timestamps = [t for t in timestamps if now - t < window]
+    
+    if len(timestamps) >= max_reqs:
+        retry_after = int(window - (now - timestamps[0])) if timestamps else 60
+        return JSONResponse(
+            status_code=429,
+            content={
+                "detail": f"Rate limit exceeded. Please wait {max(1, retry_after)} seconds before retrying.",
+                "retry_after_seconds": max(1, retry_after)
+            },
+            headers={"Retry-After": str(max(1, retry_after))}
+        )
+        
+    timestamps.append(now)
+    _rate_limit_store[client_ip] = timestamps
+    return await call_next(request)
+
 # Mount Router Modules
 app.include_router(auth_router)
 app.include_router(curriculum_router)
@@ -201,6 +235,19 @@ app.include_router(mentor_router)
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "app": "Codempress API", "version": "1.0.0"}
+
+@app.get("/ready")
+@app.get("/api/ready")
+async def readiness_check():
+    """Kubernetes / Cloud readiness probe verifying database connectivity."""
+    try:
+        from backend.database import execute_query
+        rows = await execute_query("SELECT 1")
+        if rows:
+            return {"status": "ready", "database": "connected"}
+    except Exception as e:
+        return JSONResponse(status_code=503, content={"status": "not_ready", "error": str(e)})
+    return JSONResponse(status_code=503, content={"status": "not_ready", "error": "Database returned empty response"})
 
 @app.get("/api/telemetry")
 async def get_telemetry():
