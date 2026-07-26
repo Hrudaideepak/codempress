@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { Sparkles, ArrowRight, Terminal, Layers, Code2, Cpu, Zap, Award } from "lucide-react";
+import { Sparkles, ArrowRight, Terminal, Layers, Code2, Cpu, Zap, Award, Compass } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 
@@ -34,19 +34,35 @@ export default function Landing() {
             {user ? "Go to My Curriculum" : "Get Started Free"}
           </Button>
 
-          <Button variant="secondary" size="lg" onClick={() => navigate("/library")}>
-            Browse 3,405 Topics
+          <Button variant="secondary" size="lg" onClick={() => navigate("/roadmaps")}>
+            🗺️ Explore 26 Career Roadmaps
+          </Button>
+
+          <Button variant="ghost" size="lg" onClick={() => navigate("/library")}>
+            Browse 1,846 Topics
           </Button>
         </div>
 
         <div style={{ marginTop: "24px", color: "var(--ink-faint)", fontSize: "13px", fontFamily: "var(--mono)" }}>
-          ✦ SQLite Offline-First • 34 Computer Science Subjects • GitHub Models AI Engine
+          ✦ SQLite Offline-First • 26 Career Roadmaps • 34 CS Subjects • GitHub Models AI Engine
         </div>
       </div>
 
       {/* Feature Cards Grid */}
       <div className="features-grid">
-        <Card hoverLift clickable onClick={enter}>
+        <Card hoverLift clickable onClick={() => navigate("/roadmaps")}>
+          <div className="feature-icon" style={{ background: "#F5F3FF", borderColor: "#DDD6FE" }}>
+            <Compass size={24} color="#7C3AED" />
+          </div>
+          <h3 style={{ fontSize: "18px", color: "#0F172A", marginBottom: "8px", fontFamily: "var(--font-heading)" }}>
+            26 AI-Native Career Roadmaps
+          </h3>
+          <p style={{ color: "var(--ink-soft)", fontSize: "14px", lineHeight: "1.6" }}>
+            Explore specialized career blueprints for AI Agent Architects, RAG Engineers, DevEx Engineers, and Full-Stack Founders with automatic skill gap analysis.
+          </p>
+        </Card>
+
+        <Card hoverLift clickable onClick={() => navigate("/library")}>
           <div className="feature-icon">
             <Layers size={24} color="#7C3AED" />
           </div>
@@ -58,19 +74,7 @@ export default function Landing() {
           </p>
         </Card>
 
-        <Card hoverLift clickable onClick={enter}>
-          <div className="feature-icon" style={{ background: "#E0F2FE", borderColor: "#BAE6FD" }}>
-            <Terminal size={24} color="#0284C7" />
-          </div>
-          <h3 style={{ fontSize: "18px", color: "#0F172A", marginBottom: "8px", fontFamily: "var(--font-heading)" }}>
-            Code Forge Playground
-          </h3>
-          <p style={{ color: "var(--ink-soft)", fontSize: "14px", lineHeight: "1.6" }}>
-            In-browser code editor with instant output, syntax highlighting, and AI logic assistance.
-          </p>
-        </Card>
-
-        <Card hoverLift clickable onClick={enter}>
+        <Card hoverLift clickable onClick={() => navigate("/forge")}>
           <div className="feature-icon" style={{ background: "#ECFDF5", borderColor: "#A7F3D0" }}>
             <Zap size={24} color="#059669" />
           </div>

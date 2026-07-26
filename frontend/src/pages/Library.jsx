@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useToast } from "../ToastContext";
-import { Flame, BookOpen, ArrowRight, Brain, Zap, Target, Search, CheckCircle } from "lucide-react";
+import { Flame, BookOpen, ArrowRight, Brain, Zap, Target, Search, CheckCircle, Compass } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { CardSkeleton } from "../components/ui/SkeletonLoader";
@@ -53,6 +53,27 @@ export default function Library() {
 
   return (
     <div style={{ paddingBottom: "64px" }}>
+      {/* Career Roadmaps Banner */}
+      <div className="glass-panel" style={{ marginBottom: "28px", background: "linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(79, 70, 229, 0.04) 100%)", border: "1.5px solid rgba(124, 58, 237, 0.25)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)", color: "#ffffff", display: "grid", placeItems: "center", flexShrink: 0 }}>
+              <Compass size={24} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: "18px", color: "#0F172A", margin: "0 0 4px 0", fontWeight: 800 }}>
+                🧭 26 AI-Native & Software Engineering Roadmaps
+              </h3>
+              <p style={{ color: "var(--ink-soft)", fontSize: "14px", margin: 0 }}>
+                Follow structured career blueprints for AI Agent Architects, DevEx Engineers, RAG Developers, and Full-Stack Founders.
+              </p>
+            </div>
+          </div>
+          <Button variant="primary" size="md" onClick={() => navigate("/roadmaps")} rightIcon={<ArrowRight size={16} />}>
+            Explore Roadmaps
+          </Button>
+        </div>
+      </div>
       {/* Today's Action Plan Hero Card */}
       <div className="glass-panel" style={{ marginBottom: "36px", border: "1px solid rgba(139, 92, 246, 0.3)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
