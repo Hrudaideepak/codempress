@@ -7,13 +7,14 @@ import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { CardSkeleton } from "../components/ui/SkeletonLoader";
 import EmptyState from "../components/ui/EmptyState";
+import { STATIC_SUBJECTS } from "../data/staticSubjects";
 
 export default function Library() {
-  const [subjects, setSubjects] = useState([]);
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [subjects, setSubjects] = useState(STATIC_SUBJECTS);
+  const [filteredSubjects, setFilteredSubjects] = useState(STATIC_SUBJECTS);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [status, setStatus] = useState("loading");
+  const [status, setStatus] = useState("ready");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const toast = useToast();
@@ -22,22 +23,23 @@ export default function Library() {
     api
       .getLibrary()
       .then((data) => {
-        const subs = (data.categories || []).map((cat) => ({
-          name: cat.name,
-          total_topics: cat.topic_count,
-          mastery_percent: cat.topics?.length
-            ? Math.round(
-                (cat.topics.filter((t) => t.cleared).length / cat.topic_count) * 100
-              )
-            : 0
-        }));
-        setSubjects(subs);
-        setFilteredSubjects(subs);
-        setStatus(subs.length ? "ready" : "empty");
+        if (data.categories && data.categories.length > 0) {
+          const subs = data.categories.map((cat) => ({
+            name: cat.name,
+            total_topics: cat.topic_count || (cat.topics ? cat.topics.length : 100),
+            mastery_percent: cat.topics?.length
+              ? Math.round(
+                  (cat.topics.filter((t) => t.cleared).length / cat.topics.length) * 100
+                )
+              : 0
+          }));
+          setSubjects(subs);
+          setFilteredSubjects(subs);
+          setStatus("ready");
+        }
       })
       .catch((e) => {
-        setError(e.message);
-        setStatus("error");
+        console.warn("Using static subjects fallback:", e);
       });
   }, []);
 
