@@ -34,7 +34,7 @@ export default function Roadmaps() {
   const navigate = useNavigate();
   const [roadmaps, setRoadmaps] = useState(STATIC_ROADMAPS);
   const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("ai_native"); // 'ai_native', 'exclusive', 'legacy', 'all'
+  const [activeCategory, setActiveCategory] = useState("all"); // 'all', 'ai_native', 'exclusive', 'legacy'
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [taxonomyData, setTaxonomyData] = useState(null);
