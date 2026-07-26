@@ -224,6 +224,8 @@ export const api = {
     }),
   getRoadmaps: (category) => request(category ? `/roadmaps?category=${category}` : "/roadmaps"),
   getRoadmap: (slug) => request(`/roadmaps/${slug}`),
+  getCurriculumSchema: () => request("/curriculum/schema"),
+  getCurriculumTaxonomy: () => request("/curriculum/taxonomy"),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

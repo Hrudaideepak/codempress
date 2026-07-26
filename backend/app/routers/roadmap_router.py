@@ -1048,3 +1048,16 @@ async def get_roadmap_by_slug(slug: str):
         if r["slug"] == slug:
             return r
     raise HTTPException(status_code=404, detail="Roadmap not found")
+
+@router.get("/curriculum/schema")
+async def get_curriculum_schema():
+    """Returns the Universal Curriculum SDK Schema specification and knowledge graph stats."""
+    from backend.app.domain.curriculum_sdk import get_curriculum_sdk_overview
+    return get_curriculum_sdk_overview()
+
+@router.get("/curriculum/taxonomy")
+async def get_curriculum_taxonomy():
+    """Returns the Master Skill Taxonomy across AI/ML, Frontend, Backend, DevOps, and Specializations."""
+    from backend.app.domain.curriculum_sdk import MASTER_SKILL_TAXONOMY
+    return {"taxonomy": MASTER_SKILL_TAXONOMY}
+

@@ -17,7 +17,13 @@ import {
   Rocket,
   ShieldAlert,
   ChevronRight,
-  X
+  X,
+  Code2,
+  Database,
+  Cpu,
+  BrainCircuit,
+  FileCode,
+  Network
 } from "lucide-react";
 
 export default function Roadmaps() {
@@ -27,23 +33,30 @@ export default function Roadmaps() {
   const [activeCategory, setActiveCategory] = useState("ai_native"); // 'ai_native', 'exclusive', 'legacy', 'all'
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [taxonomyData, setTaxonomyData] = useState(null);
+  const [showTaxonomyModal, setShowTaxonomyModal] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    api
-      .getRoadmaps()
-      .then((res) => {
-        if (res && res.roadmaps) {
-          setRoadmaps(res.roadmaps);
+    Promise.all([
+      api.getRoadmaps(),
+      api.getCurriculumTaxonomy().catch(() => null)
+    ])
+      .then(([resRoadmaps, resTaxonomy]) => {
+        if (resRoadmaps && resRoadmaps.roadmaps) {
+          setRoadmaps(resRoadmaps.roadmaps);
+        }
+        if (resTaxonomy && resTaxonomy.taxonomy) {
+          setTaxonomyData(resTaxonomy.taxonomy);
         }
       })
-      .catch((err) => console.error("Failed to load roadmaps:", err))
+      .catch((err) => console.error("Failed to load roadmaps & taxonomy:", err))
       .finally(() => setLoading(false));
   }, []);
 
   const categories = [
     { id: "ai_native", label: "✨ AI-Native Roadmaps", count: 10, desc: "Fastest-growing roles in the GenAI & Agentic era" },
-    { id: "exclusive", label: "🚀 Codempress Exclusive", count: 6, desc: "Founders, Indie Hackers & Productivity Engineers" },
+    { id: "exclusive", label: "🚀 Codempress Exclusive", count: 6, desc: "Founders, Indie Hackers & DevEx Engineers" },
     { id: "legacy", label: "💻 Industry Legacy", count: 10, desc: "Classic high-demand software engineering careers" },
     { id: "all", label: "🌐 All Roadmaps", count: 26, desc: "Complete library of career systems" }
   ];
@@ -85,37 +98,66 @@ export default function Roadmaps() {
         }}
       >
         <div style={{ position: "relative", zIndex: 2 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(168, 85, 247, 0.15)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 14px", borderRadius: "30px", color: "#C084FC", fontSize: "13px", fontWeight: 700, marginBottom: "16px" }}>
-            <Compass size={15} /> Codempress AI Career Operating System
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center", marginBottom: "16px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(168, 85, 247, 0.15)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 14px", borderRadius: "30px", color: "#C084FC", fontSize: "13px", fontWeight: 700 }}>
+              <Compass size={15} /> Codempress AI Career Operating System
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(236, 72, 153, 0.15)", border: "1px solid rgba(236, 72, 153, 0.3)", padding: "6px 14px", borderRadius: "30px", color: "#F472B6", fontSize: "13px", fontWeight: 700 }}>
+              <Sparkles size={15} /> Curriculum SDK v1.0 Universal
+            </div>
           </div>
 
           <h1 style={{ fontSize: "36px", fontWeight: 800, color: "#F8FAFC", marginBottom: "12px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
             Career Roadmaps for the <span style={{ background: "linear-gradient(90deg, #A855F7 0%, #EC4899 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI Era</span>
           </h1>
 
-          <p style={{ color: "#94A3B8", fontSize: "16px", maxWidth: "800px", lineHeight: 1.6, marginBottom: "24px" }}>
+          <p style={{ color: "#94A3B8", fontSize: "16px", maxWidth: "820px", lineHeight: 1.6, marginBottom: "24px" }}>
             Move beyond generic technology tutorials. Codempress delivers complete, end-to-end career roadmaps designed around emerging 
-            GenAI, Agentic AI, MCP, and modern engineering specializations.
+            GenAI, Agentic AI, MCP, and modern engineering specializations—from beginner to job-ready professional.
           </p>
 
-          {/* Search Input */}
-          <div style={{ maxWidth: "480px", position: "relative" }}>
-            <input
-              type="text"
-              placeholder="Search by role, technology, or specialization..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "14px 18px",
-                borderRadius: "12px",
-                background: "rgba(15, 23, 42, 0.8)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "#F8FAFC",
-                fontSize: "14px",
-                outline: "none"
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center" }}>
+            {/* Search Input */}
+            <div style={{ flex: 1, minWidth: "280px", maxWidth: "480px" }}>
+              <input
+                type="text"
+                placeholder="Search by role, technology, or specialization..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  background: "rgba(15, 23, 42, 0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  color: "#F8FAFC",
+                  fontSize: "14px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <button
+              onClick={() => {
+                soundService.play("click");
+                setShowTaxonomyModal(true);
               }}
-            />
+              style={{
+                padding: "14px 22px",
+                borderRadius: "12px",
+                background: "rgba(168, 85, 247, 0.2)",
+                border: "1px solid rgba(168, 85, 247, 0.4)",
+                color: "#C084FC",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px"
+              }}
+            >
+              <BrainCircuit size={16} /> Explore Skill Taxonomy (53 Skills)
+            </button>
           </div>
         </div>
       </div>
@@ -243,7 +285,7 @@ export default function Roadmaps() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.8)",
+            background: "rgba(0, 0, 0, 0.85)",
             backdropFilter: "blur(8px)",
             zIndex: 9999,
             display: "flex",
@@ -398,6 +440,90 @@ export default function Roadmaps() {
                 Start Roadmap in Library <ArrowRight size={16} />
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Master Skill Taxonomy Modal */}
+      {showTaxonomyModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.85)",
+            backdropFilter: "blur(8px)",
+            zIndex: 9999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px"
+          }}
+          onClick={() => setShowTaxonomyModal(false)}
+        >
+          <div
+            style={{
+              background: "#0F172A",
+              border: "1px solid rgba(168, 85, 247, 0.4)",
+              borderRadius: "24px",
+              maxWidth: "800px",
+              width: "100%",
+              maxHeight: "85vh",
+              overflowY: "auto",
+              padding: "32px",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              position: "relative"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowTaxonomyModal(false)}
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "20px",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "none",
+                borderRadius: "50%",
+                width: "36px",
+                height: "36px",
+                color: "#F8FAFC",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer"
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#F8FAFC", marginBottom: "8px", display: "flex", alignItems: "center", gap: "10px" }}>
+              <BrainCircuit color="#A855F7" /> Master Skill Taxonomy Engine
+            </h2>
+            <p style={{ color: "#94A3B8", fontSize: "14px", marginBottom: "24px" }}>
+              Codempress Curriculum SDK indexes 53 core skill taxonomies across AI, Web, Mobile, DevOps, and Exclusive Builder disciplines.
+            </p>
+
+            {taxonomyData && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                {Object.entries(taxonomyData).map(([catKey, skills]) => (
+                  <div key={catKey} style={{ background: "rgba(30, 41, 59, 0.5)", borderRadius: "16px", padding: "20px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#C084FC", marginBottom: "12px", textTransform: "capitalize" }}>
+                      {catKey.replace(/_/g, " ")} ({skills.length} Skills)
+                    </h3>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                      {skills.map((s, idx) => (
+                        <span key={idx} style={{ background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(168, 85, 247, 0.3)", color: "#F8FAFC", padding: "6px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600 }}>
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
