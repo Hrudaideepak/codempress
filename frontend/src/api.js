@@ -322,6 +322,21 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ step_id: stepId }),
     }),
+  generateCoverLetter: (jobTitle, companyName = "Tech Company", jobDescription = "") =>
+    request("/mentor/cover-letter", {
+      method: "POST",
+      body: JSON.stringify({ job_title: jobTitle, company_name: companyName, job_description: jobDescription }),
+    }),
+  generateInterviewQuestions: (targetRole = "Software Engineer", difficulty = "Mid") =>
+    request("/mentor/interview/generate", {
+      method: "POST",
+      body: JSON.stringify({ target_role: targetRole, difficulty }),
+    }),
+  evaluateInterviewAnswer: (targetRole = "Software Engineer", question, userAnswer) =>
+    request("/mentor/interview/evaluate", {
+      method: "POST",
+      body: JSON.stringify({ target_role: targetRole, question, user_answer: userAnswer }),
+    }),
   generateRoadmapSkeleton: (targetRole, userGoals = "", resumeSkills = [], experienceLevel = "Mid") =>
     request("/mentor/roadmap/generate-skeleton", {
       method: "POST",
