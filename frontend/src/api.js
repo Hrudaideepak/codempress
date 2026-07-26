@@ -284,6 +284,24 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ resume_text: resumeText }),
     }),
+  uploadMentorResumeFile: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const token = getToken();
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(`${BASE}/mentor/upload-file`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Upload failed" }));
+      throw new Error(err.detail || `Upload failed with status ${res.status}`);
+    }
+    return res.json();
+  },
   getMentorResume: () => request("/mentor/resume"),
   getMentorAnalytics: () => request("/mentor/analytics"),
   sendMentorChat: (message, sessionId = "default") =>

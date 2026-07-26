@@ -19,7 +19,9 @@ import {
   Terminal,
   Cpu,
   Brain,
-  Zap
+  Zap,
+  FileCode,
+  FileSpreadsheet
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -33,7 +35,7 @@ export default function Mentor() {
   const [messages, setMessages] = useState([
     {
       sender: "mentor",
-      text: "Hello! I am your AI Career Mentor. I analyze your resume, skills, and goals to provide personalized engineering career guidance. What career or technical goal are you aiming for today?"
+      text: "Hello! I am your AI Career Mentor. I analyze your uploaded resume and career goals to provide personalized engineering advice. Upload a resume file or ask a question to begin!"
     }
   ]);
   const [chatInput, setChatInput] = useState("");
@@ -44,12 +46,15 @@ export default function Mentor() {
   const [resumeText, setResumeText] = useState("");
   const [resumeProfile, setResumeProfile] = useState(null);
   const [resumeLoading, setResumeLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Analytics State
   const [analytics, setAnalytics] = useState({
-    skills: ["Python", "System Design", "Git", "Web Development", "Algorithms"],
-    scores: [85, 80, 75, 70, 65],
-    experience_level: "Mid"
+    has_data: false,
+    skills: [],
+    scores: [],
+    experience_level: ""
   });
 
   // Roadmap State
@@ -58,7 +63,6 @@ export default function Mentor() {
   const [roadmapLoading, setRoadmapLoading] = useState(false);
 
   useEffect(() => {
-    // Scroll chat to bottom
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -111,9 +115,9 @@ export default function Mentor() {
     }
   };
 
-  const handleUploadResume = async () => {
+  const handleUploadResumeText = async () => {
     if (!resumeText.trim()) {
-      toast.show("Please paste your resume text first", "warning");
+      toast.show("Please paste or upload your resume first", "warning");
       return;
     }
     soundService.play("click");
@@ -122,14 +126,45 @@ export default function Mentor() {
       const res = await api.uploadMentorResume(resumeText);
       setResumeProfile(res);
       setAnalytics({
-        skills: res.proficiency?.Skill || ["Python", "Git", "SQL"],
-        scores: res.proficiency?.Score || [80, 75, 70],
+        has_data: true,
+        skills: res.proficiency?.Skill || res.skills || [],
+        scores: res.proficiency?.Score || [],
         experience_level: res.experience_level || "Mid"
       });
-      toast.show("Resume analyzed & saved to AI Memory!", "success");
+      toast.show("Resume dynamically analyzed & saved to AI Memory!", "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show("Failed to analyze resume", "error");
+      toast.show(err.message || "Failed to analyze resume", "error");
+    } finally {
+      setResumeLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    soundService.play("click");
+    setSelectedFile(file);
+    setResumeLoading(true);
+
+    try {
+      toast.show(`Uploading & parsing ${file.name}...`, "info");
+      const res = await api.uploadMentorResumeFile(file);
+      setResumeProfile(res);
+      if (res.resume_text) {
+        setResumeText(res.resume_text);
+      }
+      setAnalytics({
+        has_data: true,
+        skills: res.proficiency?.Skill || res.skills || [],
+        scores: res.proficiency?.Score || [],
+        experience_level: res.experience_level || "Mid"
+      });
+      toast.show(`Successfully analyzed ${file.name}!`, "success");
+      soundService.play("levelup");
+    } catch (err) {
+      toast.show(err.message || "Failed to parse uploaded file", "error");
     } finally {
       setResumeLoading(false);
     }
@@ -144,7 +179,7 @@ export default function Mentor() {
       toast.show(`Personalized ${targetRoleInput} Roadmap Generated!`, "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show("Failed to generate career roadmap", "error");
+      toast.show(err.message || "Failed to generate career roadmap", "error");
     } finally {
       setRoadmapLoading(false);
     }
@@ -180,14 +215,14 @@ export default function Mentor() {
               <span>AI CAREER MENTOR PLATFORM</span>
             </div>
             <h1 style={{ fontSize: "28px", margin: "0 0 6px 0", color: "#0F172A", fontWeight: 800 }}>
-              Personalized AI Guidance & Resume Intelligence
+              Dynamic AI Resume Intelligence & Guidance
             </h1>
             <p style={{ color: "var(--ink-soft)", fontSize: "14px", margin: 0, maxWidth: "680px" }}>
-              Cross-session AI memory, automatic resume skill parsing, top-5 proficiency analytics, and 5-step career roadmaps with curated resources.
+              Upload your PDF, DOCX, or TXT resume to trigger real-time AI skill extraction, proficiency scores, and personalized 5-step career roadmaps.
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
             <Button
               variant={activeTab === "chat" ? "primary" : "ghost"}
               onClick={() => setActiveTab("chat")}
@@ -200,7 +235,7 @@ export default function Mentor() {
               onClick={() => setActiveTab("resume")}
               leftIcon={<FileText size={16} />}
             >
-              Resume Profile
+              Resume File Upload
             </Button>
             <Button
               variant={activeTab === "analytics" ? "primary" : "ghost"}
@@ -228,7 +263,7 @@ export default function Mentor() {
             <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "16px", borderBottom: "1px solid var(--border)", marginBottom: "20px" }}>
               <Sparkles size={20} color="var(--primary)" />
               <div>
-                <h3 style={{ margin: 0, fontSize: "16px", color: "#0F172A" }}>AI Career Mentor</h3>
+                <h3 style={{ margin: 0, fontSize: "16px", color: "#0F172A" }}>Socratic AI Mentor</h3>
                 <span style={{ fontSize: "12px", color: "var(--accent-emerald)", fontWeight: 600 }}>● Active Context Memory</span>
               </div>
             </div>
@@ -265,7 +300,7 @@ export default function Mentor() {
             <form onSubmit={handleSendChat} style={{ display: "flex", gap: "12px", marginTop: "20px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
               <input
                 type="text"
-                placeholder="Ask for advice on interviews, skills, transition, or career strategy..."
+                placeholder="Ask for guidance based on your resume, skills, or target engineering role..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 style={{
@@ -287,26 +322,26 @@ export default function Mentor() {
           {/* Context Sidebar */}
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <Card padding="20px">
-              <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", color: "#0F172A" }}>🧠 Active Resume Context</h4>
+              <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", color: "#0F172A" }}>🧠 Active Resume Memory</h4>
               {resumeProfile ? (
                 <div>
                   <div style={{ fontSize: "12px", color: "var(--ink-soft)", marginBottom: "8px" }}>
-                    <strong>Level:</strong> {resumeProfile.experience_level || "Mid"}
+                    <strong>Level:</strong> {resumeProfile.experience_level || "Mid"} Tier
                   </div>
                   <div style={{ fontSize: "12px", color: "var(--ink-soft)", marginBottom: "12px" }}>
                     <strong>Skills:</strong> {(resumeProfile.skills || []).slice(0, 6).join(", ")}
                   </div>
                   <Button variant="outline" size="sm" fullWidth onClick={() => setActiveTab("resume")}>
-                    Update Resume
+                    Manage Resume File
                   </Button>
                 </div>
               ) : (
                 <div>
                   <p style={{ fontSize: "12px", color: "var(--ink-faint)", marginBottom: "12px" }}>
-                    No resume uploaded. Upload text to unlock context-aware mentorship.
+                    No resume uploaded yet. Upload a PDF or DOCX file to unlock custom mentorship.
                   </p>
                   <Button variant="secondary" size="sm" fullWidth onClick={() => setActiveTab("resume")}>
-                    Upload Resume
+                    Upload Resume File
                   </Button>
                 </div>
               )}
@@ -339,18 +374,57 @@ export default function Mentor() {
         </div>
       )}
 
-      {/* TAB 2: RESUME PROFILE & PARSING */}
+      {/* TAB 2: RESUME PROFILE & FILE UPLOAD */}
       {activeTab === "resume" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
           <Card padding="24px">
-            <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", color: "#0F172A" }}>📄 Paste / Upload Resume Text</h3>
-            <p style={{ fontSize: "13px", color: "var(--ink-soft)", marginBottom: "16px" }}>
-              Our AI engine automatically extracts technical skills, experience tier, and proficiency benchmarks.
+            <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", color: "#0F172A" }}>📄 Resume Upload & Text Parser</h3>
+            <p style={{ fontSize: "13px", color: "var(--ink-soft)", marginBottom: "20px" }}>
+              Upload your PDF, DOCX, or TXT resume file for automatic dynamic AI extraction.
             </p>
 
+            {/* Hidden native file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".pdf,.docx,.doc,.txt,.csv"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+
+            {/* Drag & Drop / File Click Box */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                border: "2px dashed var(--primary)",
+                borderRadius: "16px",
+                padding: "32px 20px",
+                textAlign: "center",
+                background: "var(--primary-soft)",
+                cursor: "pointer",
+                marginBottom: "24px",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <Upload size={36} color="var(--primary)" style={{ margin: "0 auto 12px" }} />
+              <div style={{ fontWeight: 700, fontSize: "15px", color: "#0F172A", marginBottom: "4px" }}>
+                {selectedFile ? `Selected: ${selectedFile.name}` : "Click to Upload Resume File (PDF, DOCX, TXT)"}
+              </div>
+              <p style={{ fontSize: "12px", color: "var(--ink-soft)", margin: 0 }}>
+                Automatic multi-format text extraction & dynamic AI analysis
+              </p>
+            </div>
+
+            <div style={{ position: "relative", textAlign: "center", marginBottom: "20px" }}>
+              <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "16px 0" }} />
+              <span style={{ position: "absolute", top: "-10px", left: "50%", transform: "translateX(-50%)", background: "#FFFFFF", padding: "0 12px", fontSize: "12px", color: "var(--ink-faint)", fontWeight: 700 }}>
+                OR PASTE PLAIN TEXT
+              </span>
+            </div>
+
             <textarea
-              rows={12}
-              placeholder="Paste your plain text resume content here (experience, skills, projects, degree)..."
+              rows={8}
+              placeholder="Or paste your plain text resume content here..."
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
               style={{
@@ -369,35 +443,36 @@ export default function Mentor() {
             <Button
               variant="glowing"
               size="lg"
-              onClick={handleUploadResume}
+              onClick={handleUploadResumeText}
               disabled={resumeLoading}
-              leftIcon={<Upload size={18} />}
+              leftIcon={<Sparkles size={18} />}
             >
-              {resumeLoading ? "Analyzing Resume..." : "Analyze & Save to Memory"}
+              {resumeLoading ? "Analyzing Dynamically with AI..." : "Analyze Text Dynamically"}
             </Button>
           </Card>
 
+          {/* AI Parsed Profile Output */}
           <Card padding="24px">
-            <h3 style={{ margin: "0 0 16px 0", fontSize: "18px", color: "#0F172A" }}>✨ AI Parsed Profile</h3>
+            <h3 style={{ margin: "0 0 16px 0", fontSize: "18px", color: "#0F172A" }}>✨ Dynamic AI Extracted Profile</h3>
             {resumeProfile ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div>
-                  <span style={{ fontSize: "12px", color: "var(--ink-faint)", fontWeight: 700 }}>EXPERIENCE LEVEL</span>
-                  <div style={{ fontSize: "18px", fontWeight: 800, color: "var(--primary)", marginTop: "2px" }}>
-                    {resumeProfile.experience_level || "Mid"} Tier
+              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <div style={{ background: "var(--bg-subtle)", padding: "16px", borderRadius: "12px" }}>
+                  <span style={{ fontSize: "11px", color: "var(--ink-faint)", fontWeight: 800, textTransform: "uppercase" }}>DYNAMIC EXPERIENCE TIER</span>
+                  <div style={{ fontSize: "20px", fontWeight: 800, color: "var(--primary)", marginTop: "4px" }}>
+                    {resumeProfile.experience_level || "Mid"}
                   </div>
                 </div>
 
-                <div>
-                  <span style={{ fontSize: "12px", color: "var(--ink-faint)", fontWeight: 700 }}>BACKGROUND & EDUCATION</span>
-                  <div style={{ fontSize: "14px", color: "#0F172A", marginTop: "4px" }}>
-                    {resumeProfile.education || "Software Engineering"}
+                <div style={{ background: "var(--bg-subtle)", padding: "16px", borderRadius: "12px" }}>
+                  <span style={{ fontSize: "11px", color: "var(--ink-faint)", fontWeight: 800, textTransform: "uppercase" }}>BACKGROUND & DEGREES</span>
+                  <div style={{ fontSize: "14px", color: "#0F172A", marginTop: "4px", lineHeight: 1.4 }}>
+                    {resumeProfile.education || "Extracted Computer Science / Software Engineering Background"}
                   </div>
                 </div>
 
-                <div>
-                  <span style={{ fontSize: "12px", color: "var(--ink-faint)", fontWeight: 700 }}>EXTRACTED SKILLS</span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
+                <div style={{ background: "var(--bg-subtle)", padding: "16px", borderRadius: "12px" }}>
+                  <span style={{ fontSize: "11px", color: "var(--ink-faint)", fontWeight: 800, textTransform: "uppercase" }}>DYNAMICALLY EXTRACTED SKILLS ({resumeProfile.skills?.length || 0})</span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
                     {(resumeProfile.skills || []).map((sk, idx) => (
                       <span key={idx} className="pill xp" style={{ background: "#EDE9FE", color: "#7C3AED", fontWeight: 700 }}>
                         {sk}
@@ -407,9 +482,12 @@ export default function Mentor() {
                 </div>
               </div>
             ) : (
-              <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--ink-faint)" }}>
-                <FileText size={40} style={{ margin: "0 auto 12px", opacity: 0.5 }} />
-                <p>No parsed resume profile found yet. Paste your resume text on the left to begin.</p>
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--ink-faint)" }}>
+                <FileText size={48} style={{ margin: "0 auto 16px", opacity: 0.4 }} />
+                <h4 style={{ color: "#0F172A", margin: "0 0 6px 0" }}>No Dynamic Resume Analyzed Yet</h4>
+                <p style={{ fontSize: "13px", margin: 0 }}>
+                  Upload a PDF/DOCX file or paste text on the left to extract your skills dynamically.
+                </p>
               </div>
             )}
           </Card>
@@ -420,31 +498,44 @@ export default function Mentor() {
       {activeTab === "analytics" && (
         <Card padding="28px">
           <div style={{ marginBottom: "24px" }}>
-            <h3 style={{ margin: "0 0 6px 0", fontSize: "20px", color: "#0F172A" }}>📊 Top 5 Skill Proficiency Benchmark</h3>
+            <h3 style={{ margin: "0 0 6px 0", fontSize: "20px", color: "#0F172A" }}>📊 Dynamic Skill Proficiency Metrics</h3>
             <p style={{ fontSize: "14px", color: "var(--ink-soft)", margin: 0 }}>
-              Estimated proficiency scores (0-100) extracted from your resume & project telemetry.
+              Proficiency scores (0-100) extracted dynamically from your actual uploaded resume.
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            {analytics.skills.map((skill, idx) => {
-              const score = analytics.scores[idx] || 70;
-              return (
-                <div key={idx} style={{ background: "var(--bg-subtle)", padding: "16px 20px", borderRadius: "14px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                    <span style={{ fontWeight: 700, fontSize: "15px", color: "#0F172A" }}>{skill}</span>
-                    <span style={{ fontWeight: 800, fontSize: "14px", color: "var(--primary)" }}>{score}%</span>
+          {analytics.has_data && analytics.skills?.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              {analytics.skills.map((skill, idx) => {
+                const score = analytics.scores[idx] || 75;
+                return (
+                  <div key={idx} style={{ background: "var(--bg-subtle)", padding: "16px 20px", borderRadius: "14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <span style={{ fontWeight: 700, fontSize: "15px", color: "#0F172A" }}>{skill}</span>
+                      <span style={{ fontWeight: 800, fontSize: "14px", color: "var(--primary)" }}>{score}%</span>
+                    </div>
+                    <div className="progress-bar-bg" style={{ height: "10px" }}>
+                      <div
+                        className="progress-bar-fill"
+                        style={{ width: `${score}%`, background: "linear-gradient(90deg, #7C3AED 0%, #059669 100%)" }}
+                      />
+                    </div>
                   </div>
-                  <div className="progress-bar-bg" style={{ height: "10px" }}>
-                    <div
-                      className="progress-bar-fill"
-                      style={{ width: `${score}%`, background: "linear-gradient(90deg, #7C3AED 0%, #059669 100%)" }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--ink-faint)" }}>
+              <BarChart3 size={48} style={{ margin: "0 auto 16px", opacity: 0.4 }} />
+              <h4 style={{ color: "#0F172A", margin: "0 0 6px 0" }}>No Dynamic Analytics Found</h4>
+              <p style={{ fontSize: "13px", margin: "0 0 16px 0" }}>
+                Upload your resume file in the "Resume File Upload" tab to generate your proficiency scores.
+              </p>
+              <Button variant="primary" onClick={() => setActiveTab("resume")}>
+                Go to Resume Upload
+              </Button>
+            </div>
+          )}
         </Card>
       )}
 
@@ -454,13 +545,13 @@ export default function Mentor() {
           <Card padding="24px" style={{ marginBottom: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
               <div>
-                <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", color: "#0F172A" }}>🗺️ 5-Step AI Career Roadmap Engine</h3>
+                <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", color: "#0F172A" }}>🗺️ 5-Step Dynamic AI Career Roadmap</h3>
                 <p style={{ fontSize: "13px", color: "var(--ink-soft)", margin: 0 }}>
-                  Generate custom learning blueprints with real working URLs (Coursera, MDN, Python Docs, FreeCodeCamp).
+                  Generated tailored blueprints with real working URLs based on your uploaded resume.
                 </p>
               </div>
 
-              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
                 <input
                   type="text"
                   value={targetRoleInput}
@@ -475,20 +566,20 @@ export default function Mentor() {
                   }}
                 />
                 <Button variant="glowing" onClick={handleGenerateRoadmap} disabled={roadmapLoading} leftIcon={<Zap size={16} />}>
-                  {roadmapLoading ? "Generating..." : "Generate Roadmap"}
+                  {roadmapLoading ? "Generating Dynamic Roadmap..." : "Generate Dynamic Roadmap"}
                 </Button>
               </div>
             </div>
           </Card>
 
           {/* Steps Display */}
-          {roadmap && roadmap.steps ? (
+          {roadmap && roadmap.steps && roadmap.steps.length > 0 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               {roadmap.steps.map((st) => (
                 <Card key={st.id} padding="20px" style={{ borderLeft: st.completed ? "4px solid #059669" : "4px solid #7C3AED" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px", flexWrap: "wrap" }}>
                         <button
                           onClick={() => handleToggleStep(st.id)}
                           style={{ background: "none", border: "none", cursor: "pointer", display: "grid", placeItems: "center" }}
@@ -498,15 +589,15 @@ export default function Mentor() {
                         <h4 style={{ margin: 0, fontSize: "16px", color: "#0F172A", textDecoration: st.completed ? "line-through" : "none" }}>
                           {st.step}
                         </h4>
-                        <span className="pill xp" style={{ fontSize: "11px" }}>{st.difficulty}</span>
-                        <span className="pill streak" style={{ fontSize: "11px" }}>⏱️ {st.estimated_time}</span>
+                        {st.difficulty && <span className="pill xp" style={{ fontSize: "11px" }}>{st.difficulty}</span>}
+                        {st.estimated_time && <span className="pill streak" style={{ fontSize: "11px" }}>⏱️ {st.estimated_time}</span>}
                       </div>
                       <p style={{ fontSize: "14px", color: "var(--ink-soft)", margin: "0 0 16px 32px" }}>
                         {st.description}
                       </p>
 
                       {/* Curated Resources */}
-                      {st.resources && (
+                      {st.resources && st.resources.length > 0 && (
                         <div style={{ marginLeft: "32px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
                           {st.resources.map((res, rIdx) => (
                             <a
@@ -540,7 +631,11 @@ export default function Mentor() {
             </div>
           ) : (
             <Card padding="40px" style={{ textAlign: "center" }}>
-              <p style={{ color: "var(--ink-faint)" }}>Click "Generate Roadmap" above to create your custom 5-step career blueprint.</p>
+              <MapPin size={48} style={{ margin: "0 auto 16px", opacity: 0.4, color: "var(--primary)" }} />
+              <h4 style={{ color: "#0F172A", margin: "0 0 6px 0" }}>No Career Roadmap Generated Yet</h4>
+              <p style={{ color: "var(--ink-faint)", margin: "0 0 16px 0" }}>
+                Click "Generate Dynamic Roadmap" above to build a 5-step blueprint from your resume.
+              </p>
             </Card>
           )}
         </div>
