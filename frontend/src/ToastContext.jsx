@@ -29,7 +29,7 @@ export function ToastProvider({ children }) {
   );
 
   return (
-    <ToastContext.Provider value={{ push }}>
+    <ToastContext.Provider value={{ push, show: push }}>
       {children}
       <div
         className="toast-wrap"
@@ -103,6 +103,23 @@ export function ToastProvider({ children }) {
       `}</style>
     </ToastContext.Provider>
   );
-}
-
-export const useToast = () => useContext(ToastContext);
+export const useToast = () => {
+  const context = useContext(ToastContext);
+  if (!context) {
+    return {
+      push: () => {},
+      show: () => {},
+      success: () => {},
+      error: () => {},
+      info: () => {}
+    };
+  }
+  const showFn = context.show || context.push;
+  return {
+    push: showFn,
+    show: showFn,
+    success: (msg) => showFn(msg, "success"),
+    error: (msg) => showFn(msg, "error"),
+    info: (msg) => showFn(msg, "info")
+  };
+};
