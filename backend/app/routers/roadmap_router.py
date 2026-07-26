@@ -1051,6 +1051,28 @@ async def get_roadmap_by_slug(slug: str, response: Response):
             return r
     raise HTTPException(status_code=404, detail="Roadmap not found")
 
+@router.get("/roadmaps/{slug}/stage/{stage_id}")
+async def get_roadmap_stage(slug: str, stage_id: str, response: Response):
+    """Returns role-scoped course content for a specific stage of a job roadmap without cross-content bleeding."""
+    response.headers["Cache-Control"] = "public, max-age=3600, s-maxage=86400"
+    target_rm = None
+    for r in ROADMAPS_DATA:
+        if r["slug"] == slug:
+            target_rm = r
+            break
+    if not target_rm:
+        raise HTTPException(status_code=404, detail=f"Roadmap '{slug}' not found")
+        
+    for m in target_rm.get("milestones", []):
+        m_id = str(m.get("stage_id") or m.get("id"))
+        if m_id == str(stage_id):
+            return {
+                "roadmap_slug": slug,
+                "roadmap_title": target_rm.get("title"),
+                "stage": m
+            }
+    raise HTTPException(status_code=404, detail=f"Stage '{stage_id}' not found for roadmap '{slug}'")
+
 @router.get("/curriculum/schema")
 async def get_curriculum_schema(response: Response):
     """Returns the Universal Curriculum SDK Schema specification and knowledge graph stats."""

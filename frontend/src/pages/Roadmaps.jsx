@@ -120,8 +120,7 @@ export default function Roadmaps() {
 
   const openRoadmapModal = (rm) => {
     soundService.play("click");
-    setSelectedRoadmap(rm);
-    setSkillGapResult(null);
+    navigate(`/roadmaps/${rm.slug}`);
   };
 
   const closeRoadmapModal = () => {

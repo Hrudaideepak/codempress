@@ -224,6 +224,7 @@ export const api = {
     }),
   getRoadmaps: (category) => request(category ? `/roadmaps?category=${category}` : "/roadmaps"),
   getRoadmap: (slug) => request(`/roadmaps/${slug}`),
+  getRoadmapStage: (slug, stageId) => request(`/roadmaps/${slug}/stage/${stageId}`),
   getCurriculumSchema: () => request("/curriculum/schema"),
   getCurriculumTaxonomy: () => request("/curriculum/taxonomy"),
   getKnowledgeGraph: () => request("/knowledge-graph"),

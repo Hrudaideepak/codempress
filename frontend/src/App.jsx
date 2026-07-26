@@ -18,6 +18,8 @@ import Quiz from "./pages/Quiz";
 import Profile from "./pages/Profile";
 import Forge from "./pages/Forge";
 import Roadmaps from "./pages/Roadmaps";
+import RoadmapDetail from "./pages/RoadmapDetail";
+import RoadmapStageReader from "./pages/RoadmapStageReader";
 import Mentor from "./pages/Mentor";
 
 function TopBar() {
@@ -343,6 +345,24 @@ function AppShell() {
                 <>
                   <TopBar />
                   <Roadmaps />
+                </>
+              }
+            />
+            <Route
+              path="/roadmaps/:slug"
+              element={
+                <>
+                  <TopBar />
+                  <RoadmapDetail />
+                </>
+              }
+            />
+            <Route
+              path="/roadmaps/:slug/stage/:stageId"
+              element={
+                <>
+                  <TopBar />
+                  <RoadmapStageReader />
                 </>
               }
             />
