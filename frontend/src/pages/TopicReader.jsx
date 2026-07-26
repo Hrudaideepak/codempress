@@ -9,6 +9,7 @@ import Card from "../components/ui/Card";
 import Skeleton from "../components/ui/SkeletonLoader";
 import { soundService } from "../services/soundService";
 import { fireCelebrationConfetti } from "../utils/confetti";
+import InteractiveCodeSandbox from "../components/InteractiveCodeSandbox";
 
 function CodeBlock({ code, language = "python" }) {
   const [copied, setCopied] = useState(false);
@@ -256,9 +257,15 @@ export default function TopicReader() {
               {(view.code_example || view.theory_syntax) && (
                 <div style={{ marginTop: "36px" }}>
                   <h3 style={{ fontSize: "20px", color: "#0F172A", marginBottom: "14px", display: "flex", alignItems: "center", gap: "10px" }}>
-                    <Play size={20} color="var(--primary)" /> Interactive Code Snippet
+                    <Play size={20} color="var(--primary)" /> Interactive Code Sandbox & Exercise
                   </h3>
-                  <CodeBlock code={view.code_example?.code || view.theory_syntax} />
+                  <InteractiveCodeSandbox
+                    initialCode={view.code_example?.code || view.theory_syntax || ""}
+                    language={topic?.language || (topic?.subject_name?.toLowerCase().includes("javascript") ? "javascript" : "python")}
+                    topicId={topic?._id || topic?.id || id}
+                    exerciseTitle={`${topic?.title || "Topic"} Practice Sandbox`}
+                    testCases={view.test_cases || topic?.test_cases || null}
+                  />
                   {view.code_example?.explanation && (
                     <p style={{ fontSize: "14.5px", color: "var(--ink-soft)", marginTop: "12px", background: "#F1F5F9", padding: "14px 18px", borderRadius: "12px" }}>
                       <strong>Explanation:</strong> {view.code_example.explanation}

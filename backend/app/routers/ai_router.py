@@ -1,7 +1,7 @@
 import json
 import time
 import logging
-from typing import Optional
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Depends
 from backend.database import execute_query
@@ -55,14 +55,28 @@ class HintRequest(BaseModel):
     topic_id: int
     exercise_title: Optional[str] = "Interactive Exercise"
     code_snippet: Optional[str] = ""
+    error_traceback: Optional[str] = None
+    failed_test_case: Optional[Dict[str, Any]] = None
+    requested_level: Optional[int] = None
 
 @router.post("/hints")
 async def get_progressive_hints(req: HintRequest):
-    """Returns 4 progressive hints (Level 1 nudge to Level 4 complete solution) according to Content Production Guide v2.0."""
+    """Returns 4 progressive hints (Level 1 nudge to Level 4 complete solution) incorporating runtime errors if present."""
     from backend.app.domain.content_pipeline import generate_progressive_hints
     topic_rows = await execute_query("SELECT title FROM topics WHERE _id = ?", (req.topic_id,))
     title = topic_rows[0]['title'] if topic_rows else "Topic"
-    hints = generate_progressive_hints(title, req.exercise_title, req.code_snippet)
+    hints = generate_progressive_hints(
+        title,
+        req.exercise_title or "Interactive Exercise",
+        req.code_snippet or "",
+        req.error_traceback,
+        req.failed_test_case
+    )
+    if req.requested_level and 1 <= req.requested_level <= 4:
+        filtered = [h for h in hints if h.get("level") == req.requested_level]
+        if filtered:
+            return {"topic_id": req.topic_id, "hint": filtered[0], "hints": hints}
+
     return {"topic_id": req.topic_id, "hints": hints}
 
 class MisconceptionRequest(BaseModel):
@@ -75,4 +89,3 @@ async def analyze_misconception(req: MisconceptionRequest):
     from backend.app.domain.content_pipeline import detect_misconceptions
     result = detect_misconceptions(req.topic_id, req.wrong_answer_index)
     return {"topic_id": req.topic_id, "analysis": result}
-

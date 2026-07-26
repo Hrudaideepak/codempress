@@ -55,36 +55,91 @@ class StandardTopicTemplate(BaseModel):
 # AI Mentor 4-Level Progressive Hint Generator
 # -------------------------------------------------------------------------
 
-def generate_progressive_hints(topic_title: str, exercise_title: str, user_stuck_code: str = "") -> List[Dict[str, Any]]:
-    """Generates 4 levels of hints from gentle nudge to complete code solution."""
+def generate_progressive_hints(
+    topic_title: str,
+    exercise_title: str,
+    user_stuck_code: str = "",
+    error_traceback: Optional[str] = None,
+    failed_test_case: Optional[Dict[str, Any]] = None
+) -> List[Dict[str, Any]]:
+    """Generates 4 levels of hints from gentle nudge to complete code solution, incorporating runtime error details if present."""
+    
+    error_info = None
+    if error_traceback:
+        from backend.app.domain.error_parser import parse_and_sanitize_error
+        error_info = parse_and_sanitize_error(error_traceback)
+
+    err_type = error_info.get("error_type") if error_info else None
+    line_no = error_info.get("line_number") if error_info else None
+    err_msg = error_info.get("message") if error_info else None
+
+    # Level 1: Nudge
+    if err_type:
+        level1_text = f"Recall the requirements for {topic_title}. Your code encountered a runtime error—check your logic around variables and bounds."
+    else:
+        level1_text = f"Recall the core contract for {topic_title}. Check what inputs your function expects before processing."
+
+    # Level 2: Guidance
+    if err_type and line_no:
+        level2_text = f"Runtime error ({err_type}) detected at line {line_no}: '{err_msg}'. Inspect the variable state leading up to this line."
+    elif err_type:
+        level2_text = f"A {err_type} error occurred ({err_msg}). Consider adding validation or guard clauses to handle unexpected state."
+    elif failed_test_case:
+        exp = failed_test_case.get("expected") or failed_test_case.get("expected_output") or ""
+        act = failed_test_case.get("actual") or failed_test_case.get("actual_output") or ""
+        level2_text = f"Assertion check failed. Your code output '{act}', but test case expected '{exp}'. Check edge case conditions."
+    else:
+        level2_text = f"Consider using structured data validation or an explicit error check for edge cases in {exercise_title}."
+
+    # Level 3: Syntax / Code Pattern
+    if err_type == "ZeroDivisionError":
+        pattern = "if divisor != 0:\n    return num / divisor\nelse:\n    return 0"
+    elif err_type in ("IndexError", "KeyError"):
+        pattern = "if index < len(arr):\n    return arr[index]\nelse:\n    return None"
+    elif err_type == "TypeError":
+        pattern = "if isinstance(value, (int, float)):\n    return process(value)\nelse:\n    return 0"
+    elif err_type in ("NameError", "ReferenceError"):
+        pattern = "# Ensure all variables are defined before reference\nresult = 0"
+    else:
+        pattern = f"# Recommended guard pattern for {topic_title}\ntry:\n    result = process_data()\n    return result\nexcept Exception as err:\n    logger.error(err)"
+
+    level3_text = f"Check variable scope, types, and guard clauses. Here is a resilient pattern for {topic_title}:"
+
+    # Level 4: Complete Solution & Explanation
+    level4_text = f"Here is the reference solution and structural pattern for {topic_title}."
+
     return [
         {
             "level": 1,
             "title": "Level 1: Architectural Nudge",
             "type": "nudge",
-            "hint": f"Recall the core contract for {topic_title}. Check what inputs your function expects before processing.",
+            "hint": level1_text,
+            "content": level1_text,
             "xp_cost": 0
         },
         {
             "level": 2,
             "title": "Level 2: Specific Technique Guidance",
             "type": "guidance",
-            "hint": f"Consider using structured data validation or an explicit error check for edge cases in {exercise_title}.",
+            "hint": level2_text,
+            "content": level2_text,
             "xp_cost": 5
         },
         {
             "level": 3,
             "title": "Level 3: Direct Code Pattern",
             "type": "code_pattern",
-            "hint": "Check your variable scoping and ensure return statements match expected output types.",
-            "code_snippet": f"# Recommended structure for {topic_title}\ntry:\n    result = process_data()\n    return result\nexcept Exception as err:\n    logger.error(err)",
+            "hint": level3_text,
+            "content": level3_text,
+            "code_snippet": pattern,
             "xp_cost": 10
         },
         {
             "level": 4,
             "title": "Level 4: Complete Solution & Explanation",
             "type": "solution",
-            "hint": "Here is the production-ready reference solution with clean architecture principles.",
+            "hint": level4_text,
+            "content": level4_text,
             "code_snippet": f"def solution():\n    \"\"\"Reference solution for {topic_title}\"\"\"\n    return {{'status': 'success', 'verified': True}}",
             "xp_cost": 15
         }

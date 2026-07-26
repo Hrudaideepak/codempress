@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { soundService } from "../services/soundService";
-import { fireCelebrationConfetti } from "../utils/confetti";
-import { ArrowLeft, Play, Terminal, Code2, Trash2, Copy, Check } from "lucide-react";
+import { ArrowLeft, Terminal, Code2, Sparkles, BookOpen } from "lucide-react";
 import Button from "../components/ui/Button";
-import Card from "../components/ui/Card";
+import InteractiveCodeSandbox from "../components/InteractiveCodeSandbox";
 
 const JS_TEMPLATES = [
   {
     name: "Hello World",
     code: `// Welcome to the Codempress Code Forge!
 console.log("Hello, Codempress!");
-return "Playground ready.";`
+`
   },
   {
     name: "Fibonacci Sequence",
@@ -25,7 +23,8 @@ function fibonacci(n) {
 }
 
 console.log("Fibonacci series of 10 terms:");
-console.log(fibonacci(10));`
+console.log(fibonacci(10));
+`
   },
   {
     name: "FizzBuzz Challenge",
@@ -35,7 +34,8 @@ for (let i = 1; i <= 15; i++) {
   else if (i % 3 === 0) console.log("Fizz");
   else if (i % 5 === 0) console.log("Buzz");
   else console.log(i);
-}`
+}
+`
   }
 ];
 
@@ -77,127 +77,22 @@ for i in range(1, 16):
 
 export default function Forge() {
   const [lang, setLang] = useState("javascript");
+  const [activeTemplateIdx, setActiveTemplateIdx] = useState(0);
   const [code, setCode] = useState(JS_TEMPLATES[0].code);
-  const [output, setOutput] = useState("Run your script to inspect console outputs and return values.");
-  const [pyodideInstance, setPyodideInstance] = useState(null);
-  const [loadingPyodide, setLoadingPyodide] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const navigate = useNavigate();
 
   const changeLanguage = (newLang) => {
     setLang(newLang);
-    setCode(newLang === "javascript" ? JS_TEMPLATES[0].code : PY_TEMPLATES[0].code);
-    setOutput(`Switched to ${newLang === "javascript" ? "JavaScript" : "Python"}. Ready to execute.`);
+    const templates = newLang === "javascript" ? JS_TEMPLATES : PY_TEMPLATES;
+    setActiveTemplateIdx(0);
+    setCode(templates[0].code);
   };
 
-  const loadPyodideRuntime = () => {
-    if (window.loadPyodide) return Promise.resolve(window.pyodideInstance);
-    return new Promise((resolve, reject) => {
-      setLoadingPyodide(true);
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js";
-      script.async = true;
-      script.onload = () => {
-        window
-          .loadPyodide({
-            indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/"
-          })
-          .then((py) => {
-            window.pyodideInstance = py;
-            setPyodideInstance(py);
-            setLoadingPyodide(false);
-            resolve(py);
-          })
-          .catch((err) => {
-            setLoadingPyodide(false);
-            reject(err);
-          });
-      };
-      script.onerror = () => {
-        setLoadingPyodide(false);
-        reject(new Error("Failed to load Pyodide WebAssembly script from CDN"));
-      };
-      document.head.appendChild(script);
-    });
-  };
-
-  const runCode = async () => {
-    setOutput("Executing script...");
-    if (lang === "javascript") {
-      try {
-        const workerCode = `
-          self.onmessage = function(e) {
-            const logs = [];
-            const customConsole = {
-              log: function(...args) {
-                logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-              }
-            };
-            try {
-              const fn = new Function('console', e.data);
-              const result = fn(customConsole);
-              if (result !== undefined) {
-                logs.push('→ Return: ' + (typeof result === 'object' ? JSON.stringify(result) : String(result)));
-              }
-              self.postMessage({ status: 'success', output: logs.join('\\n') || 'Script ran successfully with no log outputs.' });
-            } catch(err) {
-              self.postMessage({ status: 'error', error: err.message });
-            }
-          };
-        `;
-        const blob = new Blob([workerCode], { type: "application/javascript" });
-        const worker = new Worker(URL.createObjectURL(blob));
-
-        worker.onmessage = (e) => {
-          if (e.data.status === "success") {
-            setOutput(e.data.output);
-            soundService.playCorrect();
-            fireCelebrationConfetti();
-          } else {
-            soundService.playIncorrect();
-            setOutput(`⚠️ JS Evaluation Error: ${e.data.error}`);
-          }
-          worker.terminate();
-        };
-
-        worker.onerror = (err) => {
-          soundService.playIncorrect();
-          setOutput(`⚠️ JS Execution Error: ${err.message}`);
-          worker.terminate();
-        };
-
-        worker.postMessage(code);
-      } catch (err) {
-        soundService.playIncorrect();
-        setOutput(`⚠️ JS Evaluation Error: ${err.message}`);
-      }
-    } else {
-      try {
-        let py = pyodideInstance || window.pyodideInstance;
-        if (!py) {
-          setOutput("Loading Python WebAssembly runtime (approx. 5-10MB)...");
-          py = await loadPyodideRuntime();
-        }
-        const logs = [];
-        py.setStdout({
-          batched: (str) => {
-            logs.push(str);
-          }
-        });
-        const result = await py.runPythonAsync(code);
-        let outText = logs.join("\n");
-        if (result !== undefined) {
-          outText += `\n→ Return: ${result}`;
-        }
-        setOutput(outText.trim() || "Python script completed with no prints.");
-        soundService.playCorrect();
-        fireCelebrationConfetti();
-      } catch (err) {
-        soundService.playIncorrect();
-        setOutput(`⚠️ Python Error: ${err.message}`);
-      }
-    }
+  const selectTemplate = (idx) => {
+    const templates = lang === "javascript" ? JS_TEMPLATES : PY_TEMPLATES;
+    setActiveTemplateIdx(idx);
+    setCode(templates[idx].code);
   };
 
   const currentTemplates = lang === "javascript" ? JS_TEMPLATES : PY_TEMPLATES;
@@ -228,96 +123,44 @@ export default function Forge() {
             <Terminal color="#C084FC" /> Code Forge Playground
           </h2>
           <p style={{ color: "var(--ink-soft)", fontSize: "14px" }}>
-            In-browser code execution & experimentation sandbox
+            Production full-stack sandbox with automated test evaluation & Socratic AI diagnostics
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "10px" }}>
-          <Button
-            variant={lang === "javascript" ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => changeLanguage("javascript")}
-          >
-            JavaScript
-          </Button>
-          <Button
-            variant={lang === "python" ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => changeLanguage("python")}
-          >
-            Python (WASM)
-          </Button>
-        </div>
-      </div>
-
-      <div className="forge-container">
-        {/* Editor Box */}
-        <div className="code-editor-box">
-          <div className="code-header">
-            <div style={{ display: "flex", gap: "8px" }}>
-              {currentTemplates.map((t, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCode(t.code)}
-                  style={{
-                    background: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid var(--border)",
-                    color: "#CBD5E1",
-                    borderRadius: "6px",
-                    padding: "4px 10px",
-                    fontSize: "12px",
-                    cursor: "pointer"
-                  }}
-                >
-                  {t.name}
-                </button>
-              ))}
-            </div>
-            <Button
-              variant="glowing"
-              size="sm"
-              onClick={runCode}
-              loading={loadingPyodide}
-              leftIcon={<Play size={14} />}
-            >
-              Run Script
-            </Button>
-          </div>
-
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck={false}
-            className="editor-textarea"
-          />
-        </div>
-
-        {/* Output Terminal */}
-        <div className="code-editor-box">
-          <div className="code-header">
-            <span>CONSOLE LOGS</span>
+        {/* Template Selector Pills */}
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+          <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 600 }}>Templates:</span>
+          {currentTemplates.map((t, idx) => (
             <button
-              onClick={() => setOutput("Console cleared.")}
+              key={idx}
+              onClick={() => selectTemplate(idx)}
               style={{
-                background: "none",
-                border: "none",
-                color: "var(--ink-soft)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                fontSize: "12px"
+                background: activeTemplateIdx === idx ? "var(--primary-soft)" : "var(--bg-panel)",
+                border: `1px solid ${activeTemplateIdx === idx ? "var(--primary)" : "var(--border)"}`,
+                color: activeTemplateIdx === idx ? "var(--primary)" : "var(--ink-soft)",
+                borderRadius: "8px",
+                padding: "6px 12px",
+                fontSize: "12px",
+                fontWeight: 600,
+                cursor: "pointer"
               }}
             >
-              <Trash2 size={14} /> Clear
+              {t.name}
             </button>
-          </div>
-
-          <div className="console-output">
-            <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{output}</pre>
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* Main Interactive Code Sandbox */}
+      <InteractiveCodeSandbox
+        key={`${lang}-${activeTemplateIdx}`}
+        initialCode={code}
+        language={lang}
+        exerciseTitle={`Forge Playground (${lang.toUpperCase()})`}
+        testCases={[
+          { id: "tc1", input: "10", expected_output: "Fibonacci series of 10 terms:\n[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]", is_hidden: false }
+        ]}
+      />
     </div>
   );
 }

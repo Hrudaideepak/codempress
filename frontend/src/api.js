@@ -232,10 +232,30 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ roadmap_slug: roadmapSlug, completed_topic_ids: completedTopicIds }),
     }),
-  getAIProgressiveHints: (topicId, exerciseTitle = "Exercise", codeSnippet = "") =>
+  executeSandbox: (data, language, stdin) => {
+    const payload = typeof data === "object" && data !== null ? data : { code: data, language, stdin };
+    return request("/sandbox/execute", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  evaluateSandbox: (data, language, topicId, testCases) => {
+    const payload = typeof data === "object" && data !== null ? data : { code: data, language, topic_id: topicId, test_cases: testCases };
+    return request("/sandbox/evaluate", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  getAIProgressiveHints: (topicId, exerciseTitle = "Exercise", codeSnippet = "", errorTraceback = null, failedTestCase = null) =>
     request("/ai/hints", {
       method: "POST",
-      body: JSON.stringify({ topic_id: topicId, exercise_title: exerciseTitle, code_snippet: codeSnippet }),
+      body: JSON.stringify({
+        topic_id: topicId,
+        exercise_title: exerciseTitle,
+        code_snippet: codeSnippet,
+        error_traceback: errorTraceback,
+        failed_test_case: failedTestCase,
+      }),
     }),
   getAIMisconception: (topicId, wrongAnswerIndex) =>
     request("/ai/misconception", {

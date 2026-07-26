@@ -25,6 +25,7 @@ from backend.app.routers.ai_router import router as ai_router
 from backend.app.routers.progress_router import router as progress_router
 from backend.app.routers.roadmap_router import router as roadmap_router
 from backend.app.routers.custom_roadmap_router import router as custom_roadmap_router
+from backend.app.routers.sandbox_router import router as sandbox_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s")
 logger = logging.getLogger("codempress.app")
@@ -190,6 +191,7 @@ app.include_router(ai_router)
 app.include_router(progress_router)
 app.include_router(roadmap_router)
 app.include_router(custom_roadmap_router)
+app.include_router(sandbox_router)
 
 @app.get("/health")
 @app.get("/api/health")
