@@ -335,10 +335,10 @@ function AppShell() {
             <Route
               path="/roadmaps"
               element={
-                <RequireAuth>
+                <>
                   <TopBar />
                   <Roadmaps />
-                </RequireAuth>
+                </>
               }
             />
             <Route

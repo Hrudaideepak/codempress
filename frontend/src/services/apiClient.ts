@@ -65,9 +65,6 @@ async function request<T = unknown>(
   if (res.status === 401) {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem("sf_user");
-    if (typeof window !== "undefined") {
-      window.location.href = "/auth";
-    }
     throw new ApiError("Unauthorized", 401, null);
   }
 
