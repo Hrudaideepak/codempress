@@ -47,3 +47,5 @@ opencode.jsonc
 
 # Temporary test artifacts
 .playwright-mcp/
+.pytest_cache/
+scratch/
