@@ -71,7 +71,7 @@ async def evaluate_sandbox_code(
         user_id = current_user.get("_id") or current_user.get("id") or 1
 
     # Convert Pydantic test cases to dict format
-    test_cases_dict = [tc.dict() for tc in payload.test_cases]
+    test_cases_dict = [(tc.model_dump() if hasattr(tc, "model_dump") else tc.dict()) for tc in payload.test_cases]
 
     eval_res = await evaluate_solution(
         language=payload.language,
