@@ -54,13 +54,22 @@ export default function Roadmaps() {
   const [customLoading, setCustomLoading] = useState(false);
   const [customRoadmapResult, setCustomRoadmapResult] = useState(null);
 
+  const [enrolledRoadmaps, setEnrolledRoadmaps] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sf_enrolled_roadmaps")) || [];
+    } catch {
+      return [];
+    }
+  });
+
   useEffect(() => {
     Promise.all([
       api.getRoadmaps().catch(() => null),
       api.getCurriculumTaxonomy().catch(() => null),
-      api.getKnowledgeGraph().catch(() => null)
+      api.getKnowledgeGraph().catch(() => null),
+      api.getEnrollments().catch(() => null)
     ])
-      .then(([resRoadmaps, resTaxonomy, resKG]) => {
+      .then(([resRoadmaps, resTaxonomy, resKG, resEnroll]) => {
         if (resRoadmaps && resRoadmaps.roadmaps && resRoadmaps.roadmaps.length > 0) {
           setRoadmaps(resRoadmaps.roadmaps);
         }
@@ -70,10 +79,25 @@ export default function Roadmaps() {
         if (resKG && resKG.ontology_levels) {
           setOntologyLevels(resKG.ontology_levels);
         }
+        if (resEnroll && resEnroll.enrolled_roadmaps) {
+          setEnrolledRoadmaps(resEnroll.enrolled_roadmaps);
+          localStorage.setItem("sf_enrolled_roadmaps", JSON.stringify(resEnroll.enrolled_roadmaps));
+        }
       })
       .catch((err) => console.error("Failed to load roadmaps & knowledge graph:", err))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleToggleEnrollment = (e, slug) => {
+    if (e) e.stopPropagation();
+    soundService.play("click");
+    const next = enrolledRoadmaps.includes(slug)
+      ? enrolledRoadmaps.filter((s) => s !== slug)
+      : [...enrolledRoadmaps, slug];
+    setEnrolledRoadmaps(next);
+    localStorage.setItem("sf_enrolled_roadmaps", JSON.stringify(next));
+    api.toggleEnrollment("roadmap", slug).catch(() => {});
+  };
 
   const categories = [
     { id: "ai_native", label: "✨ AI-Native Roadmaps", count: 10, desc: "Fastest-growing roles in the GenAI & Agentic era" },
@@ -341,12 +365,28 @@ export default function Roadmaps() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "12px", borderTop: "1px solid rgba(255, 255, 255, 0.08)" }}>
-                  <span style={{ fontSize: "13px", color: "#64748B", fontWeight: 600 }}>
-                    {rm.milestones ? rm.milestones.length : 0} Milestones · {rm.estimated_weeks}
-                  </span>
-                  <span style={{ color: "#A855F7", fontWeight: 700, fontSize: "14px", display: "flex", alignItems: "center", gap: "4px" }}>
-                    Explore Roadmap <ChevronRight size={16} />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "12px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", gap: "8px" }}>
+                  <button
+                    onClick={(e) => handleToggleEnrollment(e, rm.slug)}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "8px",
+                      background: enrolledRoadmaps.includes(rm.slug) ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.08)",
+                      border: enrolledRoadmaps.includes(rm.slug) ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.2)",
+                      color: enrolledRoadmaps.includes(rm.slug) ? "#34D399" : "#F8FAFC",
+                      fontWeight: 700,
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "4px"
+                    }}
+                  >
+                    {enrolledRoadmaps.includes(rm.slug) ? <><CheckCircle2 size={13} /> Enrolled</> : "+ Enroll"}
+                  </button>
+
+                  <span style={{ color: "#A855F7", fontWeight: 700, fontSize: "13px", display: "flex", alignItems: "center", gap: "2px" }}>
+                    Explore <ChevronRight size={15} />
                   </span>
                 </div>
               </div>
@@ -426,8 +466,27 @@ export default function Roadmaps() {
               {selectedRoadmap.overview}
             </p>
 
-            {/* Action Bar for Skill Gap Analysis */}
-            <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
+            {/* Action Bar for Skill Gap Analysis & Enrollment */}
+            <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+              <button
+                onClick={(e) => handleToggleEnrollment(e, selectedRoadmap.slug)}
+                style={{
+                  padding: "12px 20px",
+                  borderRadius: "12px",
+                  background: enrolledRoadmaps.includes(selectedRoadmap.slug) ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.1)",
+                  border: enrolledRoadmaps.includes(selectedRoadmap.slug) ? "1.5px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                  color: enrolledRoadmaps.includes(selectedRoadmap.slug) ? "#34D399" : "#F8FAFC",
+                  fontWeight: 800,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px"
+                }}
+              >
+                {enrolledRoadmaps.includes(selectedRoadmap.slug) ? <><CheckCircle2 size={16} /> Enrolled in Roadmap</> : "✦ Enroll in Roadmap"}
+              </button>
+
               <button
                 onClick={() => runSkillGapAnalysis(selectedRoadmap.slug)}
                 disabled={calculatingGap}

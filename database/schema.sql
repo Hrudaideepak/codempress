@@ -76,6 +76,18 @@ CREATE INDEX IF NOT EXISTS idx_user_progress_user_id ON user_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_topic_id ON user_progress(topic_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_user_topic ON user_progress(user_id, topic_id);
 
+-- 6b. User Enrollments Table (Explicit user enrollment in Roadmaps & Subjects)
+CREATE TABLE IF NOT EXISTS user_enrollments (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    item_type TEXT NOT NULL CHECK(item_type IN ('roadmap', 'subject')),
+    item_id TEXT NOT NULL,
+    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(_id) ON DELETE CASCADE,
+    UNIQUE(user_id, item_type, item_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_enrollments_user ON user_enrollments(user_id);
+
 -- =====================================================================
 -- MASTER TOPIC DATABASE (MTD) & CONTENT PRODUCTION SCHEMA
 -- =====================================================================

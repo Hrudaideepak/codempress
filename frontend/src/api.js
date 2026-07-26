@@ -227,6 +227,12 @@ export const api = {
   getCurriculumSchema: () => request("/curriculum/schema"),
   getCurriculumTaxonomy: () => request("/curriculum/taxonomy"),
   getKnowledgeGraph: () => request("/knowledge-graph"),
+  getEnrollments: () => request("/enrollments/me"),
+  toggleEnrollment: (itemType, itemId) =>
+    request("/enrollments/toggle", {
+      method: "POST",
+      body: JSON.stringify({ item_type: itemType, item_id: itemId }),
+    }),
   calculateSkillGap: (roadmapSlug, completedTopicIds = []) =>
     request("/knowledge-graph/skill-gap", {
       method: "POST",

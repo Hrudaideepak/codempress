@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../AuthContext";
-import { Flame, Award, BookOpen, CheckCircle2, Trophy, Star, ArrowLeft, LogOut, Shield } from "lucide-react";
+import { Flame, Award, BookOpen, CheckCircle2, Trophy, Star, ArrowLeft, LogOut, Shield, Compass, Trash2, Rocket, ChevronRight } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
+import { STATIC_ROADMAPS } from "../data/staticRoadmaps";
 
 const LEVEL_NAMES = ["Explorer", "Apprentice", "Journeyman", "Master", "Architect", "Legend"];
 
@@ -22,6 +23,13 @@ export default function Profile() {
   const [profileUser, setProfileUser] = useState(user);
   const [subjects, setSubjects] = useState([]);
   const [status, setStatus] = useState("loading");
+  const [enrolledSlugs, setEnrolledSlugs] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sf_enrolled_roadmaps")) || [];
+    } catch {
+      return [];
+    }
+  });
 
   const navigate = useNavigate();
 
@@ -42,7 +50,26 @@ export default function Profile() {
         setStatus("ready");
       })
       .catch(() => setStatus("error"));
+
+    api
+      .getEnrollments()
+      .then((res) => {
+        if (res && res.enrolled_roadmaps) {
+          setEnrolledSlugs(res.enrolled_roadmaps);
+          localStorage.setItem("sf_enrolled_roadmaps", JSON.stringify(res.enrolled_roadmaps));
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  const handleUnenrollRoadmap = (slug) => {
+    const next = enrolledSlugs.filter((s) => s !== slug);
+    setEnrolledSlugs(next);
+    localStorage.setItem("sf_enrolled_roadmaps", JSON.stringify(next));
+    api.toggleEnrollment("roadmap", slug).catch(() => {});
+  };
+
+  const myEnrolledRoadmaps = STATIC_ROADMAPS.filter((r) => enrolledSlugs.includes(r.slug));
 
   const totalMastered = subjects.reduce((sum, s) => sum + (s.mastered_topics || 0), 0);
   const xp = profileUser?.xp || 0;
@@ -230,6 +257,67 @@ export default function Profile() {
             );
           })}
         </div>
+      </div>
+
+      {/* Enrolled Roadmaps Section */}
+      <div style={{ marginBottom: "36px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+          <h2 style={{ fontSize: "22px", color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+            <Compass size={22} color="var(--primary)" /> My Enrolled Career Roadmaps ({myEnrolledRoadmaps.length})
+          </h2>
+          <button
+            onClick={() => navigate("/roadmaps")}
+            style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: 700, fontSize: "14px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+          >
+            Explore Roadmaps Library <ChevronRight size={16} />
+          </button>
+        </div>
+
+        {myEnrolledRoadmaps.length === 0 ? (
+          <Card glass padding="24px" style={{ textAlign: "center", color: "var(--ink-soft)" }}>
+            <p style={{ fontSize: "14px", marginBottom: "12px" }}>You are not currently enrolled in any career roadmaps.</p>
+            <Button variant="primary" size="sm" onClick={() => navigate("/roadmaps")}>
+              Browse & Enroll in Roadmaps
+            </Button>
+          </Card>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
+            {myEnrolledRoadmaps.map((rm) => (
+              <Card key={rm.slug} glass padding="20px" style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <span style={{ fontSize: "28px" }}>{rm.icon}</span>
+                    <button
+                      onClick={() => handleUnenrollRoadmap(rm.slug)}
+                      style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#EF4444", padding: "4px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      title="Unenroll from this roadmap"
+                    >
+                      <Trash2 size={13} /> Unenroll
+                    </button>
+                  </div>
+                  <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#0F172A", marginBottom: "4px" }}>
+                    {rm.title}
+                  </h3>
+                  <p style={{ fontSize: "13px", color: "var(--ink-soft)", marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    {rm.tagline}
+                  </p>
+                </div>
+
+                <div style={{ paddingTop: "12px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 600 }}>
+                    {rm.milestones?.length || 0} Milestones · {rm.estimated_weeks}
+                  </span>
+                  <button
+                    onClick={() => navigate("/roadmaps")}
+                    style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                  >
+                    View Roadmap <ChevronRight size={14} />
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Subject Progress Breakdown */}

@@ -88,30 +88,28 @@ function TopBar() {
         <span className="brand-text">Codempress</span>
       </Link>
       <div className="topbar-right">
-        {user && (
-          <div style={{ display: "flex", gap: "8px", marginRight: "12px" }}>
-            <Link
-              to="/library"
-              className={`nav-link ${location.pathname === "/library" ? "active" : ""}`}
-            >
-              Library
-            </Link>
-            <Link
-              to="/roadmaps"
-              className={`nav-link ${location.pathname === "/roadmaps" ? "active" : ""}`}
-              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-            >
-              <Compass size={14} /> Roadmaps
-            </Link>
-            <Link
-              to="/forge"
-              className={`nav-link ${location.pathname === "/forge" ? "active" : ""}`}
-              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-            >
-              <Terminal size={14} /> Forge
-            </Link>
-          </div>
-        )}
+        <div style={{ display: "flex", gap: "8px", marginRight: "12px" }}>
+          <Link
+            to="/library"
+            className={`nav-link ${location.pathname === "/library" ? "active" : ""}`}
+          >
+            Library
+          </Link>
+          <Link
+            to="/roadmaps"
+            className={`nav-link ${location.pathname === "/roadmaps" ? "active" : ""}`}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Compass size={14} /> Roadmaps
+          </Link>
+          <Link
+            to="/forge"
+            className={`nav-link ${location.pathname === "/forge" ? "active" : ""}`}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Terminal size={14} /> Forge
+          </Link>
+        </div>
         <button
           className="btn btn-ghost"
           onClick={() => soundService.toggleMute()}
