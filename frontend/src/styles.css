@@ -42,12 +42,24 @@
   --font-heading: "Plus Jakarta Sans", system-ui, sans-serif;
   --font: "Inter", system-ui, sans-serif;
   --mono: "JetBrains Mono", monospace;
+
+  /* UI/UX ProMax Accents */
+  --cyan: #0284C7;
+  --neon-cyan: #00F0FF;
+  --neon-magenta: #FF007A;
+  --neon-gold: #FFC700;
+  --neon-green: #00E676;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*:focus-visible {
+  outline: 2px solid #7C3AED !important;
+  outline-offset: 2px !important;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #7C3AED !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25) !important;
 }
 
 html, body {
