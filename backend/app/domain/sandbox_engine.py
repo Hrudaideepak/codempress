@@ -101,65 +101,75 @@ async def execute_code(
     env = get_clean_env()
 
     try:
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            env=env
-        )
-
-        try:
+        if norm_lang == "javascript":
+            cmd = [cmd[0], "--no-warnings", "--max-old-space-size=64", "-e", full_code]
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=env
+            )
+            stdout_bytes, stderr_bytes = await asyncio.wait_for(
+                process.communicate(),
+                timeout=timeout
+            )
+        else:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=env
+            )
             stdout_bytes, stderr_bytes = await asyncio.wait_for(
                 process.communicate(input=full_code.encode("utf-8")),
                 timeout=timeout
             )
-            duration_ms = (time.perf_counter() - start_time) * 1000.0
 
-            stdout = stdout_bytes.decode("utf-8", errors="replace")
-            stderr = stderr_bytes.decode("utf-8", errors="replace")
+        duration_ms = (time.perf_counter() - start_time) * 1000.0
+        stdout = stdout_bytes.decode("utf-8", errors="replace")
+        stderr = stderr_bytes.decode("utf-8", errors="replace")
 
-            # Apply 64KB stream truncation caps
-            if len(stdout.encode("utf-8")) > MAX_OUTPUT_BYTES:
-                stdout = stdout[:MAX_OUTPUT_BYTES] + "\n... [Output truncated at 64KB limit]"
-            if len(stderr.encode("utf-8")) > MAX_OUTPUT_BYTES:
-                stderr = stderr[:MAX_OUTPUT_BYTES] + "\n... [Output truncated at 64KB limit]"
+        if len(stdout.encode("utf-8")) > MAX_OUTPUT_BYTES:
+            stdout = stdout[:MAX_OUTPUT_BYTES] + "\n... [Output truncated at 64KB limit]"
+        if len(stderr.encode("utf-8")) > MAX_OUTPUT_BYTES:
+            stderr = stderr[:MAX_OUTPUT_BYTES] + "\n... [Output truncated at 64KB limit]"
 
-            exit_code = process.returncode if process.returncode is not None else 0
-            status = "success" if exit_code == 0 else "error"
+        exit_code = process.returncode if process.returncode is not None else 0
+        status = "success" if exit_code == 0 else "error"
 
-            parsed_err = parse_and_sanitize_error(stderr, norm_lang) if stderr.strip() else {}
+        parsed_err = parse_and_sanitize_error(stderr, norm_lang) if stderr.strip() else {}
 
-            return {
-                "stdout": stdout,
-                "stderr": stderr,
-                "exit_code": exit_code,
-                "execution_time_ms": round(duration_ms, 2),
-                "timed_out": False,
-                "status": status,
-                "error_type": parsed_err.get("error_type"),
-                "sanitized_traceback": parsed_err.get("sanitized_traceback", stderr)
-            }
+        return {
+            "stdout": stdout,
+            "stderr": stderr,
+            "exit_code": exit_code,
+            "execution_time_ms": round(duration_ms, 2),
+            "timed_out": False,
+            "status": status,
+            "error_type": parsed_err.get("error_type"),
+            "sanitized_traceback": parsed_err.get("sanitized_traceback", stderr)
+        }
 
-        except asyncio.TimeoutError:
-            try:
-                process.kill()
-                await process.wait()
-            except Exception as e:
-                logger.warning(f"Error killing timed-out process: {e}")
+    except asyncio.TimeoutError:
+        try:
+            process.kill()
+            await process.wait()
+        except Exception as e:
+            logger.warning(f"Error killing timed-out process: {e}")
 
-            duration_ms = (time.perf_counter() - start_time) * 1000.0
-            timeout_msg = f"Execution timed out (exceeded SLA limit of {timeout} seconds)."
-            return {
-                "stdout": "",
-                "stderr": timeout_msg,
-                "exit_code": -1,
-                "execution_time_ms": round(duration_ms, 2),
-                "timed_out": True,
-                "status": "timeout",
-                "error_type": "TimeoutError",
-                "sanitized_traceback": timeout_msg
-            }
+        duration_ms = (time.perf_counter() - start_time) * 1000.0
+        timeout_msg = f"Execution timed out (exceeded SLA limit of {timeout} seconds)."
+        return {
+            "stdout": "",
+            "stderr": timeout_msg,
+            "exit_code": -1,
+            "execution_time_ms": round(duration_ms, 2),
+            "timed_out": True,
+            "status": "timeout",
+            "error_type": "TimeoutError",
+            "sanitized_traceback": timeout_msg
+        }
 
     except Exception as exc:
         duration_ms = (time.perf_counter() - start_time) * 1000.0
