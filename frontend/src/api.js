@@ -222,6 +222,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ topic_id: topicId, message }),
     }),
+  getRoadmaps: (category) => request(category ? `/roadmaps?category=${category}` : "/roadmaps"),
+  getRoadmap: (slug) => request(`/roadmaps/${slug}`),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

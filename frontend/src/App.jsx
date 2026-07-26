@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import { Volume2, VolumeX, Terminal, Shield, Sparkles } from "lucide-react";
+import { Volume2, VolumeX, Terminal, Shield, Sparkles, Compass } from "lucide-react";
 import { api } from "./api";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ToastProvider, useToast } from "./ToastContext";
@@ -18,6 +18,7 @@ const TopicReader = lazy(() => import("./pages/TopicReader"));
 const Quiz = lazy(() => import("./pages/Quiz"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Forge = lazy(() => import("./pages/Forge"));
+const Roadmaps = lazy(() => import("./pages/Roadmaps"));
 
 function TopBar() {
   const { user, logout } = useAuth();
@@ -94,6 +95,13 @@ function TopBar() {
               className={`nav-link ${location.pathname === "/library" ? "active" : ""}`}
             >
               Library
+            </Link>
+            <Link
+              to="/roadmaps"
+              className={`nav-link ${location.pathname === "/roadmaps" ? "active" : ""}`}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <Compass size={14} /> Roadmaps
             </Link>
             <Link
               to="/forge"
@@ -321,6 +329,15 @@ function AppShell() {
                 <RequireAuth>
                   <TopBar />
                   <Profile />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/roadmaps"
+              element={
+                <RequireAuth>
+                  <TopBar />
+                  <Roadmaps />
                 </RequireAuth>
               }
             />
