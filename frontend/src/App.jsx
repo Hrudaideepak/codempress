@@ -25,6 +25,14 @@ const RoadmapStageReader = lazy(() => import("./pages/RoadmapStageReader"));
 const RoadmapTailored = lazy(() => import("./pages/RoadmapTailored"));
 const Mentor = lazy(() => import("./pages/Mentor"));
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function TopBar() {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState({ total_xp: 0, current_streak: 0 });
@@ -290,6 +298,7 @@ function AppShell() {
         </div>
       )}
       <main className="main-content">
+        <ScrollToTop />
         <Suspense
           fallback={
             <div
