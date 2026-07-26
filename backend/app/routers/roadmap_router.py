@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 
 logger = logging.getLogger("codempress.roadmap_router")
 router = APIRouter(prefix="/api", tags=["Roadmaps"])
@@ -1034,36 +1034,41 @@ ROADMAPS_DATA = [
 ]
 
 @router.get("/roadmaps")
-async def get_all_roadmaps(category: Optional[str] = None):
+async def get_all_roadmaps(response: Response, category: Optional[str] = None):
     """Returns all 26 roadmaps, optionally filtered by category (ai_native, exclusive, legacy)."""
+    response.headers["Cache-Control"] = "public, max-age=3600, s-maxage=86400"
     if category:
         filtered = [r for r in ROADMAPS_DATA if r["category"] == category]
         return {"roadmaps": filtered, "total": len(filtered)}
     return {"roadmaps": ROADMAPS_DATA, "total": len(ROADMAPS_DATA)}
 
 @router.get("/roadmaps/{slug}")
-async def get_roadmap_by_slug(slug: str):
+async def get_roadmap_by_slug(slug: str, response: Response):
     """Returns a specific roadmap's detailed milestone breakdown and project specifications."""
+    response.headers["Cache-Control"] = "public, max-age=3600, s-maxage=86400"
     for r in ROADMAPS_DATA:
         if r["slug"] == slug:
             return r
     raise HTTPException(status_code=404, detail="Roadmap not found")
 
 @router.get("/curriculum/schema")
-async def get_curriculum_schema():
+async def get_curriculum_schema(response: Response):
     """Returns the Universal Curriculum SDK Schema specification and knowledge graph stats."""
+    response.headers["Cache-Control"] = "public, max-age=3600, s-maxage=86400"
     from backend.app.domain.curriculum_sdk import get_curriculum_sdk_overview
     return get_curriculum_sdk_overview()
 
 @router.get("/curriculum/taxonomy")
-async def get_curriculum_taxonomy():
+async def get_curriculum_taxonomy(response: Response):
     """Returns the Master Skill Taxonomy across AI/ML, Frontend, Backend, DevOps, and Specializations."""
+    response.headers["Cache-Control"] = "public, max-age=3600, s-maxage=86400"
     from backend.app.domain.curriculum_sdk import MASTER_SKILL_TAXONOMY
     return {"taxonomy": MASTER_SKILL_TAXONOMY}
 
 @router.get("/knowledge-graph")
-async def get_knowledge_graph():
+async def get_knowledge_graph(response: Response):
     """Returns Phase 2 Master Knowledge Graph structure, 10-level ontology, and core domains."""
+    response.headers["Cache-Control"] = "public, max-age=3600, s-maxage=86400"
     from backend.app.domain.knowledge_graph import ONTOLOGY_HIERARCHY_LEVELS, CORE_KNOWLEDGE_DOMAINS
     return {
         "ontology_levels": ONTOLOGY_HIERARCHY_LEVELS,

@@ -70,6 +70,11 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
 -- 6. Performance Indexes
 CREATE INDEX IF NOT EXISTS idx_questions_topic_id ON questions(topic_id);
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_topic ON quiz_attempts(user_id, topic_id);
+CREATE INDEX IF NOT EXISTS idx_topics_subject_name ON topics(subject_name);
+CREATE INDEX IF NOT EXISTS idx_topics_level ON topics(level);
+CREATE INDEX IF NOT EXISTS idx_user_progress_user_id ON user_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_progress_topic_id ON user_progress(topic_id);
+CREATE INDEX IF NOT EXISTS idx_user_progress_user_topic ON user_progress(user_id, topic_id);
 
 -- =====================================================================
 -- MASTER TOPIC DATABASE (MTD) & CONTENT PRODUCTION SCHEMA
