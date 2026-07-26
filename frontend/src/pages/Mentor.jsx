@@ -37,12 +37,48 @@ export default function Mentor() {
   const [messages, setMessages] = useState([
     {
       sender: "mentor",
-      text: "Hello! I am your AI Career Mentor. I analyze your uploaded resume and career goals to provide personalized engineering advice. Upload a resume file or ask a question to begin!"
+      text: "Hey! 👋 I'm your AI Career & Software Development Assistant. Ask me anything about your coding goals, resume, technical concepts, or roadmaps!"
     }
   ]);
   const [chatInput, setChatInput] = useState("");
   const [chatSending, setChatSending] = useState(false);
   const chatBottomRef = useRef(null);
+
+  // Helper to render AI response formatting (markdown bolding, lists, code snippets)
+  const renderMessageContent = (text) => {
+    if (!text) return null;
+    const lines = text.split("\n");
+    return lines.map((line, lIdx) => {
+      // Code snippet block toggle formatting
+      if (line.startsWith("```")) {
+        return <div key={lIdx} style={{ height: "4px" }} />;
+      }
+      
+      // Render line with bolding (**text**)
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      const formattedLine = parts.map((part, pIdx) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return <strong key={pIdx} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+        }
+        return part;
+      });
+
+      if (line.trim().startsWith("- ") || line.trim().startsWith("• ")) {
+        return (
+          <div key={lIdx} style={{ display: "flex", gap: "8px", marginLeft: "8px", marginTop: "4px" }}>
+            <span style={{ color: "var(--primary)", fontWeight: 700 }}>•</span>
+            <span>{formattedLine}</span>
+          </div>
+        );
+      }
+
+      return (
+        <div key={lIdx} style={{ minHeight: line.trim() ? "auto" : "8px", marginBottom: "4px" }}>
+          {formattedLine}
+        </div>
+      );
+    });
+  };
 
   // Resume State
   const [resumeText, setResumeText] = useState("");
@@ -273,28 +309,61 @@ export default function Mentor() {
             </div>
 
             {/* Chat Messages */}
-            <div style={{ flex: 1, overflowY: "auto", paddingRight: "8px", display: "flex", flexDirection: "column", gap: "16px", maxHeight: "420px" }}>
+            <div style={{ flex: 1, overflowY: "auto", paddingRight: "8px", display: "flex", flexDirection: "column", gap: "16px", maxHeight: "440px" }}>
               {messages.map((m, idx) => (
                 <div
                   key={idx}
                   style={{
+                    display: "flex",
+                    gap: "10px",
                     alignSelf: m.sender === "user" ? "flex-end" : "flex-start",
-                    maxWidth: "80%",
-                    background: m.sender === "user" ? "var(--primary)" : "var(--bg-subtle)",
-                    color: m.sender === "user" ? "#FFFFFF" : "#0F172A",
-                    padding: "14px 18px",
-                    borderRadius: m.sender === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    fontSize: "14px",
-                    lineHeight: 1.5,
-                    boxShadow: "var(--shadow)"
+                    maxWidth: "85%",
+                    flexDirection: m.sender === "user" ? "row-reverse" : "row"
                   }}
                 >
-                  {m.text}
+                  <div
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "50%",
+                      background: m.sender === "user" ? "var(--primary)" : "#0F172A",
+                      color: "#FFFFFF",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      flexShrink: 0
+                    }}
+                  >
+                    {m.sender === "user" ? "YOU" : <Brain size={16} />}
+                  </div>
+
+                  <div
+                    style={{
+                      background: m.sender === "user" ? "var(--primary)" : "var(--bg-subtle)",
+                      color: m.sender === "user" ? "#FFFFFF" : "#0F172A",
+                      padding: "14px 18px",
+                      borderRadius: m.sender === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                      fontSize: "14px",
+                      lineHeight: 1.6,
+                      boxShadow: "var(--shadow)",
+                      overflowWrap: "anywhere"
+                    }}
+                  >
+                    {renderMessageContent(m.text)}
+                  </div>
                 </div>
               ))}
               {chatSending && (
-                <div style={{ alignSelf: "flex-start", background: "var(--bg-subtle)", padding: "12px 18px", borderRadius: "18px" }}>
-                  <Spinner size="sm" color="var(--primary)" />
+                <div style={{ display: "flex", gap: "10px", alignSelf: "flex-start" }}>
+                  <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#0F172A", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Brain size={16} />
+                  </div>
+                  <div style={{ background: "var(--bg-subtle)", padding: "12px 18px", borderRadius: "18px", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <Spinner size="sm" color="var(--primary)" />
+                    <span style={{ fontSize: "12px", color: "var(--ink-soft)", fontWeight: 500 }}>AI is thinking...</span>
+                  </div>
                 </div>
               )}
               <div ref={chatBottomRef} />

@@ -213,55 +213,108 @@ async def mentor_chat(
     payload: MentorChatRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Sends message to Socratic AI Career Mentor with resume context & chat history."""
+    """Sends message to natural Conversational AI Mentor with rich user context & multi-turn memory."""
     user_id = int(current_user["sub"])
     msg = payload.message.strip()
     session_id = payload.session_id or "default"
     if not msg:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
+    # 1. Fetch User Profile Data
+    user_rows = await execute_query("SELECT name, email, xp, streak_count FROM users WHERE _id = ?", (user_id,))
+    user_name = "Developer"
+    xp = 0
+    streak = 0
+    if user_rows:
+        u = user_rows[0]
+        user_name = u["name"] or u["email"].split("@")[0] if u.get("email") else "Developer"
+        xp = u["xp"] or 0
+        streak = u["streak_count"] or 0
+
+    # 2. Fetch Resume Intelligence Context
+    resume_rows = await execute_query(
+        "SELECT resume_text, skills_json, experience_level, education FROM user_resumes WHERE user_id = ? ORDER BY _id DESC LIMIT 1",
+        (user_id,)
+    )
+    resume_ctx = "No resume file uploaded yet."
+    if resume_rows:
+        r = resume_rows[0]
+        skills_str = ", ".join(json.loads(r["skills_json"] or "[]"))
+        resume_ctx = (
+            f"Uploaded Resume Profile:\n"
+            f"- Experience Level: {r['experience_level']}\n"
+            f"- Extracted Skills: {skills_str}\n"
+            f"- Education: {r['education']}\n"
+            f"- Resume Content Excerpt: {r['resume_text'][:1200]}"
+        )
+
+    # 3. Fetch Enrolled Roadmaps & Node Progress Context
+    roadmap_rows = await execute_query(
+        "SELECT roadmap_slug, completed_nodes_json, selected_track FROM user_roadmap_progress WHERE user_id = ?",
+        (user_id,)
+    )
+    roadmap_ctx_list = []
+    for rm in roadmap_rows:
+        completed = json.loads(rm["completed_nodes_json"] or "[]")
+        roadmap_ctx_list.append(f"- Roadmap: '{rm['roadmap_slug']}' (Completed Stages/Nodes: {completed}, Track: '{rm['selected_track'] or 'Default'}')")
+    roadmap_ctx = "\n".join(roadmap_ctx_list) if roadmap_ctx_list else "No active roadmap progress logged yet."
+
+    # 4. Fetch Topic Mastery Stats
+    mastered_rows = await execute_query(
+        "SELECT COUNT(*) as cnt FROM user_progress WHERE user_id = ? AND mastery_percent >= 60",
+        (user_id,)
+    )
+    mastered_cnt = mastered_rows[0]["cnt"] if mastered_rows else 0
+
+    # 5. Persist User Message to DB
     await execute_write(
         "INSERT INTO mentor_chat_messages (user_id, session_id, sender, message) VALUES (?, ?, 'user', ?)",
         (user_id, session_id, msg)
     )
 
-    resume_rows = await execute_query(
-        "SELECT resume_text, skills_json, experience_level, education FROM user_resumes WHERE user_id = ? ORDER BY _id DESC LIMIT 1",
-        (user_id,)
-    )
-    resume_ctx = "No resume uploaded yet."
-    if resume_rows:
-        r = resume_rows[0]
-        resume_ctx = f"Resume Summary:\n- Level: {r['experience_level']}\n- Skills: {r['skills_json']}\n- Education: {r['education']}\n\nExcerpts:\n{r['resume_text'][:1500]}"
-
+    # 6. Fetch Multi-Turn Chat History (Last 10 Messages)
     history_rows = await execute_query(
-        "SELECT sender, message FROM mentor_chat_messages WHERE user_id = ? AND session_id = ? ORDER BY _id DESC LIMIT 6",
+        "SELECT sender, message FROM mentor_chat_messages WHERE user_id = ? AND session_id = ? ORDER BY _id DESC LIMIT 10",
         (user_id, session_id)
     )
     history_rows.reverse()
-    history_ctx = "\n".join([f"{h['sender'].upper()}: {h['message']}" for h in history_rows[:-1]])
 
-    prompt = f"""You are a Personal AI Career Mentor & Senior Engineering Director.
-Provide actionable, personalized career guidance.
+    # 7. Construct Conversational System Prompt & Messages Payload
+    system_prompt = f"""You are the Code Empress AI Mentor — a warm, highly intelligent, encouraging, and natural conversational AI software development & career assistant (similar to ChatGPT or Claude, but specialized for software engineering, learning paths, and tech career growth).
 
-=== USER RESUME & PROFILE ===
+=== REAL-TIME USER CONTEXT ===
+- User Name: {user_name} (XP: {xp}, Streak: 🔥 {streak} days, Mastered Topics: {mastered_cnt})
+- Resume Profile:
 {resume_ctx}
+- Enrolled Roadmaps & Progress:
+{roadmap_ctx}
 
-=== CONVERSATION HISTORY ===
-{history_ctx or 'Start of conversation.'}
+=== CONVERSATIONAL BEHAVIOR & PERSONALITY RULES ===
+1. RESPOND NATURALLY & HUMANLY TO ANY USER MESSAGE.
+   - For greetings like "Hi", "Hello", "Good morning" or casual banter: Reply warmly, fluidly, and naturally as a helpful mentor (e.g. "Hey {user_name}! 👋 Great to see you today. What are you working on or hoping to learn?").
+   - NEVER force the user into rigid predefined options, menus, or button choices.
+2. CONTEXT-AWARE — NEVER REPEATEDLY ASK FOR INFORMATION ALREADY AVAILABLE.
+   - You already know their resume skills, target roles, completed topics, and active roadmaps. Refer to them naturally in conversation (e.g. "Since your resume highlights React and Node.js...").
+3. ADAPT RESPONSE LENGTH & FORMATTING TO INTENT:
+   - Greetings or casual questions → Warm, concise, conversational (1-3 sentences).
+   - Technical explanations (e.g. "Explain Flexbox"), code debugging, or interview prep → Provide clear, well-structured Markdown with clean code snippets and bullet points where useful.
+4. CAREER & LEARNING GUIDANCE:
+   - Help naturally with resume improvements, roadmap recommendations, interview prep, skill gap analysis, study planning, code help, and motivation.
+   - Ask engaging, relevant follow-up questions when helpful to keep the conversation flowing naturally."""
 
-=== USER's QUESTION ===
-{msg}
+    messages_payload = [{"role": "system", "content": system_prompt}]
+    for h in history_rows:
+        role = "user" if h["sender"] == "user" else "assistant"
+        messages_payload.append({"role": role, "content": h["message"]})
 
-INSTRUCTIONS:
-- Reference their actual background, skills, and experience level.
-- Be concise (2-3 short paragraphs).
-- Suggest 1 practical next step or resource."""
+    try:
+        res = await ai_engine.generate_completion(messages_payload)
+        reply = res["choices"][0]["message"]["content"]
+    except Exception as e:
+        logger.error(f"AI Chat completion failed: {e}")
+        reply = f"Hey {user_name}! 👋 I'm right here. How can I help you with your coding, resume, or career path today?"
 
-    reply = await call_ai(prompt)
-    if not reply:
-        reply = "I analyzed your question. As your AI Career Mentor, I recommend building a hands-on project to demonstrate your skills."
-
+    # 8. Persist AI Assistant Response to DB
     await execute_write(
         "INSERT INTO mentor_chat_messages (user_id, session_id, sender, message) VALUES (?, ?, 'mentor', ?)",
         (user_id, session_id, reply)
