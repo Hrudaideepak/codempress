@@ -246,11 +246,27 @@ async def upload_resume_file(
 ):
     """Uploads PDF, DOCX, or TXT resume file, extracts text, and triggers dynamic AI analysis."""
     user_id = int(current_user["sub"])
+
+    filename = file.filename or "resume.pdf"
+    allowed_exts = (".pdf", ".docx", ".doc", ".txt", ".csv", ".md")
+    if not filename.lower().endswith(allowed_exts):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format. Allowed extensions: {', '.join(allowed_exts)}"
+        )
+
     file_bytes = await file.read()
     if not file_bytes:
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
-    text = extract_text_from_file_bytes(file_bytes, file.filename or "resume.pdf")
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+    if len(file_bytes) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="File size exceeds maximum allowed limit of 10 MB"
+        )
+
+    text = extract_text_from_file_bytes(file_bytes, filename)
     return await process_and_analyze_resume(text, user_id)
 
 
