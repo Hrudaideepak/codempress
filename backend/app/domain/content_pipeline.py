@@ -114,3 +114,12 @@ def detect_misconceptions(topic_id: int, wrong_answer_index: int) -> Dict[str, s
         "reality": "Re-read the beginner & intermediate explanations to clarify the boundary conditions.",
         "analogy": "Think of it like a strict mathematical function: same input always produces predictable output."
     })
+
+
+class ContentPipeline:
+    def __init__(self):
+        self.generate_hints = generate_progressive_hints
+        self.detect_misconceptions = detect_misconceptions
+
+
+content_pipeline = ContentPipeline()

@@ -172,3 +172,12 @@ def analyze_roadmap_skill_gap(
         daily_learning_plan=daily_plan,
         estimated_hours_remaining=remaining_hours
     )
+
+
+class KnowledgeGraph:
+    def __init__(self):
+        self.ontology_levels = ONTOLOGY_HIERARCHY_LEVELS
+        self.nodes = CORE_KNOWLEDGE_DOMAINS
+
+
+knowledge_graph = KnowledgeGraph()

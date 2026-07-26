@@ -139,3 +139,11 @@ def get_curriculum_sdk_overview() -> Dict[str, Any]:
         "skill_categories": list(MASTER_SKILL_TAXONOMY.keys()),
         "taxonomy": MASTER_SKILL_TAXONOMY
     }
+
+
+class CurriculumSDK:
+    def __init__(self):
+        self.taxonomies = MASTER_SKILL_TAXONOMY
+
+
+curriculum_sdk = CurriculumSDK()
