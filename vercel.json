@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://codempress-backend.onrender.com/api/$1"
+      "destination": "https://codempress.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",

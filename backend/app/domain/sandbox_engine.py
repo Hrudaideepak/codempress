@@ -19,7 +19,7 @@ from backend.app.domain.error_parser import parse_and_sanitize_error
 logger = logging.getLogger("codempress.sandbox_engine")
 
 MAX_OUTPUT_BYTES = 64 * 1024  # 64 KB limit for stdout/stderr
-DEFAULT_TIMEOUT = 1.5          # 1.5 seconds SLA
+DEFAULT_TIMEOUT = 3.5          # 3.5 seconds SLA to account for cloud runner process initialization
 
 def build_execution_command(language: str) -> tuple[list[str], str]:
     """
