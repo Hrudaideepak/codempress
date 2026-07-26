@@ -138,3 +138,47 @@ CREATE TABLE IF NOT EXISTS misconceptions (
     FOREIGN KEY(topic_id) REFERENCES topics(_id) ON DELETE CASCADE
 );
 
+-- 11. User Manual Enrollments Table
+CREATE TABLE IF NOT EXISTS user_enrollments (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    item_type TEXT NOT NULL CHECK(item_type IN ('roadmap', 'subject', 'topic')),
+    item_id TEXT NOT NULL,
+    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, item_type, item_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_enrollments ON user_enrollments(user_id, item_type);
+
+-- 12. User Resumes Table (AI Career Mentor)
+CREATE TABLE IF NOT EXISTS user_resumes (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    resume_text TEXT NOT NULL,
+    skills_json TEXT, -- JSON array of skills
+    experience_level TEXT, -- Junior, Mid, Senior
+    education TEXT,
+    proficiency_json TEXT, -- JSON object: {"Skill": [...], "Score": [...]}
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 13. AI Mentor Chat Messages Table
+CREATE TABLE IF NOT EXISTS mentor_chat_messages (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    session_id TEXT NOT NULL DEFAULT 'default',
+    sender TEXT NOT NULL CHECK(sender IN ('user', 'mentor')),
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_mentor_chat ON mentor_chat_messages(user_id, session_id);
+
+-- 14. User Generated Mentor Roadmaps Table
+CREATE TABLE IF NOT EXISTS user_mentor_roadmaps (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    target_role TEXT NOT NULL,
+    roadmap_json TEXT NOT NULL, -- JSON array of 5 steps with resources & completed status
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+

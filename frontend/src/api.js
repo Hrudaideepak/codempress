@@ -279,6 +279,30 @@ export const api = {
       body: JSON.stringify({ resume_text: resumeText, certifications, target_role: targetRole }),
     }),
   getCustomRoadmapById: (id) => request(`/custom-roadmap/${id}`),
+  uploadMentorResume: (resumeText) =>
+    request("/mentor/resume", {
+      method: "POST",
+      body: JSON.stringify({ resume_text: resumeText }),
+    }),
+  getMentorResume: () => request("/mentor/resume"),
+  getMentorAnalytics: () => request("/mentor/analytics"),
+  sendMentorChat: (message, sessionId = "default") =>
+    request("/mentor/chat", {
+      method: "POST",
+      body: JSON.stringify({ message, session_id: sessionId }),
+    }),
+  getMentorChatHistory: (sessionId = "default") => request(`/mentor/chat/history?session_id=${sessionId}`),
+  generateMentorRoadmap: (targetRole = "AI Software Engineer") =>
+    request("/mentor/roadmap/generate", {
+      method: "POST",
+      body: JSON.stringify({ target_role: targetRole }),
+    }),
+  getMentorRoadmap: () => request("/mentor/roadmap"),
+  toggleMentorStep: (stepId) =>
+    request("/mentor/roadmap/toggle", {
+      method: "POST",
+      body: JSON.stringify({ step_id: stepId }),
+    }),
 };
 
 const QUEUE_KEY = "sf_offline_queue";

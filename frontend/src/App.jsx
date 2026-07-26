@@ -18,6 +18,7 @@ import Quiz from "./pages/Quiz";
 import Profile from "./pages/Profile";
 import Forge from "./pages/Forge";
 import Roadmaps from "./pages/Roadmaps";
+import Mentor from "./pages/Mentor";
 
 function TopBar() {
   const { user, logout } = useAuth();
@@ -100,6 +101,13 @@ function TopBar() {
             style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
           >
             <Compass size={14} /> Roadmaps
+          </Link>
+          <Link
+            to="/mentor"
+            className={`nav-link ${location.pathname === "/mentor" ? "active" : ""}`}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Sparkles size={14} /> AI Mentor
           </Link>
           <Link
             to="/forge"
@@ -336,6 +344,15 @@ function AppShell() {
                   <TopBar />
                   <Roadmaps />
                 </>
+              }
+            />
+            <Route
+              path="/mentor"
+              element={
+                <RequireAuth>
+                  <TopBar />
+                  <Mentor />
+                </RequireAuth>
               }
             />
             <Route
