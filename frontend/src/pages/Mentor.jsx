@@ -315,7 +315,7 @@ export default function Mentor() {
       setMessages((prev) => [...prev, { sender: "mentor", text: res.reply }]);
       soundService.play("levelup");
     } catch (err) {
-      toast.show(err.message || "Failed to reach AI Mentor", "error");
+      toast.push(err.message || "Failed to reach AI Mentor", "error");
     } finally {
       setChatSending(false);
     }
@@ -324,7 +324,7 @@ export default function Mentor() {
   // Upload Plain Resume Text
   const handleUploadResumeText = async () => {
     if (!resumeText.trim()) {
-      toast.show("Please paste or upload your resume first", "warning");
+      toast.push("Please paste or upload your resume first", "warning");
       return;
     }
     soundService.play("click");
@@ -338,10 +338,10 @@ export default function Mentor() {
         scores: res.proficiency?.Score || [],
         experience_level: res.experience_level || "Mid"
       });
-      toast.show("Resume dynamically analyzed & saved to AI Memory!", "success");
+      toast.push("Resume dynamically analyzed & saved to AI Memory!", "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show(err.message || "Failed to analyze resume", "error");
+      toast.push(err.message || "Failed to analyze resume", "error");
     } finally {
       setResumeLoading(false);
     }
@@ -357,7 +357,7 @@ export default function Mentor() {
     setResumeLoading(true);
 
     try {
-      toast.show(`Uploading & parsing ${file.name}...`, "info");
+      toast.push(`Uploading & parsing ${file.name}...`, "info");
       const res = await api.uploadMentorResumeFile(file);
       setResumeProfile(res);
       if (res.resume_text) {
@@ -369,10 +369,10 @@ export default function Mentor() {
         scores: res.proficiency?.Score || [],
         experience_level: res.experience_level || "Mid"
       });
-      toast.show(`Successfully analyzed ${file.name}!`, "success");
+      toast.push(`Successfully analyzed ${file.name}!`, "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show(err.message || "Failed to parse uploaded file", "error");
+      toast.push(err.message || "Failed to parse uploaded file", "error");
     } finally {
       setResumeLoading(false);
     }
@@ -385,10 +385,10 @@ export default function Mentor() {
     try {
       const res = await api.generateMentorRoadmap(targetRoleInput);
       setRoadmap(res);
-      toast.show(`Personalized ${targetRoleInput} Roadmap Generated!`, "success");
+      toast.push(`Personalized ${targetRoleInput} Roadmap Generated!`, "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show(err.message || "Failed to generate career roadmap", "error");
+      toast.push(err.message || "Failed to generate career roadmap", "error");
     } finally {
       setRoadmapLoading(false);
     }
@@ -408,7 +408,7 @@ export default function Mentor() {
   const handleGenerateCoverLetter = async (e) => {
     if (e) e.preventDefault();
     if (!coverJobTitle.trim()) {
-      toast.show("Please enter a target Job Title", "warning");
+      toast.push("Please enter a target Job Title", "warning");
       return;
     }
 
@@ -423,10 +423,10 @@ export default function Mentor() {
         coverDescription.trim()
       );
       setCoverLetter(res.cover_letter);
-      toast.show("AI Cover Letter generated successfully!", "success");
+      toast.push("AI Cover Letter generated successfully!", "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show(err.message || "Failed to generate cover letter", "error");
+      toast.push(err.message || "Failed to generate cover letter", "error");
     } finally {
       setCoverLoading(false);
     }
@@ -438,7 +438,7 @@ export default function Mentor() {
     navigator.clipboard.writeText(coverLetter);
     setCopiedCover(true);
     soundService.play("click");
-    toast.show("Cover Letter copied to clipboard!", "success");
+    toast.push("Cover Letter copied to clipboard!", "success");
     setTimeout(() => setCopiedCover(false), 3000);
   };
 
@@ -452,7 +452,7 @@ export default function Mentor() {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-    toast.show("Cover Letter downloaded!", "info");
+    toast.push("Cover Letter downloaded!", "info");
   };
 
   // Generate Mock Interview Questions
@@ -468,11 +468,11 @@ export default function Mentor() {
       const res = await api.generateInterviewQuestions(interviewRole, interviewDifficulty);
       if (res.questions && res.questions.length > 0) {
         setInterviewQuestions(res.questions);
-        toast.show(`5 Interview Questions generated for ${interviewRole}!`, "success");
+        toast.push(`5 Interview Questions generated for ${interviewRole}!`, "success");
         soundService.play("levelup");
       }
     } catch (err) {
-      toast.show(err.message || "Failed to generate interview questions", "error");
+      toast.push(err.message || "Failed to generate interview questions", "error");
     } finally {
       setQuestionsLoading(false);
     }
@@ -482,7 +482,7 @@ export default function Mentor() {
   const handleSubmitInterviewAnswer = async (e) => {
     if (e) e.preventDefault();
     if (!userAnswerText.trim()) {
-      toast.show("Please enter your answer before submitting", "warning");
+      toast.push("Please enter your answer before submitting", "warning");
       return;
     }
 
@@ -509,10 +509,10 @@ export default function Mentor() {
         }
       }));
 
-      toast.show(`Response Evaluated! Score: ${res.score}/100`, "success");
+      toast.push(`Response Evaluated! Score: ${res.score}/100`, "success");
       soundService.play("levelup");
     } catch (err) {
-      toast.show(err.message || "Failed to evaluate answer", "error");
+      toast.push(err.message || "Failed to evaluate answer", "error");
     } finally {
       setEvaluatingLoading(false);
     }
