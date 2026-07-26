@@ -102,7 +102,7 @@ async def get_all_user_progress(current_user: dict = Depends(get_current_user)):
 
     # Fetch Roadmap Node Progress records
     rm_rows = await execute_query(
-        "SELECT roadmap_slug, completed_nodes_json, selected_track, current_node_id, updated_at FROM user_roadmap_progress WHERE user_id = ?",
+        "SELECT roadmap_slug, completed_nodes_json, selected_track, last_node_id, updated_at FROM user_roadmap_progress WHERE user_id = ?",
         (user_id,)
     )
     roadmaps_progress = {}
@@ -110,7 +110,7 @@ async def get_all_user_progress(current_user: dict = Depends(get_current_user)):
         roadmaps_progress[r["roadmap_slug"]] = {
             "completed_nodes": json.loads(r["completed_nodes_json"] or "[]"),
             "selected_track": r["selected_track"] or "",
-            "current_node_id": r["current_node_id"] or "",
+            "last_node_id": r["last_node_id"] or "",
             "updated_at": r["updated_at"]
         }
 
@@ -174,12 +174,12 @@ async def save_roadmap_progress(
 
     if rows:
         await execute_write(
-            "UPDATE user_roadmap_progress SET completed_nodes_json = ?, current_node_id = ?, updated_at = CURRENT_TIMESTAMP WHERE _id = ?",
+            "UPDATE user_roadmap_progress SET completed_nodes_json = ?, last_node_id = ?, updated_at = CURRENT_TIMESTAMP WHERE _id = ?",
             (json.dumps(completed), payload.node_id or "", rows[0]["_id"])
         )
     else:
         await execute_write(
-            "INSERT INTO user_roadmap_progress (user_id, roadmap_slug, completed_nodes_json, current_node_id) VALUES (?, ?, ?, ?)",
+            "INSERT INTO user_roadmap_progress (user_id, roadmap_slug, completed_nodes_json, last_node_id) VALUES (?, ?, ?, ?)",
             (user_id, payload.roadmap_slug, json.dumps(completed), payload.node_id or "")
         )
 

@@ -1351,9 +1351,8 @@ html, body {
   overflow-x: hidden !important;
 }
 
-pre, code, table, textarea, input, select, button, img, iframe, video {
+pre, code, table, textarea, input, select, img, iframe, video {
   max-width: 100% !important;
-  word-break: break-word !important;
   overflow-wrap: anywhere !important;
 }
 
@@ -1362,45 +1361,102 @@ pre, code {
   word-break: break-all !important;
 }
 
-.container, main, .roadmaps-page, .library-page, .subject-page, .topic-reader-page {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-}
-
+/* Tablet breakpoint (≤ 1024px) */
 @media (max-width: 1024px) {
-  .top-bar-nav {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
+  .topbar {
+    padding: 12px 16px !important;
+  }
+
+  .topbar-right {
+    gap: 6px !important;
+  }
+
+  .stat-pills {
+    display: none !important;
+  }
+
+  .brand-text {
+    font-size: 16px !important;
   }
 }
 
+/* Mobile breakpoint (≤ 768px) */
 @media (max-width: 768px) {
   h1 { font-size: 24px !important; }
   h2 { font-size: 20px !important; }
   h3 { font-size: 17px !important; }
   h4 { font-size: 15px !important; }
 
-  .glass-panel {
-    padding: 20px 16px !important;
-    border-radius: 16px !important;
+  .topbar {
+    padding: 10px 12px !important;
+    gap: 8px !important;
   }
 
+  .topbar-right {
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide text in nav links, show only icons on mobile */
+  .nav-link {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+    gap: 4px !important;
+  }
+
+  .brand {
+    gap: 8px !important;
+    font-size: 16px !important;
+  }
+
+  .brand img {
+    height: 28px !important;
+    width: 28px !important;
+  }
+
+  .logout-btn span {
+    display: none !important;
+  }
+
+  .glass-panel {
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Touch-friendly button min-height */
   button {
     min-height: 40px !important;
   }
 
-  div[style*="gridTemplateColumns: 1fr 340px"],
-  div[style*="gridTemplateColumns: 1fr 1fr"],
-  div[style*="grid-template-columns: 1fr 340px"],
-  div[style*="grid-template-columns: 1fr 1fr"],
-  div[style*="gridTemplateColumns: 280px 1fr"] {
-    grid-template-columns: 1fr !important;
+  /* Cards responsive padding */
+  .card {
+    padding: 16px !important;
+  }
+
+  .pill {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* Roadmap page padding */
+  .roadmaps-page {
+    padding: 16px 12px 60px !important;
+  }
+
+  /* User chip compact */
+  .user-chip {
+    gap: 6px !important;
+  }
+
+  .user-avatar {
+    width: 28px !important;
+    height: 28px !important;
   }
 }
 
+/* Small phone breakpoint (≤ 480px) */
 @media (max-width: 480px) {
   body {
     font-size: 13.5px;
@@ -1408,5 +1464,23 @@ pre, code {
 
   h1 { font-size: 21px !important; }
   h2 { font-size: 18px !important; }
-}
 
+  .topbar {
+    padding: 8px 10px !important;
+  }
+
+  .brand-text {
+    display: none !important;
+  }
+
+  .nav-link {
+    font-size: 11px !important;
+    padding: 6px 6px !important;
+  }
+
+  /* Make modals edge-to-edge on very small screens */
+  .glass-panel {
+    padding: 14px 10px !important;
+    border-radius: 12px !important;
+  }
+}

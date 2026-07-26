@@ -302,7 +302,7 @@ export default function Roadmaps() {
           <p style={{ fontSize: "16px" }}>No roadmaps match your search filter.</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
           {filteredRoadmaps.map((rm) => (
             <div
               key={rm.id}

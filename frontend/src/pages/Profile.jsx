@@ -281,7 +281,7 @@ export default function Profile() {
             </Button>
           </Card>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
             {myEnrolledRoadmaps.map((rm) => (
               <Card key={rm.slug} glass padding="20px" style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div>
@@ -323,7 +323,7 @@ export default function Profile() {
       {/* Subject Progress Breakdown */}
       <div>
         <h2 style={{ fontSize: "22px", color: "#0F172A", marginBottom: "16px" }}>Subject Progress</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
           {subjects.map((sub) => (
             <Card key={sub.name} glass padding="20px">
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>

@@ -106,3 +106,41 @@ async def test_auth_production_enforcement(monkeypatch):
         response = await ac.get("/api/auth/me")
     assert response.status_code == 401
     assert "credentials are required" in response.json()["detail"]
+
+@pytest.mark.anyio
+async def test_user_roadmap_progress_sync():
+    """Verify GET /api/progress/all and POST /api/progress/roadmap/save endpoints."""
+    token = create_jwt_token(1, "arjun@example.com", "Arjun Kumar (Dev)")
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        save_resp = await ac.post(
+            "/api/progress/roadmap/save",
+            headers=headers,
+            json={
+                "roadmap_slug": "frontend-engineer",
+                "completed_nodes": ["m1", "m2"],
+                "selected_track": "frontend"
+            }
+        )
+        assert save_resp.status_code == 200
+        save_data = save_resp.json()
+        assert save_data["status"] == "success"
+
+        get_resp = await ac.get("/api/progress/all", headers=headers)
+        assert get_resp.status_code == 200
+        get_data = get_resp.json()
+        assert "roadmaps_progress" in get_data
+        assert "frontend-engineer" in get_data["roadmaps_progress"]
+        assert get_data["roadmaps_progress"]["frontend-engineer"]["completed_nodes"] == ["m1", "m2"]
+
+@pytest.mark.anyio
+async def test_scoped_roadmap_stage_endpoint():
+    """Verify GET /api/roadmaps/:slug/stage/:stage_id returns stage topics."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.get("/api/roadmaps/frontend-engineer/stage/m1")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["roadmap_slug"] == "frontend-engineer"
+    assert "stage" in data
+

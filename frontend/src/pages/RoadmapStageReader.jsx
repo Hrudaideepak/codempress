@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useIsMobile } from "../utils/useIsMobile";
 import { useParams, useNavigate } from "react-router-dom";
 import { STATIC_ROADMAPS } from "../data/staticRoadmaps";
 import { soundService } from "../services/soundService";
@@ -20,6 +21,7 @@ import InteractiveCodeSandbox from "../components/InteractiveCodeSandbox";
 export default function RoadmapStageReader() {
   const { slug, stageId } = useParams();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const [roadmap, setRoadmap] = useState(null);
   const [stage, setStage] = useState(null);
@@ -119,7 +121,7 @@ export default function RoadmapStageReader() {
       </div>
 
       {/* Main Scoped Content Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: topics.length > 1 ? "280px 1fr" : "1fr", gap: "24px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile || topics.length <= 1 ? "1fr" : "280px 1fr", gap: "24px" }}>
         {/* Topic Selector Sidebar */}
         {topics.length > 1 && (
           <Card padding="16px" style={{ height: "fit-content" }}>

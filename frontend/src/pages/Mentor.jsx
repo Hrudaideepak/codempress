@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useIsMobile } from "../utils/useIsMobile";
 import { api } from "../api";
 import { useToast } from "../ToastContext";
 import { soundService } from "../services/soundService";
@@ -29,6 +30,7 @@ import Spinner from "../components/ui/Spinner";
 
 export default function Mentor() {
   const toast = useToast();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("chat"); // 'chat', 'resume', 'analytics', 'roadmap'
 
   // Chat State
@@ -198,7 +200,7 @@ export default function Mentor() {
   };
 
   return (
-    <div style={{ maxWidth: "1240px", margin: "0 auto", paddingBottom: "80px" }}>
+    <div style={{ maxWidth: "1240px", margin: "0 auto", padding: isMobile ? "0 12px 80px" : "0 0 80px", boxSizing: "border-box" }}>
       {/* Hero Header */}
       <div
         className="glass-panel"
@@ -259,7 +261,7 @@ export default function Mentor() {
 
       {/* TAB 1: AI MENTOR CHAT */}
       {activeTab === "chat" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: "24px" }}>
           {/* Chat Window */}
           <Card padding="24px" style={{ minHeight: "560px", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "16px", borderBottom: "1px solid var(--border)", marginBottom: "20px" }}>
@@ -378,7 +380,7 @@ export default function Mentor() {
 
       {/* TAB 2: RESUME PROFILE & FILE UPLOAD */}
       {activeTab === "resume" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "24px" }}>
           <Card padding="24px">
             <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", color: "#0F172A" }}>📄 Resume Upload & Text Parser</h3>
             <p style={{ fontSize: "13px", color: "var(--ink-soft)", marginBottom: "20px" }}>

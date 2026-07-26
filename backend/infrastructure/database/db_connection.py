@@ -32,9 +32,9 @@ _local = threading.local()
 
 def ensure_database_seeded():
     """Ensure database directory, tables, and curriculum topics exist automatically."""
+    DB_DIR.mkdir(parents=True, exist_ok=True)
     if not DB_PATH.exists() or DB_PATH.stat().st_size == 0:
         logger.info(f"Database missing at {DB_PATH}. Initializing schema and curriculum topics...")
-        DB_DIR.mkdir(parents=True, exist_ok=True)
         try:
             from content.seed_topics import init_and_seed_db
             init_and_seed_db()
@@ -47,6 +47,24 @@ def ensure_database_seeded():
                 conn.executescript(schema_path.read_text(encoding="utf-8"))
             conn.commit()
             conn.close()
+
+    # Ensure all tables defined in schema exist in DB file
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS user_roadmap_progress (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            roadmap_slug TEXT NOT NULL,
+            completed_nodes_json TEXT NOT NULL DEFAULT '[]',
+            selected_track TEXT,
+            last_node_id TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(_id) ON DELETE CASCADE,
+            UNIQUE(user_id, roadmap_slug)
+        );
+    """)
+    conn.commit()
+    conn.close()
 
 def get_db_connection() -> sqlite3.Connection:
     """Returns a thread-local SQLite connection, creating and seeding it if needed."""
