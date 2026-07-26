@@ -107,21 +107,14 @@ export function ToastProvider({ children }) {
 
 export const useToast = () => {
   const context = useContext(ToastContext);
-  if (!context) {
-    return {
-      push: () => {},
-      show: () => {},
-      success: () => {},
-      error: () => {},
-      info: () => {}
-    };
-  }
-  const showFn = context.show || context.push;
-  return {
-    push: showFn,
-    show: showFn,
-    success: (msg) => showFn(msg, "success"),
-    error: (msg) => showFn(msg, "error"),
-    info: (msg) => showFn(msg, "info")
-  };
+  const showFn = context?.show || context?.push || (() => {});
+
+  const toastHandler = (message, type = "success") => showFn(message, type);
+  toastHandler.push = showFn;
+  toastHandler.show = showFn;
+  toastHandler.success = (msg) => showFn(msg, "success");
+  toastHandler.error = (msg) => showFn(msg, "error");
+  toastHandler.info = (msg) => showFn(msg, "info");
+
+  return toastHandler;
 };

@@ -87,11 +87,11 @@ export default function RoadmapTailored() {
       await api.saveRoadmapProgress(skeleton?.slug || roadmapId, nodeId, nextCompleted);
       if (!completedNodes.includes(nodeId)) {
         soundService.play("levelup");
-        toast.show("Stage completed! XP & Cross-Device Progress Saved.", "success");
+        toast.push("Stage completed! XP & Cross-Device Progress Saved.", "success");
       }
     } catch (err) {
       console.error("Failed to sync node progress:", err);
-      toast.show("Progress saved locally (network sync pending)", "info");
+      toast.push("Progress saved locally (network sync pending)", "info");
     }
   };
 
@@ -110,7 +110,7 @@ export default function RoadmapTailored() {
       );
       setModuleData(res);
     } catch (err) {
-      toast.show("Failed to lazy load stage content. Using offline template.", "warning");
+      toast.push("Failed to lazy load stage content. Using offline template.", "warning");
     } finally {
       setModuleLoading(false);
     }

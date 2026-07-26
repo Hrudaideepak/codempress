@@ -64,7 +64,7 @@ export default function RoadmapDetail() {
     localStorage.setItem("sf_enrolled_roadmaps", JSON.stringify(updatedLocal));
 
     api.toggleEnrollment("roadmap", slug).catch(() => {});
-    toast.show(
+    toast.push(
       next
         ? `Enrolled in ${roadmap?.title || "Career Roadmap"}!`
         : `Unenrolled from ${roadmap?.title || "Career Roadmap"}`,
