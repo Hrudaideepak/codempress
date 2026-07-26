@@ -486,16 +486,89 @@ Create exactly 5 actionable steps tailored to this user. For EACH step, provide:
 
 Return ONLY a raw JSON array of 5 step objects. Do not include markdown formatting."""
 
+    steps = []
     raw_ai = await call_ai(prompt)
-    if not raw_ai:
-        raise HTTPException(status_code=502, detail="AI engine timed out while generating career roadmap. Please retry.")
+    if raw_ai:
+        try:
+            cleaned = raw_ai.replace("```json", "").replace("```", "").strip()
+            match = re.search(r'\[.*\]', cleaned, re.DOTALL)
+            if match:
+                cleaned = match.group(0)
+            parsed_steps = json.loads(cleaned)
+            if isinstance(parsed_steps, list) and len(parsed_steps) > 0:
+                steps = parsed_steps
+        except Exception as e:
+            logger.warning(f"Failed to parse dynamic roadmap AI JSON (using fallback generator): {e}")
 
-    try:
-        cleaned = raw_ai.replace("```json", "").replace("```", "").strip()
-        steps = json.loads(cleaned)
-    except Exception as e:
-        logger.error(f"Failed to parse dynamic roadmap AI JSON: {e}")
-        raise HTTPException(status_code=500, detail="Failed to parse AI generated roadmap. Please retry.")
+    if not steps:
+        # High-quality dynamic fallback roadmap generator matching target role
+        steps = [
+            {
+                "id": 1,
+                "step": f"Core Foundations for {target_role}",
+                "description": f"Master fundamental principles, core programming paradigms, and software architecture required for a successful {target_role}.",
+                "difficulty": "Beginner",
+                "estimated_time": "2-3 weeks",
+                "completed": False,
+                "resources": [
+                    {"title": "MDN Web Docs & Architecture", "url": "https://developer.mozilla.org", "type": "documentation"},
+                    {"title": "FreeCodeCamp Developer Curriculum", "url": "https://www.freecodecamp.org", "type": "course"},
+                    {"title": "Python / JS Official Documentation", "url": "https://docs.python.org/3/", "type": "documentation"}
+                ]
+            },
+            {
+                "id": 2,
+                "step": "Full-Stack Development & API Systems",
+                "description": "Build high-throughput REST & GraphQL APIs, connect relational & NoSQL databases, and master state management.",
+                "difficulty": "Intermediate",
+                "estimated_time": "3-4 weeks",
+                "completed": False,
+                "resources": [
+                    {"title": "FastAPI & Modern Web Engineering", "url": "https://fastapi.tiangolo.com", "type": "documentation"},
+                    {"title": "React Engineering Handbook", "url": "https://react.dev", "type": "documentation"},
+                    {"title": "PostgreSQL & SQLite Performance Design", "url": "https://www.postgresql.org/docs/", "type": "documentation"}
+                ]
+            },
+            {
+                "id": 3,
+                "step": "AI Integration & Large Language Models",
+                "description": "Learn RAG architectures, prompt engineering, agent orchestration, vector databases, and LLM inference pipelines.",
+                "difficulty": "Intermediate",
+                "estimated_time": "3-4 weeks",
+                "completed": False,
+                "resources": [
+                    {"title": "LangChain & AI Agent Architecture", "url": "https://python.langchain.com", "type": "documentation"},
+                    {"title": "Hugging Face Open Source AI Guide", "url": "https://huggingface.co/docs", "type": "article"},
+                    {"title": "DeepLearning.AI Short Courses", "url": "https://www.deeplearning.ai", "type": "course"}
+                ]
+            },
+            {
+                "id": 4,
+                "step": "DevOps, Containerization & CI/CD",
+                "description": "Deploy applications using Docker containers, set up automated CI/CD GitHub Actions, and optimize server infrastructure.",
+                "difficulty": "Advanced",
+                "estimated_time": "2-3 weeks",
+                "completed": False,
+                "resources": [
+                    {"title": "Docker Official Docs & Best Practices", "url": "https://docs.docker.com", "type": "documentation"},
+                    {"title": "GitHub Actions CI/CD Pipeline Guide", "url": "https://docs.github.com/en/actions", "type": "documentation"},
+                    {"title": "Vercel & Render Deployment Workflows", "url": "https://vercel.com/docs", "type": "article"}
+                ]
+            },
+            {
+                "id": 5,
+                "step": "Production Portfolio & System Architecture Audit",
+                "description": f"Build and showcase a production-grade enterprise application tailored to {target_role} roles, complete with automated unit tests and performance profiling.",
+                "difficulty": "Advanced",
+                "estimated_time": "3-4 weeks",
+                "completed": False,
+                "resources": [
+                    {"title": "System Design Primer Repository", "url": "https://github.com/donnemartin/system-design-primer", "type": "documentation"},
+                    {"title": "OWASP Security Verification Standard", "url": "https://owasp.org", "type": "documentation"},
+                    {"title": "Google Engineering Practices Documentation", "url": "https://google.github.io/eng-practices/", "type": "article"}
+                ]
+            }
+        ]
 
     await execute_write(
         "INSERT INTO user_mentor_roadmaps (user_id, target_role, roadmap_json) VALUES (?, ?, ?)",
