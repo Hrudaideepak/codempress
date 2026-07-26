@@ -138,3 +138,11 @@ cd .. && antigravity --project .
 - **Frontend** `VITE_GOOGLE_CLIENT_ID` (`.env`) is the Google Client ID. **Backend** `GOOGLE_CLIENT_ID` env var must match (audience check). `JWT_SECRET` env var overrides the dev default.
 - Landing page (`frontend/src/pages/Landing.jsx`) gates the app: no token → Landing with Google button; valid token → Library. Logout clears `localStorage`.
 - User records live in the `users` table (google_sub unique). Backend `USER_ID` hardcoded constant removed in favor of JWT `sub`.
+
+## Learned Production Guidelines & Architecture Rules
+
+- **Database DDL Auto-Migrations**: `db_connection.py:ensure_database_seeded()` executes `CREATE TABLE IF NOT EXISTS` and `ALTER TABLE ADD COLUMN` queries automatically on backend boot to keep SQLite database instances in sync with `database/schema.sql` (e.g. `user_roadmap_progress` requires `last_node_id` & `current_node_id`).
+- **Sandbox Execution Standard**: Node.js snippet execution in `sandbox_engine.py` runs via `node -e "<code>"` (never `node -` via stdin) to prevent EOF race conditions and process hangs on Linux & CI runners.
+- **Conversational AI Assistant**: The AI Chat endpoint `/api/mentor/chat` operates as a natural conversational AI assistant (ChatGPT/Claude style). It automatically ingests user profile stats, resume intelligence, active roadmaps, and mastered topics count into the system prompt.
+- **Zero Horizontal Scroll Mobile Layout**: All frontend views enforce `max-width: 100vw; overflow-x: hidden !important;`. Two-column grid layouts collapse to single-column responsive stacks on viewports `< 768px` using `useIsMobile`.
+
