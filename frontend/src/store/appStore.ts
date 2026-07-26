@@ -105,3 +105,13 @@ export const useAppStore = create<AppState>()(
       }),
   }))
 );
+
+// ---------------------------------------------------------------------------
+// Granular Selectors (Prevents broad re-renders)
+// ---------------------------------------------------------------------------
+export const selectUser = (state: AppState) => state.user;
+export const selectXP = (state: AppState) => state.xp;
+export const selectLevel = (state: AppState) => state.level;
+export const selectTopicProgressMap = (state: AppState) => state.topicProgress;
+export const selectCurrentTopicId = (state: AppState) => state.currentTopicId;
+
